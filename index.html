@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .info,
+    .contact-info {
+      margin-bottom: 20px;
+      font-size: 14px;
+      /* 改为稍大字体 */
+    }
+
+    .contact-info a {
+      font-size: 14px;
+      /* 改为稍大字体 */
+    }
+
+    .info {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 10px auto;
+    }
+
+    th,
+    td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th:nth-child(1),
+    th:nth-child(2),
+    td:nth-child(1),
+    td:nth-child(2) {
+      text-align: center;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    a {
+      text-decoration: underline;
+      color: #007bff;
+    }
+
+    a:hover {
+      color: #0056b3;
+    }
+
+    select,
+    input[type="text"] {
+      width: calc(45% - 5px);
+      padding: 6px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    .search-container {
+      display: flex;
+      margin-top: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    td:nth-child(3) {
+      font-size: 12px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      white-space: nowrap;
+    }
+
+    td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .video,
+    .video+span {
+      color: #edb40b;
+    }
+
+    .audio,
+    .audio+span {
+      color: #f7977f;
+    }
+
+    .green,
+    .green+span {
+      color: #008000;
+    }
+
+    .highlighted-text {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .responsive-img {
+      max-width: 50%;
+      /* 调整为原大小的50% */
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+      gap: 10px;
+      /* 增加输入框和按钮之间的间距 */
+    }
+
+    .search-container input {
+      width: 250px;
+      /* 固定输入框宽度 */
+      padding: 8px;
+      /* 增加输入框的内边距 */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-container button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      /* 将按钮大小缩小三分之一 */
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-container button:hover {
+      background-color: #0056b3;
+    }
+
+    /* 上面的搜索框单独样式 */
+    .search-container:first-of-type input {
+      width: auto;
+      /* 设置为自动宽度 */
+      padding: 5px 10px;
+      /* 使其与按钮的内边距一致 */
+      font-size: 12px;
+      /* 调整字体大小 */
+    }
+
+    .search-container:first-of-type button {
+      padding: 5px 10px;
+      /* 与输入框保持一致 */
+    }
+
+    hr {
+            border: 0;
+            height: 2px;
+            background-color: #ccc;
+            margin: 20px 0;
+        }
+  </style>
+</head>
+
+<body>
+  <h1>雨恋女陪殿</h1>
+
+  <p><b style="color: red;">认证企业微信！！</b>所有雨恋号置顶都是企微接待，已有被骗重点提醒！</p>
+  <P>如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！</P>
+  <img class="responsive-img" src="quan.png" alt="雨恋福利号" />
+
+  <div class="highlighted-text">
+    <p><b>营业时间：</b>全天24小时（上午的话人不多）</p>
+    <p><b style="color: red;">点视频选人：</b><a href="twitter://user?screen_name=yulian_sp11">点击跳转twi推特！！</a></p>
+    <p><b style="color: red;">点磕炮选人：</b><a href="twitter://user?screen_name=yulian_kp">点击跳转twi推特！！</a></p>
+    <p><b style="color: red;">雨恋的抖音：</b><a href="snssdk1128://user/profile/3556293545828612?refer=web">点击跳转雨恋抖音！！</a></p>
+
+    <!-- 搜索框和按钮 -->
+    <!-- <div class="search-container">
+      <input type="text" id="nickname" placeholder="请输入昵称（如小琪）" />
+      <button onclick="searchTwitter()">点击跳转推看她好评</button>
+    </div> -->
+
+    <p>入门就是加陪陪好友位，下单直接找她也会更便宜！，陪陪有权不回消息拒绝下单请求，陪陪个人预存清空 陪陪自愿保留好友位！<b style="color: red;">私下大额消费请理性</b>，产生情感纠纷请勿骚扰客服，<b style="color: red;">否则只能全局黑名单</b></p>
+
+  <button onclick="toggleInfo()">陪陪/项目 说明（点击展开/关闭）</button>
+
+  <div class="info">
+    <p><b><span class="video">视频陪</span>：</b>都是黄色字体，主接非绿视频，其他线上基本都能接</p>
+    <p><b><span class="audio">女喘陪</span>：</b>都是红色字体，主接磕炮，其他线上语音类的都能接</p>
+    <p><b><span class="green">绿色陪</span>：</b>都是绿色字体，只接纯绿色的单子，要搞颜色的别找</p>
+
+    <hr>
+
+    <p><b><span class="green">身材/腿</span>：</b>看身材/腿，不漏点的视频，露脸的会另外说明</p>
+    <p><b><span class="video">视频单</span>：</b>需先入门，普通非绿视频除露脸可漏点全身，其他露脸、选丝袜衣服道具、插入等等都也是另外加钱</p>
+    <p><b><span class="audio">泡泡</span>：</b>磕炮/kp（不懂百度）是语音，不互动不会k每10分钟少2分钟，远控、水声、狗叫等等也是另外加钱</p>
+    <p><b><span class="audio">ts语聊/游戏</span>：</b>聊骚不带喘不磕</p>
+    <p><b><span class="green">语聊</span>：</b>纯绿色聊天，称呼没有老公、更没有爸爸之类</p>
+    <p><b><span class="green">扣字</span>：</b>纯绿色打字聊天，觉得冷淡聊天不回打钱就是说文字聊天单</p>
+
+    <hr>
+
+    <p><b style="color: red;">套餐组合：</b>就两个项目加一起。如ts语聊+泡泡（聊骚0.5h+10分kp）、身材/腿k（看身材/看腿+kp）</p>
+
+  </div>
+
+  <div class="search-container">
+    <select id="tagSelect" onchange="filterByTag()">
+      <option value="视频陪">视频陪</option>
+      <option value="女喘陪">女喘陪</option>
+      <option value="绿色陪">绿色陪</option>
+    </select>
+
+    <input type="text" id="keywordInput" placeholder="关键字搜索" oninput="filterByKeyword()">
+  </div>
+
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th>昵称</th>
+        <th>社媒</th>
+        <th>介绍</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.巴掌印</td>
+        <td><a href="twitter://user?screen_name=">twi</a></td>
+        <td>是雨恋-喵（客服）🚪168（送kp10分+私v），极品少御音 清纯女大；kp66/10分（远控、水声、打屁股、剧情+15、狗叫+20）；ts语聊88/30分；ts手游88/30分；语聊52/30分；入门解锁音频定制、ts读文/哄睡、照片定制…</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小丸</td>
+        <td><a href="twitter://status?id=1843405916143792409">twi</a></td>
+        <td>🚪148（送kp10分钟）少女少萝，kp60/10分；ts语聊60/30分；ts端游70/30分；语聊30/30分；手游25/30分；端游35/30分；虚恋52/30分</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小绵</td>
+        <td><a href="twitter://status?id=1881633016507986228">twi</a></td>
+        <td>🚪188（送视频单10分）少女少萝音 白幼瘦天花板；kp66/10分（远程+22、水声、打屁股、狗叫、剧情+15）；ts语聊88/30分；语聊66/30分；入门解锁音频定制，更多穿搭衣服道具福利项目选择</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.心动</td>
+        <td><a href="twitter://status?id=1794046887986893258">twi</a></td>
+        <td>🚪168（送kp+远控十分钟）kp+远控60/10，语聊45、哄睡66、王者35</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小兔</td>
+        <td><a href="twitter://status?id=1882449921535811899">twi</a></td>
+        <td>🚪168（送腿+k10分），温柔少女音；腿+k75/10分；语聊52/30分；入门解锁漏视，还接游戏陪玩/哄睡/磕炮/音频定制/电子女友</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.乖</td>
+        <td><a href="twitter://status?id=1875185765476717004">twi</a></td>
+        <td>🚪148（送kp10分）少御音 温柔姐姐；k66/10分（远控剧情水声+15、狗叫打屁股＋20）ts语聊99/30分；ts手游99/局；文爱88/30分；音频定制15/分；语聊66/30分；入门解锁甜蜜哄睡叫醒；虚拟恋人；隐藏相册</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小琪</td>
+        <td><a href="twitter://user?screen_name=mgxiaoqi52">twi</a></td>
+        <td>雨恋-小琪(店长）🚪198（送十分钟视频单+私v）少女少萝音、三坑少女（36e)有很多小裙子和cos 服 白虎 🦋粉粉哒 冷白皮 童颜巨乳  情绪价值拉满的电子女友；语聊52/30分；入门解锁露脸、cos、各种小裙子、丝袜、小玩具、喷水等等…… 全能情商高🤍</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小艾</td>
+        <td><a href="twitter://status?id=1848293131856294226">twi</a></td>
+        <td>🚪200（送视频单10min），kp66r，身材很好少女音妹妹，入门直接解锁视频更多情趣衣服，道具、照片视频定制</td>
+      </tr>
+      <tr class="green" data-tags="绿色陪">
+        <td>𝙔𝙡.十四</td>
+        <td><a href="snssdk1128://user/profile/2344603512223604?refer=web">dy</a></td>
+        <td>🚪138（送20分钟语聊 pyq百加照片等你看），极品少女音 18岁甜妹 喜欢拍照 更新快 人美声甜 想陪你；语聊40/30分 66/小时 虚恋52/30分 99/小时  哄睡52/30分 99/小时 游戏30/30分 52/小时 绿色视频 66/10分（基本上绿色都接嘟）；入门解锁pyq百➕照片 绿脸绿视</td>
+      </tr>
+      <tr class="green" data-tags="绿色陪">
+        <td>𝙔𝙡.小排骨</td>
+        <td><a href="snssdk1128://user/profile/?refer=web">dy</a></td>
+        <td>🚪138送半小时语聊，接连麦/王者/瓦罗兰特/永劫</td>
+      </tr>
+      <tr class="green" data-tags="绿色陪">
+        <td>𝙔𝙡.小卿</td>
+        <td><a href="snssdk1128://aweme/detail/">dy</a></td>
+        <td>🚪148（送半小时语聊）少女音 语聊36/30分；虚恋52/30分；王者30/30分；可接举牌</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小熊</td>
+        <td><a href="twitter://status?id=1844994161197646129">twi</a></td>
+        <td>🚪188（送视频单10分）165/88白瘦少御身材，入门解锁定制图视频 衣服丝袜 🐳等</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小气鬼</td>
+        <td><a href="twitter://status?id=1854231389811757113">twi</a></td>
+        <td>🚪198（送视频单10分）少女少御音 全能bt小气鬼三通少女；kp60/10分；ts语聊99/30分；ts手游（王者、金铲铲）108/30分；语聊52/30分；入门解锁视频假🐔+50、肛塞尾巴+50、风油精+60、喷水+80、爆菊+120等项目和露脸、定制照片视频等</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.慢慢</td>
+        <td><a href="twitter://status?id=1813601751104458962">twi</a></td>
+        <td>🚪188/238（送视频单10min，238的露脸）,06大胸无毛白虎/接视频11/照片视频定制</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小面包</td>
+        <td><a href="twitter://status?id=1794674008618918106">twi</a></td>
+        <td>🚪138（送磕10min） 接磕炮/定制音频/王者/哄睡</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.mio</td>
+        <td><a href="twitter://user?screen_name=miomio_tot">twi</a></td>
+        <td>🚪300（送福利照片视频）,接视频11(需要入门预约时间)，照片视频定制，接游戏陪玩(金铲铲 瓦 云顶 还有别的一些steam游戏)</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.水桃</td>
+        <td><a href="twitter://user?screen_name=shuitao626">twi</a></td>
+        <td>🚪188/388/520（送福利音频、视频）接磕炮，举牌，照片视频定制</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.软软</td>
+        <td><a href="twitter://user?screen_name=_sanzang">twi</a></td>
+        <td>🚪200(送涩涩福利视频）/🚪238（送视频单10分）无毛白虎叫的骚 露脸清纯反差好看 少萝天花板 御萝双修 朋友圈日更 入门解锁超多福利 更多门槛门后解锁门槛越高福利越多越好  情绪价值满满的女友 kp66/10（剧情/水声/狗叫/调教单卡➕15） 遥控小怪兽➕50  语聊52/30分 ts语聊66/30分 ts手游 王者荣耀77/30分 哄睡66/30分 入门解锁视频附加项 （高跟鞋丝袜项圈➕20） （乳夹 项圈 口球 拉珠内裤  手脚铐 剧情调教自嗨➕30）  情趣内衣35 jk40 洛丽塔50 道具 50（可以选） 远程小怪兽跳蛋60 乳交/足交假j 60  cos服90  尿尿100喷水188  洗澡/炮机200  可接（入🚪报价）语音定制kp 视频定制连麦看片 等等入股不亏</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.尤尤</td>
+        <td><a href="twitter://status?id=1795399343719272568">twi</a></td>
+        <td>🚪188送视频单十分🚪288送视频单十分+图片+小视频，入门解锁视频定制系列和视频选衣服，道具，玩具玻璃棒、假🐔、远程跳蛋等等（温柔少女一枚）</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.摆烂</td>
+        <td><a href="twitter://status?id=1816501417370333204">twi</a></td>
+        <td>🚪188（送视频单10分）,少萝音 萝莉身材 极品白虎；入门解锁假j肛塞手铐脚链乳夹等道具喷水爆菊/cos制服jk汉服洛丽塔旗袍/牛奶湿身洗澡/ 项目多服务好 长的好看 保证宝宝 看了一次 还想看 第二次</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.鹿鹿</td>
+        <td><a href="twitter://status?id=1796167924111081496">twi</a></td>
+        <td>🚪138（送kp10分),kp45（水声+15，+远控+15，普通语聊44、特殊语聊，哄睡66，🚪后解锁胸视66/10</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小情天</td>
+        <td><a href="twitter://status?id=1879513481231380934">twi</a></td>
+        <td>🚪188（送视频单十分）少萝少女音 幼师白虎妹妹；kp66/10分（88附加+远程）；ts语聊88/30分；分；语聊50/30；入门解锁视频选衣服lo和jk，玩具玻璃棒、远程跳蛋、假鸡、乳夹、接受异物插入（黄瓜.香蕉.笔）、爆菊等等</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小白</td>
+        <td><a href="twitter://status?id=1846576525057180043">twi</a></td>
+        <td>🚪238（送视频单十分）kp66/10，无毛白虎，可萝可御。入门解锁视频单超多制服情趣、jk、lo裙、cos；手脚拷、乳夹；远程小恶魔、丝袜塞b；喷水、洗澡</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.语棠</td>
+        <td><a href="twitter://user?screen_name=yulian_245">twi</a></td>
+        <td>🚪208（送视频十分钟），少女/御姐音 性格超好温柔全能型大姐姐；kp+腿视88/10分（调教/水声/狗叫/剧情+15、遥控玩具+60）；ts语聊66/30分；ts手游（金铲铲）77/30分；ts端游（lol/云顶）128/30分；入门解锁视频通话以及项目（高跟鞋/丝袜/臀腿环/项圈+20、乳夹/胸链/手脚铐/口塞球/拉珠内裤 剧情/调教/自嗨 +30、制服/跳蛋/震动棒 +40、Jk /汉服/旗袍/lo裙 +45、假鸡/吸吮棒+50、远程+60、滴蜡+70、洗澡/喷水+80、cos服+90、炮机+200）和定制照片视频/音频/asmr哄睡等
+          Cos服+90 炮机+200）</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+      <td>𝙔𝙡.奈奈</td>
+      <td><a href="twitter://status?id=1884888602389127653">twi</a></td>
+      <td>🚪188（送视频单十分）极品少女音 胸大水多；kp/66/10分；ts语聊66/30分；ts手游88/30分；入门解锁视频单（选衣+10 道具入体+25 乳交/不插+15 远程+30，喷水+60）调教，m属性，制服，远程，假鸡可挑，ts哄睡，定制视频照片，专属音频等等</td>
+    </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.海</td>
+        <td><a href="twitter://user?screen_name=77hai8_">twi</a></td>
+        <td>🚪188（送kp10分钟）少女音纯情女大；kp60/10分（附加远控 剧情+20、狗叫 打屁股 水声+15）；ts语聊88/30分；ts手游（王者、铲铲、第五、蛋仔）88/30分；ts端游（steam热门多人联机 永劫 云顶）128/30分；语聊45/30分；入门解锁ts哄睡 读文、音频定制</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.塔塔</td>
+        <td><a href="twitter://status?id=1846541286041633130">twi</a></td>
+        <td>🚪188（送视频单10分）少萝音 毕业大学生白虎；入门解锁假j肛塞手铐脚链乳夹等道具/制服jk汉服洛丽塔旗袍/牛奶湿身洗澡/ 项目多服务好长的好看 保证宝宝入门不后悔</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小萝宅</td>
+        <td><a href="twitter://status?id=1873704755803148304">twi</a></td>
+        <td>🚪198（送视频十分钟），19/165/C杯 在读女大反差拉满 三点粉嫩敏感体质水多小主播衣服多可选；ts语聊88/30分（有doi经历话题多；入门解锁露脸cos视频定制</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小郁</td>
+        <td><a href="twitter://status?id=1878364260683927578">twi</a></td>
+        <td>🚪148（送kp10分钟）极品御姐音 温柔撩人；kp60/10分（远控 打屁股 剧情+15水声+20）；ts语聊88/30分；ts手游52/30分（金铲铲）；入门解锁音频定制、哄睡、虚恋…</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.月</td>
+        <td><a href="twitter://status?id=1886088050738085896">twi</a></td>
+        <td>🚪148（送kp10分钟）少御少女，女s，kp60/10，调教/剧情+15、水声/打屁股 15/1分。入门解锁 录音定制/农/铲/劫/定制私密照片视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.幼浅</td>
+        <td><a href="twitter://status?id=1833196260826009926">twi</a></td>
+        <td>🚪148（送kp10分钟，kp68/10）少女少萝</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.失约</td>
+        <td><a href="twitter://status?id=1885261982636417296">twi</a></td>
+        <td>🚪188（送身材k10）kp60/10分（狗叫/看lu/剧情/调教/四爱/打pg：15/十分钟、远控：20/十分钟），身材k 110/10分（可选衣服丝袜）,少御音，接定制举牌，视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.猫颜</td>
+        <td><a href="twitter://user?screen_name=AdanLang130781">twi</a></td>
+        <td>🚪148（送kp10分钟，kp68/10）少女少萝</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.宝宝亲</td>
+        <td><a href="twitter://user?screen_name=yulian_sub">twi</a></td>
+        <td>🚪188送电报群（照片视频音频），kp77,入门解锁详细菜单，情绪价值满满电子女友，线上都可接</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.甜优</td>
+        <td><a href="twitter://user?screen_name=alsdon16106">twi</a></td>
+        <td>🚪148（送kp10分钟）kp68/10（自嗨+10/10，剧情SM打屁股水狗叫等+30/10，远控+50/10）聊骚88、特殊哄睡99，入门解锁音频定制跳蛋阅读连休绿聊叫醒舔耳各种套餐等</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.妮妮</td>
+        <td><a href="twitter://user?screen_name=ninikov0">twi</a></td>
+        <td>🚪148（送kp10分钟/定制简单照片/音频福利/三选一）,kp60/10少御音，女s，打屁股/水声➕15/1分 远程➕20/10分钟 音频定制10/1分 ，文52/30分，文语70/30分   入门下单优惠很多，入门解锁接asmr音频录制，语音条，照片等</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.蛊</td>
+        <td><a href="twitter://user?screen_name=Cwcsih">twi</a></td>
+        <td>🚪168（送kp10分） 御萝双修 反差在校女大 双属性；kp66/10分（自嗨单卡/剧情/打屁股/水声/调教/寸止/铃铛/看lu/声线切换/旁听➕20 远程玩具➕30）；ts语聊88/30分；文爱52/30分；手游（王者）88h ts另算；入门解锁定制音频，照片，视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.芙芙</td>
+        <td><a href="twitter://status?id=1849730038876471461">twi</a></td>
+        <td>🚪148（送kp10分钟）kp 60/10，远程 +15</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.笔笔</td>
+        <td><a href="twitter://status?id=1849744805821362581">twi</a></td>
+        <td>🚪148（送kp10分钟）kp60/10（可远程➕20） 语聊35 手游25 虚恋 52，暂不接视频11入门解锁可定制漏点视频</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.小离</td>
+        <td><a href="twitter://status?id=1879823520143974463">twi</a></td>
+        <td>🚪188（送10分视频单），少女/少御音，少萝身材腰细腿好看；kp60/10min，有玩具水多活好有淫纹可贴，接纯连/虚恋/游戏/cos定制，二次元浓度高，超值线上女友</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.萝萝</td>
+        <td><a href="twitter://status?id=1876246524763775371">twi</a></td>
+        <td>🚪158（送kp10分钟）少萝音色可御可甜 口技超棒；kp60/10（附加剧情需+15）ts语聊66/30分 语聊35/30分；入门解锁99/10露胸视频，39.9r定制照片52定制小视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小诺</td>
+        <td><a href="twitter://status?id=1849744805821362581">twi</a></td>
+        <td>🚪148（送kp10分钟）kp60/10（可远程➕20） 语聊35 手游25 虚恋 52，暂不接视频11入门解锁可定制漏点视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.甜点</td>
+        <td><a href="twitter://status?id=">twi</a></td>
+        <td>🚪138（送音频福利）kp60/10（不是经常方便，点单约时间）.jk少萝 接磕炮/定制音频/王者/铲铲/瓦/蛋仔/哄睡。入门解锁定制视频</td>
+      </tr>
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.甜甜</td>
+        <td><a href="twitter://status?id=1861502748875018243">twi</a></td>
+        <td>🚪238（送10min视频单+50露脸）少御音 极品御姐身材 长得好看 服务态度好；入门了接定制照片 定制视频 解锁洗澡喷水制服道具丝袜汝夹，鞭打等等项目 </td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小媛</td>
+        <td><a href="twitter://status?id=1864259645499715864">twi</a></td>
+        <td>🚪148（送kp10分钟）kp60/10分钟 可以带远程玩具少女少萝 接kp/语聊/游戏/虚恋</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.雪藏</td>
+        <td><a href="twitter://status?id=1865025929392853379">twi</a></td>
+        <td>🚪148（送kp10分钟）kp60/10分钟,极品少女音，接王者荣耀 第五人格 逆水寒 金铲铲  哄睡 虚恋 语聊 定制音频 卡泡 难吃的小饼干</td>
+      </tr>
+      <tr class="green" data-tags="绿色陪">
+        <td>𝙔𝙡.宝宝</td>
+        <td><a href="">dy</a></td>
+        <td>🚪233送绿色露脸视频聊天15分，语音聊天66半，118一小时，绿色视频聊天288半小时，定制举牌：52/3张 99/15秒视频，指定内容➕20，指定衣服➕30门后解锁：电子女友188r/天 1314/周亲密称呼 打字聊天 随机语音条 照片日常报备，河南周边 一日女友  cos委托 过门再问！门前不解释。</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.鱼</td>
+        <td><a href="twitter://status?id=1869426059629998471">twi</a></td>
+        <td>🚪128（送音频照片）少女少萝音；kp52/10 88/20（遥控/剧情/水声狗叫打屁股扇脸+22）；ts语聊66/30；手游（王者25/1铲铲35/1）；入门解锁更多点单有优惠</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.女朋友</td>
+        <td><a href="twitter://status?id=1871786377542865264">twi</a></td>
+        <td>🚪158（送kp10分钟）御姐音；kp66/10分（sm/自嗨/狗叫/水声/打屁股/调教/远控 一个20）；ts语聊99/30分；ts手游（金铲铲）99/30分；ts端游（lol）99/30分；语聊99/30分；入门解锁：胸照 小视频 除k 其他项目9折</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.心碎</td>
+        <td><a href="twitter://status?id=1871970628766704055">twi</a></td>
+        <td>🚪148（送kp10分钟）少御骚御姐、kp66，项目一个20（调教+15 、远控 +20 、水声+15、打屁股 +20 、狗叫+ 20、剧情+15、旁听一人＋15）。 </td>
+      </tr>
+      <!-- <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.牛牛</td>
+        <td><a href="twitter://status?id=">twi</a></td>
+        <td>🚪148（送kp10分），少御音；kp66/10分（30附加+寸止 sm 剧情 调教 水 打屁股 60附加小怪兽）；ts语聊88/30分；ts手游（金蝉子 王者 永杰）88/30分；ts端游（联盟 永杰 瓦罗兰特 pubg csgo）88/30分；语聊xx/30分；入门解锁更多项目优惠</td>
+      </tr> -->
+      <tr class="video" data-tags="视频陪">
+        <td>𝙔𝙡.雪梨</td>
+        <td><a href="twitter://status?id=1885748836016230872">twi</a></td>
+        <td>🚪238（送10min视频单+50露脸）少萝音；入门解锁 sw 制服 喷水 sw套头 等等 双人可互舔 互摸等等</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.小蛋糕</td>
+        <td><a href="twitter://status?id=1886806623030796405">twi</a></td>
+        <td>🚪188（送kp），少女少萝音 听话小狗；kp70/10分；ts语聊88/30分；ts手游8830分 ts端游88/30分；语聊52/30分；入门解锁自录图包➕kp</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.kiko</td>
+        <td><a href="twitter://status?id=1888581014240575926">twi</a></td>
+        <td>🚪158（送kp10分钟），少御音；kp78/10分（远程附加+30）；ts语聊68/30分；ts手游（和平、王者、铲铲）68/30分；语聊40/30分；入门解锁定制ts录音5min</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.kot</td>
+        <td><a href="twitter://status?id=1888600833505587328">twi</a></td>
+        <td>🚪150（送kp10分钟），少女音；kp70/10分（远程附加+30）；ts语聊68/30分；ts手游（和平、王者、铲铲）78/30分；语聊40/30分；入门解锁秘密视频</td>
+      </tr>
+      <tr class="audio" data-tags="女喘陪">
+        <td>𝙔𝙡.爱恋</td>
+        <td><a href="twitter://status?id=1889343963292897500">twi</a></td>
+        <td>🚪158（送kp10分钟） 引导型温柔虚拟恋人 双属性 想和宝宝一起做爱做的事情 体验刺激与甜蜜；kp68/10 分钟（远程跳蛋+20/10分、远程炮机+30/10分、狗叫、剧情+15、打屁股、水声+22、旁听+20）；文聊40/30分；ts文聊66/30分；语聊50/30分；ts语聊99/30分；手游40/局；ts手游99/局；音频定制15/分钟；</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+
+    function searchTwitter() {
+      // 获取输入框中的昵称
+      var nickname = document.getElementById('nickname').value;
+
+      // 如果输入框为空，提醒用户
+      if (!nickname) {
+        alert("请输入一个昵称！");
+        return;
+      }
+
+      // 推特搜索的URL格式，使用 encodeURIComponent 来处理特殊字符
+      var url = 'twitter://search?query=' + encodeURIComponent(nickname) + '%20from:yulian_milkcat';
+
+
+      // 跳转到生成的深度链接
+      window.location.href = url;
+    }
+
+    function toggleInfo() {
+      var info = document.querySelector('.info');
+      info.style.display = info.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function filterByTag() {
+      var selectedTag = document.getElementById("tagSelect").value;
+      var rows = document.querySelectorAll("#myTable tbody tr");
+
+      rows.forEach(function (row) {
+        var tags = row.getAttribute("data-tags").split(" ");
+        row.style.display = tags.includes(selectedTag) ? "" : "none";
+      });
+    }
+
+    function filterByKeyword() {
+      var keyword = document.getElementById("keywordInput").value.toUpperCase();
+      var rows = document.querySelectorAll("#myTable tbody tr");
+
+      rows.forEach(function (row) {
+        var cells = row.getElementsByTagName("td");
+        var found = false;
+        Array.from(cells).forEach(function (cell) {
+          if (cell.textContent.toUpperCase().indexOf(keyword) > -1) {
+            found = true;
+          }
+        });
+        row.style.display = found ? "" : "none";
+      });
+    }
+  </script>
+
+</body>
+
+</html>
