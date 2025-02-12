@@ -183,6 +183,32 @@
             color: #000;
             transform: scale(1.15);
         }
+        .markdown-quote {
+    background: #f8f9fa;
+    border-left: 3px solid var(--secondary);  /* 减细边框 */
+    margin: 8px 0;  /* 减少上下边距 */
+    padding: 8px 12px;  /* 减少内边距 */
+    border-radius: 3px;
+    position: relative;
+}
+
+.markdown-quote::before {
+    content: "";  /* 移除默认符号 */
+}
+
+.markdown-quote p {
+    color: var(--text);
+    font-size: 11px;  /* 缩小字体 */
+    margin: 0;
+    line-height: 1.3;  /* 减小行高 */
+    padding-left: 0;
+}
+
+/* 调整警告图标尺寸 */
+.markdown-quote .fa-exclamation-triangle {
+    font-size: 11px;
+    margin-right: 4px;
+}
     </style>
 </head>
 <body>
@@ -222,6 +248,12 @@
                <span class="social-text">雨恋抖音号</span>
             </a>
         </p>
+        <div class="markdown-quote">
+            <p style="color: var(--secondary); margin: 2px 0;">  <!-- 缩小段落间距 -->
+                <i class="fas fa-exclamation-triangle"></i>
+                注意：需在浏览器打开才能跳转，微信内无法跳转喔~
+            </p>
+        </div>
         <p style="font-size:12px; color:#666; margin:10px 0 0;">
             入门就是加陪陪好友位，下单直接找她也会更便宜！陪陪有权不回消息拒绝下单请求，陪陪个人预存清空 陪陪自愿保留好友位！
             <span style="color:var(--secondary);">私下大额消费请理性</span>
