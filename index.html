@@ -234,6 +234,8 @@
             如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！
         </p>
     </div>
+    
+    <button onclick="copyPageUrl()">复制网页链接</button>
 
     <img class="qrcode" src="https://cdn.jsdelivr.net/gh/YulianPW/YulianPW.github.io@main/quan.png" alt="雨恋福利号">
 
@@ -413,6 +415,20 @@ function toggleInfo() {
 
         // 事件监听
         window.onload = init;
+
+        function copyPageUrl() {
+    // 创建一个临时的 input 元素
+    const input = document.createElement('input');
+    input.value = window.location.href; // 获取当前页面的 URL
+    document.body.appendChild(input);  // 将 input 元素加入到 DOM 中
+    input.select();  // 选择文本
+    document.execCommand('copy');  // 执行复制命令
+    document.body.removeChild(input);  // 删除临时的 input 元素
+
+    // 提示用户复制成功
+    alert('网页链接已复制到剪贴板');
+}
+
     </script>
 </body>
 </html>
