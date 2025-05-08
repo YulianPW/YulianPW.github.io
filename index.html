@@ -270,7 +270,7 @@
         </p>
     </div>
 
-    <button onclick="loadInfoContent()">陪陪/项目说明</button>
+    <button onclick="loadInfoContent()">项目说明（点击展开）</button>
     <div id="info-container"></div>
 
     <div id="loading" style="display:none; text-align:center; color:#666; font-size:12px;">
@@ -312,7 +312,7 @@
 function loadInfoContent() {
     const container = document.getElementById('info-container');
     if (!container.innerHTML) {
-        fetch('info-content.html')
+        fetch('https://cdn.jsdelivr.net/gh/YulianPW/YulianPW.github.io@main/info-content.html')
             .then(response => response.text())
             .then(html => {
                 container.innerHTML = html;
