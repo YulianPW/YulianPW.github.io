@@ -129,6 +129,25 @@
         .video { color: #f1c40f; }
         .audio { color: var(--secondary); }
         .green { color: #27ae60; }
+    .unjoined { 
+    color: #aaa;
+    position: relative;
+}
+      .unjoined::after {
+            content: "未进店";
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            background: #f0f0f0; /* 背景色加深 */
+            color: #555; /* 文字颜色加深 */
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            border: 1px solid #ddd; /* 边框加深 */
+            opacity: 0.95; /* 略微提高不透明度 */
+            font-weight: 500; /* 中等粗细 */
+            text-shadow: 0 0 1px rgba(255,255,255,0.5); /* 添加文字阴影增强可读性 */
+        }
 
         td:nth-child(1) {
             white-space: nowrap;
@@ -283,6 +302,7 @@
             <option value="绿色陪">绿色陪</option>
             <option value="女喘陪">女喘陪</option>
             <option value="视频陪">视频陪</option>
+            <option value="未进店">未进店</option>
         </select>
         <input type="text" id="keywordInput" placeholder="关键字搜索" oninput="filterByTag()">
     </div>
@@ -400,7 +420,8 @@ function loadInfoContent() {
             const tagClasses = {
                 '绿色陪': 'green',
                 '女喘陪': 'audio',
-                '视频陪': 'video'
+                '视频陪': 'video',
+                '未进店': 'unjoined' // 新增未进店样式
             };
             return tagClasses[tags] || '';
         }
