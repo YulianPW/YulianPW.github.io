@@ -256,7 +256,7 @@
     
     <button onclick="copyPageUrl()">复制网页链接</button>
 
-    <img class="qrcode" src="https://cdn.jsdelivr.net/gh/YulianPW/YulianPW.github.io@main/quan.png" alt="雨恋福利号">
+    <img class="qrcode" src="quan.png" alt="雨恋福利号">
 
     <div class="info-block">
         <p style="margin:5px 0;"><b>营业时间：</b>全天24小时（上午人不多）</p>
@@ -332,7 +332,7 @@
 function loadInfoContent() {
     const container = document.getElementById('info-container');
     if (!container.innerHTML) {
-        fetch('https://cdn.jsdelivr.net/gh/YulianPW/YulianPW.github.io@main/info-content.html')
+        fetch('info-content.html')
             .then(response => response.text())
             .then(html => {
                 container.innerHTML = html;
@@ -346,7 +346,7 @@ function loadInfoContent() {
         // 数据加载函数
         function loadTableData() {
             document.getElementById('loading').style.display = 'block';
-            fetch('https://cdn.jsdelivr.net/gh/YulianPW/YulianPW.github.io@main/data.json?v=' + Date.now(), { cache: 'no-store' })
+            fetch('data.json?v=' + Date.now(), { cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) throw new Error('网络响应异常');
                     return response.json();
