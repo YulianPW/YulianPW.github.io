@@ -278,7 +278,7 @@
     
     <button onclick="copyPageUrl()">复制网页链接</button>
 
-    <img class="qrcode" src="quan.png" alt="雨恋福利号">
+    <img class="qrcode" src="quan.png" alt="雨恋福利号" loading="lazy">
 
     <div class="info-block">
         <p style="margin:5px 0;"><b>营业时间：</b>全天24小时（上午人不多）</p>
@@ -351,10 +351,14 @@
     </table>
 
     <script>
-        // 初始化函数
+        const INFO_VERSION = '20251114';
+        const DATA_VERSION = '20251114';
+        const DATA_CACHE_KEY = 'staff_data_cache';
+        const DATA_CACHE_TIME_KEY = 'staff_data_cache_time';
+        const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
+
         function init() {
             loadTableData();
-            document.querySelector('.info').style.display = 'none';
             document.getElementById("tagSelect").value = "all";
         }
 
@@ -362,41 +366,65 @@
 function loadInfoContent() {
     const container = document.getElementById('info-container');
     if (!container.innerHTML) {
-        fetch('info-content.html')
-            .then(response => response.text())
+        document.getElementById('loading').style.display = 'block';
+        fetch(`info-content.html?v=${INFO_VERSION}`, { cache: 'reload' })
+            .then(response => {
+                if (!response.ok) throw new Error('内容加载失败');
+                return response.text();
+            })
             .then(html => {
                 container.innerHTML = html;
                 toggleInfo();
-            });
+            })
+            .catch(err => console.error(err))
+            .finally(() => document.getElementById('loading').style.display = 'none');
     } else {
         toggleInfo();
     }
 }
 
         // 数据加载函数
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = data.staff.map(item => `
+                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}">
+                    <td>${item.name}</td>
+                    <td>
+                        <div class="social-links">
+                            ${getSocialIcon(item.social)}
+                        </div>
+                    </td>
+                    <td>${item.desc}</td>
+                </tr>
+            `).join('');
+            filterByTag();
+        }
+
         function loadTableData() {
             document.getElementById('loading').style.display = 'block';
-            fetch('data.json?v=' + Date.now(), { cache: 'no-store' })
+            const cached = localStorage.getItem(DATA_CACHE_KEY);
+            const cachedTime = Number(localStorage.getItem(DATA_CACHE_TIME_KEY) || 0);
+            const now = Date.now();
+
+            if (cached && now - cachedTime < DATA_CACHE_TTL) {
+                renderTable(JSON.parse(cached));
+            }
+
+            fetch(`data.json?v=${DATA_VERSION}`, { cache: 'reload' })
                 .then(response => {
                     if (!response.ok) throw new Error('网络响应异常');
                     return response.json();
                 })
                 .then(data => {
-                    const tbody = document.getElementById('tableBody');
-                    tbody.innerHTML = data.staff.map(item => `
-                        <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}">
-                            <td>${item.name}</td>
-                            <td>
-                                <div class="social-links">
-                                    ${getSocialIcon(item.social)}
-                                </div>
-                            </td>
-                            <td>${item.desc}</td>
-                        </tr>
-                    `).join('');
-                    filterByTag();
+                    localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data));
+                    localStorage.setItem(DATA_CACHE_TIME_KEY, String(Date.now()));
+                    renderTable(data);
                 })
-                .catch(error => console.error('数据加载失败:', error))
+                .catch(error => {
+                    if (!cached) {
+                        console.error('数据加载失败:', error);
+                    }
+                })
                 .finally(() => document.getElementById('loading').style.display = 'none');
         }
 
@@ -488,17 +516,24 @@ function toggleInfo() {
         window.onload = init;
 
         function copyPageUrl() {
-    // 创建一个临时的 input 元素
-    const input = document.createElement('input');
-    input.value = window.location.href; // 获取当前页面的 URL
-    document.body.appendChild(input);  // 将 input 元素加入到 DOM 中
-    input.select();  // 选择文本
-    document.execCommand('copy');  // 执行复制命令
-    document.body.removeChild(input);  // 删除临时的 input 元素
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => alert('网页链接已复制到剪贴板'))
+                    .catch(() => fallbackCopy());
+            } else {
+                fallbackCopy();
+            }
+        }
 
-    // 提示用户复制成功
-    alert('网页链接已复制到剪贴板');
-}
+        function fallbackCopy() {
+            const input = document.createElement('input');
+            input.value = window.location.href;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert('网页链接已复制到剪贴板');
+        }
 
     </script>
 </body>
