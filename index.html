@@ -352,14 +352,27 @@
 
     <script>
         const INFO_VERSION = '20251114';
-        const DATA_VERSION = '20251114';
+        let DATA_VERSION = '20251114';
         const DATA_CACHE_KEY = 'staff_data_cache';
         const DATA_CACHE_TIME_KEY = 'staff_data_cache_time';
         const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
 
         function init() {
-            loadTableData();
             document.getElementById("tagSelect").value = "all";
+            loadVersion().finally(loadTableData);
+        }
+
+        async function loadVersion() {
+            try {
+                const response = await fetch('version.json', { cache: 'no-store' });
+                if (!response.ok) throw new Error('version.json 获取失败');
+                const data = await response.json();
+                if (data.dataVersion) {
+                    DATA_VERSION = data.dataVersion;
+                }
+            } catch (error) {
+                console.warn('使用默认 DATA_VERSION，原因：', error.message);
+            }
         }
 
         // 动态加载说明内容
