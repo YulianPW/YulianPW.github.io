@@ -125,11 +125,15 @@
             font-size: 13px;
         }
 
-        .video { color: #f1c40f; }
-        .audio { color: var(--secondary); }
-        .green { color: #27ae60; }
+        .video .name-text,
+        .video .desc-text { color: #f1c40f; }
+        .audio .name-text,
+        .audio .desc-text { color: var(--secondary); }
+        .green .name-text,
+        .green .desc-text { color: #27ae60; }
+        .unjoined .name-text,
+        .unjoined .desc-text { color: #aaa; }
     .unjoined { 
-    color: #aaa;
     position: relative;
 }
       .unjoined::after {
@@ -161,12 +165,34 @@
             padding: 6px 4px;
         }
 
+        .name-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 4px;
+        }
+
+        .name-text {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+        }
+
         .social-links {
             display: inline-flex;
             gap: 2px;
             align-items: center;
             padding: 2px 4px;
             line-height: 1;
+        }
+
+        .social-links.compact {
+            font-size: 11px;
+            color: #7f8c8d;
+            gap: 4px;
+            padding: 0;
+            justify-content: center;
         }
 
         .social-icon {
@@ -326,6 +352,15 @@
         数据加载中...
     </div>
 
+    <svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+        <symbol id="icon-twitter" viewBox="0 0 512 512">
+            <path d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z" />
+        </symbol>
+        <symbol id="icon-douyin" viewBox="0 0 1024 1024">
+            <path d="M672 128h128c10 92 75 156 160 160v160c-66 2-127-23-160-64v352c0 141-115 256-256 256S288 877 288 736s115-256 256-256c18 0 35 2 52 6V640c-16-5-33-8-52-8-71 0-128 57-128 128s57 128 128 128 128-57 128-128V128z" />
+        </symbol>
+    </svg>
+
     <div class="search-container">
         <select id="tagSelect" onchange="filterByTag()">
             <option value="all">全部</option>
@@ -340,8 +375,7 @@
     <table id="myTable">
         <thead>
             <tr>
-                <th>昵称</th>
-                <th>社媒</th>
+                <th>陪陪</th>
                 <th>介绍</th>
             </tr>
         </thead>
@@ -401,13 +435,15 @@ function loadInfoContent() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = data.staff.map(item => `
                 <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}">
-                    <td>${item.name}</td>
                     <td>
-                        <div class="social-links">
-                            ${getSocialIcon(item.social)}
+                        <div class="name-cell">
+                            <div class="name-text">${item.name}</div>
+                            <div class="social-links compact">
+                                ${getSocialIcon(item.social)}
+                            </div>
                         </div>
                     </td>
-                    <td>${item.desc}</td>
+                    <td><span class="desc-text">${item.desc}</span></td>
                 </tr>
             `).join('');
             filterByTag();
@@ -502,14 +538,14 @@ function loadInfoContent() {
                 twitter: `
                     <span class="icon icon-twitter" aria-hidden="true">
                         <svg viewBox="0 0 512 512">
-                            <path d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z" fill="currentColor"/>
+                            <use href="#icon-twitter" />
                         </svg>
                     </span>
                 `,
                 douyin: `
                     <span class="icon icon-douyin" aria-hidden="true">
                         <svg viewBox="0 0 1024 1024">
-                            <path d="M672 128h128c10 92 75 156 160 160v160c-66 2-127-23-160-64v352c0 141-115 256-256 256S288 877 288 736s115-256 256-256c18 0 35 2 52 6V640c-16-5-33-8-52-8-71 0-128 57-128 128s57 128 128 128 128-57 128-128V128z" fill="currentColor"/>
+                            <use href="#icon-douyin" />
                         </svg>
                     </span>
                 `
