@@ -85,6 +85,43 @@
             padding: 10px 6px;
         }
 
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th.sortable:hover {
+            background: #34495e;
+        }
+
+        .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        th.sortable .sort-icon::after {
+            content: "⇅";
+        }
+
+        th.sort-asc .sort-icon {
+            opacity: 1;
+        }
+
+        th.sort-asc .sort-icon::after {
+            content: "▲";
+        }
+
+        th.sort-desc .sort-icon {
+            opacity: 1;
+        }
+
+        th.sort-desc .sort-icon::after {
+            content: "▼";
+        }
+
         button {
             background: var(--primary);
             color: white;
@@ -126,13 +163,17 @@
         }
 
         .video .name-text,
-        .video .desc-text { color: #f1c40f; }
+        .video .desc-text,
+        .video .kp-text { color: #f1c40f; }
         .audio .name-text,
-        .audio .desc-text { color: var(--secondary); }
+        .audio .desc-text,
+        .audio .kp-text { color: var(--secondary); }
         .green .name-text,
-        .green .desc-text { color: #27ae60; }
+        .green .desc-text,
+        .green .kp-text { color: #27ae60; }
         .unjoined .name-text,
-        .unjoined .desc-text { color: #aaa; }
+        .unjoined .desc-text,
+        .unjoined .kp-text { color: #aaa; }
         .info .video { color: #f1c40f; }
         .info .audio { color: var(--secondary); }
         .info .green { color: #27ae60; }
@@ -144,7 +185,7 @@
             text-overflow: ellipsis;
         }
 
-        td:nth-child(2) {
+        td:nth-child(3) {
             min-width: 50px;
             text-align: center;
             padding: 6px 4px;
@@ -162,6 +203,17 @@
             font-weight: 600;
             font-size: 13px;
             color: var(--text);
+        }
+
+        .kp-cell {
+            text-align: center;
+            padding: 6px 8px;
+            min-width: 60px;
+        }
+
+        .kp-text {
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .social-links {
@@ -361,6 +413,9 @@
         <thead>
             <tr>
                 <th>陪陪</th>
+                <th class="sortable" data-sort="kp" onclick="sortTable('kp')">
+                    kp <span class="sort-icon"></span>
+                </th>
                 <th>介绍</th>
             </tr>
         </thead>
@@ -375,6 +430,18 @@
         const DATA_CACHE_KEY = 'staff_data_cache';
         const DATA_CACHE_TIME_KEY = 'staff_data_cache_time';
         const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
+        let currentSortColumn = null;
+        let currentSortDirection = null;
+        let tableData = null;
+
+        // 提取 kp 价格
+        function extractKpPrice(desc) {
+            if (!desc) return null;
+            // 优先使用单独的 kp 字段（如果存在）
+            // 否则从 desc 中提取，支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
+            const match = desc.match(/(?:^|[^a-zA-Z])k(?:p)?(\d+)\//);
+            return match ? parseInt(match[1], 10) : null;
+        }
 
         function init() {
             document.getElementById("tagSelect").value = "all";
@@ -416,10 +483,40 @@ function loadInfoContent() {
 }
 
         // 数据加载函数
-        function renderTable(data) {
+        function renderTable(data, applySort = true) {
+            tableData = data;
+            let staff = [...data.staff];
+            
+            // 如果需要应用排序
+            if (applySort && currentSortColumn && currentSortDirection) {
+                staff.sort((a, b) => {
+                    let aVal, bVal;
+                    if (currentSortColumn === 'kp') {
+                        aVal = extractKpPrice(a.desc) || (a.kp ? parseInt(a.kp) : null);
+                        bVal = extractKpPrice(b.desc) || (b.kp ? parseInt(b.kp) : null);
+                        // 处理 null 值，放在最后
+                        if (aVal === null && bVal === null) return 0;
+                        if (aVal === null) return 1;
+                        if (bVal === null) return -1;
+                    } else {
+                        aVal = a[currentSortColumn];
+                        bVal = b[currentSortColumn];
+                    }
+                    
+                    if (currentSortDirection === 'asc') {
+                        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                    } else {
+                        return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                    }
+                });
+            }
+
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = data.staff.map(item => `
-                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}">
+            tbody.innerHTML = staff.map(item => {
+                const kpPrice = item.kp ? parseInt(item.kp) : extractKpPrice(item.desc);
+                const kpDisplay = kpPrice ? kpPrice : '-';
+                return `
+                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}" data-kp="${kpPrice || ''}">
                     <td>
                         <div class="name-cell">
                             <div class="name-text">${item.name}</div>
@@ -428,10 +525,38 @@ function loadInfoContent() {
                             </div>
                         </div>
                     </td>
+                    <td class="kp-cell"><span class="kp-text">${kpDisplay}</span></td>
                     <td><span class="desc-text">${item.desc}</span></td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
             filterByTag();
+        }
+
+        // 排序函数
+        function sortTable(column) {
+            const th = document.querySelector(`th[data-sort="${column}"]`);
+            
+            // 切换排序方向
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+            
+            // 更新排序图标
+            document.querySelectorAll('th.sortable').forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+            });
+            if (th) {
+                th.classList.add(`sort-${currentSortDirection}`);
+            }
+            
+            // 重新渲染表格
+            if (tableData) {
+                renderTable(tableData, true);
+            }
         }
 
         function loadTableData() {
@@ -441,7 +566,8 @@ function loadInfoContent() {
             const now = Date.now();
 
             if (cached && now - cachedTime < DATA_CACHE_TTL) {
-                renderTable(JSON.parse(cached));
+                const cachedData = JSON.parse(cached);
+                renderTable(cachedData, false); // 首次加载不排序
             }
 
             fetch(`data.json?v=${DATA_VERSION}`, { cache: 'reload' })
@@ -452,7 +578,7 @@ function loadInfoContent() {
                 .then(data => {
                     localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data));
                     localStorage.setItem(DATA_CACHE_TIME_KEY, String(Date.now()));
-                    renderTable(data);
+                    renderTable(data, false); // 首次加载不排序
                 })
                 .catch(error => {
                     if (!cached) {
