@@ -1,0 +1,19 @@
+# Agent 指令文件
+AGENTS.md
+
+# 编辑器配置
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+
+# OpenCode 工作目录
+.sisyphus/
+
+# CI 生成文件
+version.json
