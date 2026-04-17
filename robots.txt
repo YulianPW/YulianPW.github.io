@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# 明确允许 Twitter 爬虫
+User-agent: Twitterbot
+Allow: /
+
+User-agent: twitterbot
+Allow: /
+
+# 允许所有图片
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.webp
+
