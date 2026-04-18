@@ -17,3 +17,6 @@ AGENTS.md
 
 # CI 生成文件
 version.json
+
+# 本地启动脚本
+dev.sh
