@@ -442,6 +442,21 @@
         let currentSortDirection = null;
         let tableData = null;
 
+        function getSiteBaseUrl() {
+            const { origin, pathname } = window.location;
+            const normalizedPath = pathname.endsWith('/')
+                ? pathname
+                : pathname.endsWith('/index.html')
+                    ? pathname.replace(/index\.html$/, '')
+                    : `${pathname}/`;
+
+            return new URL(normalizedPath, origin);
+        }
+
+        function buildRuntimeUrl(path) {
+            return new URL(path, getSiteBaseUrl()).toString();
+        }
+
         // 提取 kp 价格
         function extractKpPrice(desc) {
             if (!desc) return null;
@@ -458,7 +473,7 @@
 
         async function loadVersion() {
             try {
-                const response = await fetch('version.json', { cache: 'no-store' });
+                const response = await fetch(buildRuntimeUrl('version.json'), { cache: 'no-store' });
                 if (!response.ok) throw new Error('version.json 获取失败');
                 const data = await response.json();
                 if (data.dataVersion) {
@@ -474,7 +489,7 @@ function loadInfoContent() {
     const container = document.getElementById('info-container');
     if (!container.innerHTML) {
         document.getElementById('loading').style.display = 'block';
-        fetch(`assets/fragments/info-content.html?v=${INFO_VERSION}`, { cache: 'reload' })
+        fetch(buildRuntimeUrl(`assets/fragments/info-content.html?v=${INFO_VERSION}`), { cache: 'reload' })
             .then(response => {
                 if (!response.ok) throw new Error('内容加载失败');
                 return response.text();
@@ -578,7 +593,7 @@ function loadInfoContent() {
                 renderTable(cachedData, false); // 首次加载不排序
             }
 
-            fetch(`assets/data/data.json?v=${DATA_VERSION}`, { cache: 'reload' })
+            fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), { cache: 'reload' })
                 .then(response => {
                     if (!response.ok) throw new Error('网络响应异常');
                     return response.json();
