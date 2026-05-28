@@ -1,545 +1,628 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
 
-    <meta property="og:image" content="https://cdn.jsdelivr.net/gh/yulianpw/YulianPW.github.io@main/assets/images/rainlove-social-cover.jpg" />
+    <meta
+      property="og:image"
+      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg"
+    />
     <meta property="og:image:width" content="1672" />
     <meta property="og:image:height" content="941" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:title" content="雨恋女陪殿" />
-    <meta property="og:description" content="主营 #磕炮 也有接 #视频1v1 #语聊 #哄睡 #手游 #端游" />
+    <meta
+      property="og:description"
+      content="主营 #磕炮 也有接 #视频1v1 #语聊 #哄睡 #手游 #端游"
+    />
     <meta property="og:url" content="https://yulianpw.github.io/" />
     <meta property="og:type" content="website" />
-    
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/yulianpw/YulianPW.github.io@main/assets/images/rainlove-social-cover.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg"
+    />
     <meta name="twitter:image:alt" content="雨恋女陪殿" />
     <meta name="twitter:title" content="雨恋女陪殿" />
-    <meta name="twitter:description" content="主营 #磕炮 也有接 #视频1v1 #语聊 #哄睡 #手游 #端游" />
+    <meta
+      name="twitter:description"
+      content="主营 #磕炮 也有接 #视频1v1 #语聊 #哄睡 #手游 #端游"
+    />
     <meta name="twitter:site" content="@Rain_KissYl" />
+    <meta name="twitter:url" content="https://yulianpw.github.io/" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s" />
-    <link rel="stylesheet" href="assets/styles/info-content.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="google-site-verification"
+      content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s"
+    />
+    <link rel="stylesheet" href="assets/styles/info-content.css" />
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #e74c3c;
-            --text: #34495e;
-        }
+      :root {
+        --primary: #2c3e50;
+        --secondary: #e74c3c;
+        --text: #34495e;
+      }
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 15px;
-            color: var(--text);
-            background: #f8f9fa;
-        }
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        padding: 15px;
+        color: var(--text);
+        background: #f8f9fa;
+      }
 
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 1.8em;
-        }
+      h1 {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 1.8em;
+      }
 
-        .alert-box {
-            background: #fff3f3;
-            padding: 12px;
-            margin: 15px 0;
-            border-radius: 6px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
+      .alert-box {
+        background: #fff3f3;
+        padding: 12px;
+        margin: 15px 0;
+        border-radius: 6px;
+        font-size: 13px;
+        line-height: 1.4;
+      }
 
-        .qrcode {
-            width: 180px;
-            display: block;
-            margin: 15px auto;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-        }
+      .qrcode {
+        width: 180px;
+        display: block;
+        margin: 15px auto;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+      }
 
-        .info-block {
-            background: white;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-size: 12.5px;
-        }
+      .info-block {
+        background: white;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        font-size: 12.5px;
+      }
 
-        table {
-            width: 100%;
-            max-width: 800px;
-            margin: 25px auto 15px;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+      table {
+        width: 100%;
+        max-width: 800px;
+        margin: 25px auto 15px;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
 
-        th, td {
-            padding: 10px 8px;
-            border: 1px solid #e0e0e0;
-            font-size: 13px;
-            line-height: 1.2;
-        }
+      th,
+      td {
+        padding: 10px 8px;
+        border: 1px solid #e0e0e0;
+        font-size: 13px;
+        line-height: 1.2;
+      }
 
-        th {
-            background: var(--primary);
-            color: white;
-            padding: 10px 6px;
-        }
+      th {
+        background: var(--primary);
+        color: white;
+        padding: 10px 6px;
+      }
 
-        th.sortable {
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
+      th.sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+      }
 
-        th.sortable:hover {
-            background: #34495e;
-        }
+      th.sortable:hover {
+        background: #34495e;
+      }
 
-        .sort-icon {
-            display: inline-block;
-            margin-left: 5px;
-            font-size: 10px;
-            opacity: 0.6;
-        }
+      .sort-icon {
+        display: inline-block;
+        margin-left: 5px;
+        font-size: 10px;
+        opacity: 0.6;
+      }
 
-        th.sortable .sort-icon::after {
-            content: "⇅";
-        }
+      th.sortable .sort-icon::after {
+        content: "⇅";
+      }
 
-        th.sort-asc .sort-icon {
-            opacity: 1;
-        }
+      th.sort-asc .sort-icon {
+        opacity: 1;
+      }
 
-        th.sort-asc .sort-icon::after {
-            content: "▲";
-        }
+      th.sort-asc .sort-icon::after {
+        content: "▲";
+      }
 
-        th.sort-desc .sort-icon {
-            opacity: 1;
-        }
+      th.sort-desc .sort-icon {
+        opacity: 1;
+      }
 
-        th.sort-desc .sort-icon::after {
-            content: "▼";
-        }
+      th.sort-desc .sort-icon::after {
+        content: "▼";
+      }
 
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: block;
-            margin: 10px auto;
-        }
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: block;
+        margin: 10px auto;
+      }
 
-        .info {
-            display: none;
-            background: white;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-size: 13px;
-        }
+      .info {
+        display: none;
+        background: white;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        font-size: 13px;
+      }
 
-        a {
-            color: var(--primary);
-            text-decoration: none;
-        }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
 
-        .search-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
+      .search-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 15px 0;
+      }
 
-        select, input[type="text"] {
-            padding: 8px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            font-size: 13px;
-        }
+      select,
+      input[type="text"] {
+        padding: 8px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 13px;
+      }
 
-        .video .name-text,
-        .video .desc-text,
-        .video .kp-text { color: #f1c40f; }
-        .audio .name-text,
-        .audio .desc-text,
-        .audio .kp-text { color: var(--secondary); }
-        .green .name-text,
-        .green .desc-text,
-        .green .kp-text { color: #27ae60; }
-        .unjoined .name-text,
-        .unjoined .desc-text,
-        .unjoined .kp-text { color: #aaa; }
-        .info .video { color: #f1c40f; }
-        .info .audio { color: var(--secondary); }
-        .info .green { color: #27ae60; }
+      .video .name-text,
+      .video .desc-text,
+      .video .kp-text {
+        color: #f1c40f;
+      }
+      .audio .name-text,
+      .audio .desc-text,
+      .audio .kp-text {
+        color: var(--secondary);
+      }
+      .green .name-text,
+      .green .desc-text,
+      .green .kp-text {
+        color: #27ae60;
+      }
+      .unjoined .name-text,
+      .unjoined .desc-text,
+      .unjoined .kp-text {
+        color: #aaa;
+      }
+      .info .video {
+        color: #f1c40f;
+      }
+      .info .audio {
+        color: var(--secondary);
+      }
+      .info .green {
+        color: #27ae60;
+      }
 
-        td:nth-child(1) {
-            white-space: nowrap;
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+      td:nth-child(1) {
+        white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-        td:nth-child(3) {
-            min-width: 50px;
-            text-align: center;
-            padding: 6px 4px;
-        }
+      td:nth-child(3) {
+        min-width: 50px;
+        text-align: center;
+        padding: 6px 4px;
+      }
 
-        .name-cell {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 4px;
-        }
+      .name-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+      }
 
-        .name-text {
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text);
-        }
+      .name-text {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text);
+      }
 
-        .kp-cell {
-            text-align: center;
-            padding: 6px 8px;
-            min-width: 60px;
-        }
+      .kp-cell {
+        text-align: center;
+        padding: 6px 8px;
+        min-width: 60px;
+      }
 
-        .kp-text {
-            font-size: 13px;
-            font-weight: 500;
-        }
+      .kp-text {
+        font-size: 13px;
+        font-weight: 500;
+      }
 
-        .social-links {
-            display: inline-flex;
-            gap: 2px;
-            align-items: center;
-            padding: 2px 4px;
-            line-height: 1;
-        }
+      .social-links {
+        display: inline-flex;
+        gap: 2px;
+        align-items: center;
+        padding: 2px 4px;
+        line-height: 1;
+      }
 
-        .social-links.compact {
-            font-size: 11px;
-            color: #7f8c8d;
-            gap: 4px;
-            padding: 0;
-            justify-content: center;
-        }
+      .social-links.compact {
+        font-size: 11px;
+        color: #7f8c8d;
+        gap: 4px;
+        padding: 0;
+        justify-content: center;
+      }
 
-        .social-icon {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            transition: all 0.2s ease;
-            margin: -1px 0;
-        }
+      .social-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        transition: all 0.2s ease;
+        margin: -1px 0;
+      }
 
-        .social-icon .icon svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+      .social-icon .icon svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
 
-        .social-text {
-            font-size: 12px;
-            color: var(--primary);
-            margin-left: 1px;
-            font-weight: 500;
-            position: relative;
-            top: -0.5px;
-        }
+      .social-text {
+        font-size: 12px;
+        color: var(--primary);
+        margin-left: 1px;
+        font-weight: 500;
+        position: relative;
+        top: -0.5px;
+      }
 
-        .douyin-icon {
-            color: var(--primary);
-        }
-        .douyin-icon:hover {
-            color: #FE2C55;
-            transform: scale(1.15);
-        }
+      .douyin-icon {
+        color: var(--primary);
+      }
+      .douyin-icon:hover {
+        color: #fe2c55;
+        transform: scale(1.15);
+      }
 
-        .info-block .social-icon {
-            font-size: 12px;
-            margin-right: 2px;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-        .info-block .social-text {
-            font-size: 12px;
-            position: relative;
-            top: -0.5px;
-        }
+      .info-block .social-icon {
+        font-size: 12px;
+        margin-right: 2px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .info-block .social-text {
+        font-size: 12px;
+        position: relative;
+        top: -0.5px;
+      }
 
-        .twitter-icon {
-            color: var(--primary);
-        }
-        .twitter-icon:hover {
-            color: #000;
-            transform: scale(1.15);
-        }
-        .markdown-quote {
-    background: #f8f9fa;
-    border-left: 3px solid var(--secondary);  /* 减细边框 */
-    margin: 8px 0;  /* 减少上下边距 */
-    padding: 8px 12px;  /* 减少内边距 */
-    border-radius: 3px;
-    position: relative;
-}
+      .twitter-icon {
+        color: var(--primary);
+      }
+      .twitter-icon:hover {
+        color: #000;
+        transform: scale(1.15);
+      }
+      .markdown-quote {
+        background: #f8f9fa;
+        border-left: 3px solid var(--secondary); /* 减细边框 */
+        margin: 8px 0; /* 减少上下边距 */
+        padding: 8px 12px; /* 减少内边距 */
+        border-radius: 3px;
+        position: relative;
+      }
 
-.markdown-quote::before {
-    content: "";  /* 移除默认符号 */
-}
+      .markdown-quote::before {
+        content: ""; /* 移除默认符号 */
+      }
 
-.markdown-quote p {
-    color: var(--text);
-    font-size: 11px;  /* 缩小字体 */
-    margin: 0;
-    line-height: 1.3;  /* 减小行高 */
-    padding-left: 0;
-}
+      .markdown-quote p {
+        color: var(--text);
+        font-size: 11px; /* 缩小字体 */
+        margin: 0;
+        line-height: 1.3; /* 减小行高 */
+        padding-left: 0;
+      }
 
-/* 调整警告图标尺寸 */
-.markdown-quote .icon-warning {
-    font-size: 12px;
-    margin-right: 4px;
-    display: inline-block;
-}
+      /* 调整警告图标尺寸 */
+      .markdown-quote .icon-warning {
+        font-size: 12px;
+        margin-right: 4px;
+        display: inline-block;
+      }
 
-.icon {
-    width: 14px;
-    height: 14px;
-    display: inline-block;
-    vertical-align: middle;
-    fill: currentColor;
-}
+      .icon {
+        width: 14px;
+        height: 14px;
+        display: inline-block;
+        vertical-align: middle;
+        fill: currentColor;
+      }
 
-.icon-twitter,
-.icon-douyin {
-    width: 12px;
-    height: 12px;
-}
+      .icon-twitter,
+      .icon-douyin {
+        width: 12px;
+        height: 12px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>雨恋女陪殿</h1>
 
     <div class="alert-box">
-        <p style="color:var(--secondary); margin:0 0 8px 0;">
-            <b>认证企业微信！！</b>所有雨恋号置顶都是企微接待，已有被骗重点提醒！
-        </p>
-        <p style="font-size:12px; color:#666; margin:0;">
-            如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！
-        </p>
+      <p style="color: var(--secondary); margin: 0 0 8px 0">
+        <b>认证企业微信！！</b>所有雨恋号置顶都是企微接待，已有被骗重点提醒！
+      </p>
+      <p style="font-size: 12px; color: #666; margin: 0">
+        如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！
+      </p>
     </div>
-    
+
     <button onclick="copyPageUrl()">复制网页链接</button>
 
-    <img class="qrcode" src="assets/images/quan.png" alt="雨恋福利号" loading="lazy">
+    <img
+      class="qrcode"
+      src="assets/images/quan.png"
+      alt="雨恋福利号"
+      loading="lazy"
+    />
 
     <div class="info-block">
-        <p style="margin:5px 0;"><b>营业时间：</b>全天24小时（上午人不多）</p>
-        <p style="margin:5px 0;">
-            <b style="color:var(--secondary);">平台账号：</b>
-            <a href="https://twitter.com/intent/user?screen_name=Yulian_Baby" 
-               class="twitter-icon social-icon" Rain_KissYl
-               target="_blank"
-               onclick="openTwitterWithIntent('Yulian_Baby'); return false;">
-               <span class="icon icon-twitter" aria-hidden="true">
-                   <svg viewBox="0 0 512 512">
-                       <path d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z" fill="currentColor"/>
-                   </svg>
-               </span>
-               <span class="social-text">视频选人号</span>
-            </a>、
-            <a href="https://twitter.com/intent/user?screen_name=pwyl_kp" 
-               class="twitter-icon social-icon" 
-               target="_blank"
-               onclick="openTwitterWithIntent('pwyl_kp'); return false;">
-               <span class="icon icon-twitter" aria-hidden="true">
-                   <svg viewBox="0 0 512 512">
-                       <path d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z" fill="currentColor"/>
-                   </svg>
-               </span>
-               <span class="social-text">语音选人号</span>
-            </a>
+      <p style="margin: 5px 0"><b>营业时间：</b>全天24小时（上午人不多）</p>
+      <p style="margin: 5px 0">
+        <b style="color: var(--secondary)">平台账号：</b>
+        <a
+          href="https://twitter.com/intent/user?screen_name=Yulian_Baby"
+          class="twitter-icon social-icon"
+          Rain_KissYl
+          target="_blank"
+          onclick="
+            openTwitterWithIntent('Yulian_Baby');
+            return false;
+          "
+        >
+          <span class="icon icon-twitter" aria-hidden="true">
+            <svg viewBox="0 0 512 512">
+              <path
+                d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+          <span class="social-text">视频选人号</span> </a
+        >、
+        <a
+          href="https://twitter.com/intent/user?screen_name=pwyl_kp"
+          class="twitter-icon social-icon"
+          target="_blank"
+          onclick="
+            openTwitterWithIntent('pwyl_kp');
+            return false;
+          "
+        >
+          <span class="icon icon-twitter" aria-hidden="true">
+            <svg viewBox="0 0 512 512">
+              <path
+                d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+          <span class="social-text">语音选人号</span>
+        </a>
+      </p>
+      <div class="markdown-quote">
+        <p style="color: var(--secondary); margin: 2px 0">
+          <!-- 缩小段落间距 -->
+          <span class="icon-warning" aria-hidden="true">⚠️</span>
+          注意：需在浏览器打开才能跳转，微信内无法跳转喔~
         </p>
-        <div class="markdown-quote">
-            <p style="color: var(--secondary); margin: 2px 0;">  <!-- 缩小段落间距 -->
-                <span class="icon-warning" aria-hidden="true">⚠️</span>
-                注意：需在浏览器打开才能跳转，微信内无法跳转喔~
-            </p>
-        </div>
-        <p style="font-size:12px; color:#666; margin:10px 0 0;">
-            入门就是加陪陪好友位，下单直接找她也会更便宜！陪陪有权不回消息拒绝下单请求，陪陪个人预存清空 陪陪自愿保留好友位！
-            <span style="color:var(--secondary);">私下大额消费请理性</span>
-            ，产生情感纠纷请勿骚扰客服，
-            <span style="color:var(--secondary);">否则只能全局黑名单</span>
-        </p>
+      </div>
+      <p style="font-size: 12px; color: #666; margin: 10px 0 0">
+        入门就是加陪陪好友位，下单直接找她也会更便宜！陪陪有权不回消息拒绝下单请求，陪陪个人预存清空
+        陪陪自愿保留好友位！
+        <span style="color: var(--secondary)">私下大额消费请理性</span>
+        ，产生情感纠纷请勿骚扰客服，
+        <span style="color: var(--secondary)">否则只能全局黑名单</span>
+      </p>
     </div>
 
     <button onclick="loadInfoContent()">项目介绍（点击展开）</button>
     <div id="info-container"></div>
 
-    <div id="loading" style="display:none; text-align:center; color:#666; font-size:12px;">
-        数据加载中...
+    <div
+      id="loading"
+      style="display: none; text-align: center; color: #666; font-size: 12px"
+    >
+      数据加载中...
     </div>
 
-    <svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
-        <symbol id="icon-twitter" viewBox="0 0 512 512">
-            <path d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z" />
-        </symbol>
-        <symbol id="icon-douyin" viewBox="0 0 1024 1024">
-            <path d="M672 128h128c10 92 75 156 160 160v160c-66 2-127-23-160-64v352c0 141-115 256-256 256S288 877 288 736s115-256 256-256c18 0 35 2 52 6V640c-16-5-33-8-52-8-71 0-128 57-128 128s57 128 128 128 128-57 128-128V128z" />
-        </symbol>
+    <svg
+      style="position: absolute; width: 0; height: 0; overflow: hidden"
+      aria-hidden="true"
+    >
+      <symbol id="icon-twitter" viewBox="0 0 512 512">
+        <path
+          d="M389.2 48h70.6L305.6 224.6 480 464H343.1l-92.3-126.8L139.9 464H69.3l164.8-186.1L64 48h139.3l83.2 112.5L389.2 48zm-24.7 374.9h39.1L150.2 85.1h-42L364.5 422.9z"
+        />
+      </symbol>
+      <symbol id="icon-douyin" viewBox="0 0 1024 1024">
+        <path
+          d="M672 128h128c10 92 75 156 160 160v160c-66 2-127-23-160-64v352c0 141-115 256-256 256S288 877 288 736s115-256 256-256c18 0 35 2 52 6V640c-16-5-33-8-52-8-71 0-128 57-128 128s57 128 128 128 128-57 128-128V128z"
+        />
+      </symbol>
     </svg>
 
     <div class="search-container">
-        <select id="tagSelect" onchange="filterByTag()">
-            <option value="all">全部</option>
-            <option value="绿色陪">绿色陪</option>
-            <option value="女喘陪">女喘陪</option>
-            <option value="视频陪">视频陪</option>
-            <option value="未进店">未进店</option>
-        </select>
-        <input type="text" id="keywordInput" placeholder="关键字搜索" oninput="filterByTag()">
+      <select id="tagSelect" onchange="filterByTag()">
+        <option value="all">全部</option>
+        <option value="绿色陪">绿色陪</option>
+        <option value="女喘陪">女喘陪</option>
+        <option value="视频陪">视频陪</option>
+        <option value="未进店">未进店</option>
+      </select>
+      <input
+        type="text"
+        id="keywordInput"
+        placeholder="关键字搜索"
+        oninput="filterByTag()"
+      />
     </div>
 
     <table id="myTable">
-        <thead>
-            <tr>
-                <th>陪陪</th>
-                <th class="sortable" data-sort="kp" onclick="sortTable('kp')">
-                    kp <span class="sort-icon"></span>
-                </th>
-                <th>介绍</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <!-- 数据将通过JS动态插入 -->
-        </tbody>
+      <thead>
+        <tr>
+          <th>陪陪</th>
+          <th class="sortable" data-sort="kp" onclick="sortTable('kp')">
+            kp <span class="sort-icon"></span>
+          </th>
+          <th>介绍</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- 数据将通过JS动态插入 -->
+      </tbody>
     </table>
 
     <script>
-        const INFO_VERSION = '20251114';
-        let DATA_VERSION = '20251114';
-        const DATA_CACHE_KEY = 'staff_data_cache';
-        const DATA_CACHE_TIME_KEY = 'staff_data_cache_time';
-        const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
-        let currentSortColumn = null;
-        let currentSortDirection = null;
-        let tableData = null;
+      const INFO_VERSION = "20251114";
+      let DATA_VERSION = "20251114";
+      const DATA_CACHE_KEY = "staff_data_cache";
+      const DATA_CACHE_TIME_KEY = "staff_data_cache_time";
+      const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
+      let currentSortColumn = null;
+      let currentSortDirection = null;
+      let tableData = null;
 
-        function getSiteBaseUrl() {
-            const { origin, pathname } = window.location;
-            const normalizedPath = pathname.endsWith('/')
-                ? pathname
-                : pathname.endsWith('/index.html')
-                    ? pathname.replace(/index\.html$/, '')
-                    : `${pathname}/`;
+      function getSiteBaseUrl() {
+        const { origin, pathname } = window.location;
+        const normalizedPath = pathname.endsWith("/")
+          ? pathname
+          : pathname.endsWith("/index.html")
+            ? pathname.replace(/index\.html$/, "")
+            : `${pathname}/`;
 
-            return new URL(normalizedPath, origin);
+        return new URL(normalizedPath, origin);
+      }
+
+      function buildRuntimeUrl(path) {
+        return new URL(path, getSiteBaseUrl()).toString();
+      }
+
+      // 提取 kp 价格
+      function extractKpPrice(desc) {
+        if (!desc) return null;
+        // 优先使用单独的 kp 字段（如果存在）
+        // 否则从 desc 中提取，支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
+        const match = desc.match(/(?:^|[^a-zA-Z])k(?:p)?(\d+)\//);
+        return match ? parseInt(match[1], 10) : null;
+      }
+
+      function init() {
+        document.getElementById("tagSelect").value = "all";
+        loadVersion().finally(loadTableData);
+      }
+
+      async function loadVersion() {
+        try {
+          const response = await fetch(buildRuntimeUrl("version.json"), {
+            cache: "no-store",
+          });
+          if (!response.ok) return; // 本地开发时 version.json 不存在，静默跳过
+          const data = await response.json();
+          if (data.dataVersion) {
+            DATA_VERSION = data.dataVersion;
+          }
+        } catch (_) {
+          // 本地开发时正常情况，不打印警告
         }
+      }
 
-        function buildRuntimeUrl(path) {
-            return new URL(path, getSiteBaseUrl()).toString();
-        }
-
-        // 提取 kp 价格
-        function extractKpPrice(desc) {
-            if (!desc) return null;
-            // 优先使用单独的 kp 字段（如果存在）
-            // 否则从 desc 中提取，支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
-            const match = desc.match(/(?:^|[^a-zA-Z])k(?:p)?(\d+)\//);
-            return match ? parseInt(match[1], 10) : null;
-        }
-
-        function init() {
-            document.getElementById("tagSelect").value = "all";
-            loadVersion().finally(loadTableData);
-        }
-
-        async function loadVersion() {
-            try {
-                const response = await fetch(buildRuntimeUrl('version.json'), { cache: 'no-store' });
-                if (!response.ok) throw new Error('version.json 获取失败');
-                const data = await response.json();
-                if (data.dataVersion) {
-                    DATA_VERSION = data.dataVersion;
-                }
-            } catch (error) {
-                console.warn('使用默认 DATA_VERSION，原因：', error.message);
-            }
-        }
-
-        // 动态加载说明内容
-function loadInfoContent() {
-    const container = document.getElementById('info-container');
-    if (!container.innerHTML) {
-        document.getElementById('loading').style.display = 'block';
-        fetch(buildRuntimeUrl(`assets/fragments/info-content.html?v=${INFO_VERSION}`), { cache: 'reload' })
-            .then(response => {
-                if (!response.ok) throw new Error('内容加载失败');
-                return response.text();
+      // 动态加载说明内容
+      function loadInfoContent() {
+        const container = document.getElementById("info-container");
+        if (!container.innerHTML) {
+          document.getElementById("loading").style.display = "block";
+          fetch(
+            buildRuntimeUrl(
+              `assets/fragments/info-content.html?v=${INFO_VERSION}`,
+            ),
+            { cache: "reload" },
+          )
+            .then((response) => {
+              if (!response.ok) throw new Error("内容加载失败");
+              return response.text();
             })
-            .then(html => {
-                container.innerHTML = html;
-                toggleInfo();
+            .then((html) => {
+              container.innerHTML = html;
+              toggleInfo();
             })
-            .catch(err => console.error(err))
-            .finally(() => document.getElementById('loading').style.display = 'none');
-    } else {
-        toggleInfo();
-    }
-}
+            .catch((err) => console.error(err))
+            .finally(
+              () => (document.getElementById("loading").style.display = "none"),
+            );
+        } else {
+          toggleInfo();
+        }
+      }
 
-        // 数据加载函数
-        function renderTable(data, applySort = true) {
-            tableData = data;
-            let staff = [...data.staff];
-            
-            // 如果需要应用排序
-            if (applySort && currentSortColumn && currentSortDirection) {
-                staff.sort((a, b) => {
-                    let aVal, bVal;
-                    if (currentSortColumn === 'kp') {
-                        aVal = extractKpPrice(a.desc) || (a.kp ? parseInt(a.kp) : null);
-                        bVal = extractKpPrice(b.desc) || (b.kp ? parseInt(b.kp) : null);
-                        // 处理 null 值，放在最后
-                        if (aVal === null && bVal === null) return 0;
-                        if (aVal === null) return 1;
-                        if (bVal === null) return -1;
-                    } else {
-                        aVal = a[currentSortColumn];
-                        bVal = b[currentSortColumn];
-                    }
-                    
-                    if (currentSortDirection === 'asc') {
-                        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-                    } else {
-                        return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
-                    }
-                });
+      // 数据加载函数
+      function renderTable(data, applySort = true) {
+        tableData = data;
+        let staff = [...data.staff];
+
+        // 如果需要应用排序
+        if (applySort && currentSortColumn && currentSortDirection) {
+          staff.sort((a, b) => {
+            let aVal, bVal;
+            if (currentSortColumn === "kp") {
+              aVal = extractKpPrice(a.desc) || (a.kp ? parseInt(a.kp) : null);
+              bVal = extractKpPrice(b.desc) || (b.kp ? parseInt(b.kp) : null);
+              // 处理 null 值，放在最后
+              if (aVal === null && bVal === null) return 0;
+              if (aVal === null) return 1;
+              if (bVal === null) return -1;
+            } else {
+              aVal = a[currentSortColumn];
+              bVal = b[currentSortColumn];
             }
 
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = staff.map(item => {
-                const kpPrice = item.kp ? parseInt(item.kp) : extractKpPrice(item.desc);
-                const kpDisplay = kpPrice ? kpPrice : '-';
-                return `
-                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}" data-kp="${kpPrice || ''}">
+            if (currentSortDirection === "asc") {
+              return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+            } else {
+              return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+            }
+          });
+        }
+
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = staff
+          .map((item) => {
+            const kpPrice = item.kp
+              ? parseInt(item.kp)
+              : extractKpPrice(item.desc);
+            const kpDisplay = kpPrice ? kpPrice : "-";
+            return `
+                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}" data-kp="${kpPrice || ""}">
                     <td>
                         <div class="name-cell">
                             <div class="name-text">${item.name}</div>
@@ -552,142 +635,157 @@ function loadInfoContent() {
                     <td><span class="desc-text">${item.desc}</span></td>
                 </tr>
             `;
-            }).join('');
-            filterByTag();
+          })
+          .join("");
+        filterByTag();
+      }
+
+      // 排序函数
+      function sortTable(column) {
+        const th = document.querySelector(`th[data-sort="${column}"]`);
+
+        // 切换排序方向
+        if (currentSortColumn === column) {
+          currentSortDirection =
+            currentSortDirection === "asc" ? "desc" : "asc";
+        } else {
+          currentSortColumn = column;
+          currentSortDirection = "asc";
         }
 
-        // 排序函数
-        function sortTable(column) {
-            const th = document.querySelector(`th[data-sort="${column}"]`);
-            
-            // 切换排序方向
-            if (currentSortColumn === column) {
-                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortColumn = column;
-                currentSortDirection = 'asc';
-            }
-            
-            // 更新排序图标
-            document.querySelectorAll('th.sortable').forEach(header => {
-                header.classList.remove('sort-asc', 'sort-desc');
-            });
-            if (th) {
-                th.classList.add(`sort-${currentSortDirection}`);
-            }
-            
-            // 重新渲染表格
-            if (tableData) {
-                renderTable(tableData, true);
-            }
+        // 更新排序图标
+        document.querySelectorAll("th.sortable").forEach((header) => {
+          header.classList.remove("sort-asc", "sort-desc");
+        });
+        if (th) {
+          th.classList.add(`sort-${currentSortDirection}`);
         }
 
-        function loadTableData() {
-            document.getElementById('loading').style.display = 'block';
-            const cached = localStorage.getItem(DATA_CACHE_KEY);
-            const cachedTime = Number(localStorage.getItem(DATA_CACHE_TIME_KEY) || 0);
-            const now = Date.now();
+        // 重新渲染表格
+        if (tableData) {
+          renderTable(tableData, true);
+        }
+      }
 
-            if (cached && now - cachedTime < DATA_CACHE_TTL) {
-                const cachedData = JSON.parse(cached);
-                renderTable(cachedData, false); // 首次加载不排序
-            }
+      function loadTableData() {
+        document.getElementById("loading").style.display = "block";
+        const cached = localStorage.getItem(DATA_CACHE_KEY);
+        const cachedTime = Number(
+          localStorage.getItem(DATA_CACHE_TIME_KEY) || 0,
+        );
+        const now = Date.now();
 
-            fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), { cache: 'reload' })
-                .then(response => {
-                    if (!response.ok) throw new Error('网络响应异常');
-                    return response.json();
-                })
-                .then(data => {
-                    localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data));
-                    localStorage.setItem(DATA_CACHE_TIME_KEY, String(Date.now()));
-                    renderTable(data, false); // 首次加载不排序
-                })
-                .catch(error => {
-                    if (!cached) {
-                        console.error('数据加载失败:', error);
-                    }
-                })
-                .finally(() => document.getElementById('loading').style.display = 'none');
+        if (cached && now - cachedTime < DATA_CACHE_TTL) {
+          const cachedData = JSON.parse(cached);
+          renderTable(cachedData, false); // 首次加载不排序
         }
 
-        // 统一筛选函数
-        function filterByTag() {
-            const selectedTag = document.getElementById("tagSelect").value;
-            const keyword = document.getElementById("keywordInput").value.trim().toUpperCase();
-            
-            document.querySelectorAll("#myTable tbody tr").forEach(row => {
-                const matchTag = selectedTag === "all" || row.dataset.tags.includes(selectedTag);
-                const matchKeyword = Array.from(row.getElementsByTagName('td'))
-                    .some(cell => cell.textContent.toUpperCase().includes(keyword));
-                
-                row.style.display = (matchTag && matchKeyword) ? "" : "none";
-            });
+        fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), {
+          cache: "reload",
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error("网络响应异常");
+            return response.json();
+          })
+          .then((data) => {
+            localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data));
+            localStorage.setItem(DATA_CACHE_TIME_KEY, String(Date.now()));
+            renderTable(data, false); // 首次加载不排序
+          })
+          .catch((error) => {
+            if (!cached) {
+              console.error("数据加载失败:", error);
+            }
+          })
+          .finally(
+            () => (document.getElementById("loading").style.display = "none"),
+          );
+      }
+
+      // 统一筛选函数
+      function filterByTag() {
+        const selectedTag = document.getElementById("tagSelect").value;
+        const keyword = document
+          .getElementById("keywordInput")
+          .value.trim()
+          .toUpperCase();
+
+        document.querySelectorAll("#myTable tbody tr").forEach((row) => {
+          const matchTag =
+            selectedTag === "all" || row.dataset.tags.includes(selectedTag);
+          const matchKeyword = Array.from(row.getElementsByTagName("td")).some(
+            (cell) => cell.textContent.toUpperCase().includes(keyword),
+          );
+
+          row.style.display = matchTag && matchKeyword ? "" : "none";
+        });
+      }
+
+      // 转换 Twitter 链接为 Intent API
+      function convertTwitterUrl(url) {
+        if (url.includes("twitter://user?screen_name=")) {
+          const screenName = url.match(/screen_name=([^&]+)/)?.[1];
+          if (screenName) {
+            return `https://twitter.com/intent/user?screen_name=${screenName}`;
+          }
+        }
+        return url;
+      }
+
+      // 打开 Twitter Intent（移动端优先打开应用，失败则打开网页）
+      function openTwitterWithIntent(screenName) {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const intentUrl = `https://twitter.com/intent/user?screen_name=${screenName}`;
+
+        if (isMobile) {
+          // 移动端：先尝试打开应用
+          window.location.href = `twitter://user?screen_name=${screenName}`;
+          // 如果应用未安装，500ms 后打开网页
+          setTimeout(() => {
+            window.location.href = intentUrl;
+          }, 500);
+        } else {
+          // 桌面端：直接打开 Intent API
+          window.open(intentUrl, "_blank");
+        }
+      }
+
+      // 获取社交媒体图标
+      function getSocialIcon(url) {
+        const platformMap = {
+          snssdk1128: {
+            class: "douyin-icon",
+            icon: "douyin",
+            text: "dy",
+            title: "抖音主页",
+          },
+          twitter: {
+            class: "twitter-icon",
+            icon: "twitter",
+            text: "twi",
+            title: "Twitter主页",
+          },
+        };
+
+        const platform = Object.keys(platformMap).find((key) =>
+          url.includes(key),
+        );
+        const config = platformMap[platform] || {};
+
+        if (!config.class) return "";
+
+        // 如果是 Twitter 链接，转换为 Intent API
+        let finalUrl = url;
+        let onClick = "";
+        if (platform === "twitter") {
+          finalUrl = convertTwitterUrl(url);
+          const screenName = url.match(/screen_name=([^&]+)/)?.[1];
+          if (screenName) {
+            onClick = `onclick="openTwitterWithIntent('${screenName}'); return false;"`;
+          }
         }
 
-        // 转换 Twitter 链接为 Intent API
-        function convertTwitterUrl(url) {
-            if (url.includes('twitter://user?screen_name=')) {
-                const screenName = url.match(/screen_name=([^&]+)/)?.[1];
-                if (screenName) {
-                    return `https://twitter.com/intent/user?screen_name=${screenName}`;
-                }
-            }
-            return url;
-        }
-
-        // 打开 Twitter Intent（移动端优先打开应用，失败则打开网页）
-        function openTwitterWithIntent(screenName) {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const intentUrl = `https://twitter.com/intent/user?screen_name=${screenName}`;
-            
-            if (isMobile) {
-                // 移动端：先尝试打开应用
-                window.location.href = `twitter://user?screen_name=${screenName}`;
-                // 如果应用未安装，500ms 后打开网页
-                setTimeout(() => {
-                    window.location.href = intentUrl;
-                }, 500);
-            } else {
-                // 桌面端：直接打开 Intent API
-                window.open(intentUrl, '_blank');
-            }
-        }
-
-        // 获取社交媒体图标
-        function getSocialIcon(url) {
-            const platformMap = {
-                'snssdk1128': {
-                    class: 'douyin-icon',
-                    icon: 'douyin',
-                    text: 'dy',
-                    title: '抖音主页'
-                },
-                'twitter': {
-                    class: 'twitter-icon',
-                    icon: 'twitter',
-                    text: 'twi',
-                    title: 'Twitter主页'
-                }
-            };
-
-            const platform = Object.keys(platformMap).find(key => url.includes(key));
-            const config = platformMap[platform] || {};
-
-            if (!config.class) return '';
-
-            // 如果是 Twitter 链接，转换为 Intent API
-            let finalUrl = url;
-            let onClick = '';
-            if (platform === 'twitter') {
-                finalUrl = convertTwitterUrl(url);
-                const screenName = url.match(/screen_name=([^&]+)/)?.[1];
-                if (screenName) {
-                    onClick = `onclick="openTwitterWithIntent('${screenName}'); return false;"`;
-                }
-            }
-
-            return `
+        return `
                 <a href="${finalUrl}" 
                    class="social-icon ${config.class}" 
                    target="_blank"
@@ -697,70 +795,71 @@ function loadInfoContent() {
                    <span class="social-text">${config.text}</span>
                 </a>
             `;
-        }
+      }
 
-        // 获取标签样式类
-        function getTagClass(tags) {
-            const tagClasses = {
-                '绿色陪': 'green',
-                '女喘陪': 'audio',
-                '视频陪': 'video',
-                '未进店': 'unjoined' // 新增未进店样式
-            };
-            return tagClasses[tags] || '';
-        }
+      // 获取标签样式类
+      function getTagClass(tags) {
+        const tagClasses = {
+          绿色陪: "green",
+          女喘陪: "audio",
+          视频陪: "video",
+          未进店: "unjoined", // 新增未进店样式
+        };
+        return tagClasses[tags] || "";
+      }
 
-        function getSvgIcon(name) {
-            const icons = {
-                twitter: `
+      function getSvgIcon(name) {
+        const icons = {
+          twitter: `
                     <span class="icon icon-twitter" aria-hidden="true">
                         <svg viewBox="0 0 512 512">
                             <use href="#icon-twitter" />
                         </svg>
                     </span>
                 `,
-                douyin: `
+          douyin: `
                     <span class="icon icon-douyin" aria-hidden="true">
                         <svg viewBox="0 0 1024 1024">
                             <use href="#icon-douyin" />
                         </svg>
                     </span>
-                `
-            };
-            return icons[name] || '';
+                `,
+        };
+        return icons[name] || "";
+      }
+
+      // 修改后的切换函数
+      function toggleInfo() {
+        const info = document.querySelector(".info");
+        if (info) {
+          info.style.display =
+            info.style.display === "block" ? "none" : "block";
         }
+      }
 
-    // 修改后的切换函数
-function toggleInfo() {
-    const info = document.querySelector('.info');
-    if (info) {
-        info.style.display = info.style.display === 'block' ? 'none' : 'block';
-    }
-}
+      // 事件监听
+      window.onload = init;
 
-        // 事件监听
-        window.onload = init;
-
-        function copyPageUrl() {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(window.location.href)
-                    .then(() => alert('网页链接已复制到剪贴板'))
-                    .catch(() => fallbackCopy());
-            } else {
-                fallbackCopy();
-            }
+      function copyPageUrl() {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(window.location.href)
+            .then(() => alert("网页链接已复制到剪贴板"))
+            .catch(() => fallbackCopy());
+        } else {
+          fallbackCopy();
         }
+      }
 
-        function fallbackCopy() {
-            const input = document.createElement('input');
-            input.value = window.location.href;
-            document.body.appendChild(input);
-            input.select();
-            document.execCommand('copy');
-            document.body.removeChild(input);
-            alert('网页链接已复制到剪贴板');
-        }
-
+      function fallbackCopy() {
+        const input = document.createElement("input");
+        input.value = window.location.href;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+        alert("网页链接已复制到剪贴板");
+      }
     </script>
-</body>
+  </body>
 </html>
