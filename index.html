@@ -37,7 +37,21 @@
       name="google-site-verification"
       content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s"
     />
-    <link rel="stylesheet" href="assets/styles/info-content.css" />
+    <script>
+      (() => {
+        try {
+          const cachedBackground = localStorage.getItem(
+            "rainlove_mobile_bg_v20260616"
+          );
+          if (cachedBackground) {
+            document.documentElement.style.setProperty(
+              "--mobile-bg-image",
+              `url("${cachedBackground}")`
+            );
+          }
+        } catch (_) {}
+      })();
+    </script>
     <style>
       :root {
         --primary: #2c3e50;
@@ -59,6 +73,10 @@
         font-size: 1.8em;
       }
 
+      .hero-panel {
+        text-align: center;
+      }
+
       .alert-box {
         background: #fff3f3;
         padding: 12px;
@@ -70,6 +88,7 @@
 
       .qrcode {
         width: 180px;
+        height: 180px;
         display: block;
         margin: 15px auto;
         border: 2px solid var(--primary);
@@ -174,6 +193,8 @@
       .search-container {
         display: flex;
         justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
         gap: 10px;
         margin: 15px 0;
       }
@@ -186,24 +207,45 @@
         font-size: 13px;
       }
 
+      .empty-state {
+        max-width: 800px;
+        margin: 16px auto;
+        padding: 14px;
+        border: 1px dashed #c8d1d8;
+        border-radius: 8px;
+        background: white;
+        color: #66727c;
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .staff-item[hidden],
+      .empty-state[hidden] {
+        display: none !important;
+      }
+
       .video .name-text,
       .video .desc-text,
-      .video .kp-text {
+      .video .kp-text,
+      .video .card-desc {
         color: #f1c40f;
       }
       .audio .name-text,
       .audio .desc-text,
-      .audio .kp-text {
+      .audio .kp-text,
+      .audio .card-desc {
         color: var(--secondary);
       }
       .green .name-text,
       .green .desc-text,
-      .green .kp-text {
+      .green .kp-text,
+      .green .card-desc {
         color: #27ae60;
       }
       .unjoined .name-text,
       .unjoined .desc-text,
-      .unjoined .kp-text {
+      .unjoined .kp-text,
+      .unjoined .card-desc {
         color: #aaa;
       }
       .info .video {
@@ -363,28 +405,298 @@
         width: 12px;
         height: 12px;
       }
+
+      .feature-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+
+      .feature-chip,
+      .tag-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .feature-chip {
+        padding: 4px 7px;
+        background: #f2f5f7;
+        color: #52616d;
+        font-size: 11px;
+      }
+
+      .tag-badge {
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .tag-badge.green-badge {
+        background: #e9f8ef;
+        color: #1e874b;
+      }
+
+      .tag-badge.audio-badge {
+        background: #fff0ee;
+        color: #c0392b;
+      }
+
+      .tag-badge.video-badge {
+        background: #fff8d8;
+        color: #9a6b00;
+      }
+
+      .tag-badge.unjoined-badge {
+        background: #f1f1f1;
+        color: #777;
+      }
+
+      .card-list {
+        display: none;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 10px;
+          background-color: #f6f8fc;
+          background-image:
+            linear-gradient(
+              to bottom,
+              rgba(220, 235, 255, 0.08) 0,
+              rgba(246, 248, 252, 0.62) 700px,
+              #f6f8fc 1080px
+            ),
+            var(
+              --mobile-bg-image,
+              url("assets/images/rainlove-mobile-bg.webp?v=20260616")
+            );
+          background-repeat: no-repeat, no-repeat;
+          background-position: top center;
+          background-size: 100% auto, 100% auto;
+        }
+
+        .hero-panel {
+          margin: -10px -10px 12px;
+          padding: 24px 10px 16px;
+          background: linear-gradient(
+            to bottom,
+            rgba(218, 234, 255, 0.42),
+            rgba(255, 255, 255, 0.2) 68%,
+            rgba(246, 248, 252, 0)
+          );
+        }
+
+        .hero-panel h1 {
+          margin: 0 0 12px;
+          color: #24384b;
+          font-size: 1.7em;
+          font-weight: 800;
+          text-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.92),
+            0 8px 22px rgba(52, 82, 120, 0.18);
+        }
+
+        button {
+          min-height: 38px;
+        }
+
+        .hero-panel .alert-box {
+          margin: 0 10px 12px;
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          background: rgba(255, 245, 248, 0.78);
+          box-shadow: 0 10px 24px rgba(52, 82, 120, 0.12);
+          backdrop-filter: blur(8px);
+          text-align: left;
+        }
+
+        .hero-panel button {
+          margin: 12px auto;
+          border-radius: 6px;
+          background: linear-gradient(135deg, #24384b, #31536f);
+          box-shadow: 0 8px 18px rgba(36, 56, 75, 0.22);
+        }
+
+        .hero-panel .qrcode {
+          width: 188px;
+          height: 188px;
+          margin: 12px auto 0;
+          border-color: #24384b;
+          background: white;
+          box-shadow: 0 12px 28px rgba(36, 56, 75, 0.18);
+        }
+
+        .info-block {
+          margin: 10px 0;
+          border-radius: 8px;
+        }
+
+        .search-container {
+          position: sticky;
+          top: 0;
+          z-index: 2;
+          margin: 12px -10px 8px;
+          padding: 10px;
+          background: rgba(248, 251, 255, 0.96);
+          backdrop-filter: blur(8px);
+          border-bottom: 1px solid #e5eaee;
+        }
+
+        .search-container select,
+        .search-container input[type="text"] {
+          flex: 1 1 calc(50% - 8px);
+          min-width: 0;
+          height: 36px;
+          box-sizing: border-box;
+        }
+
+        #myTable {
+          display: none;
+        }
+
+        .card-list {
+          display: grid;
+          gap: 10px;
+          max-width: 800px;
+          margin: 10px auto 18px;
+        }
+
+        .staff-card {
+          padding: 12px;
+          border: 1px solid #e3e7ea;
+          border-radius: 8px;
+          background: white;
+          box-shadow: 0 1px 2px rgba(44, 62, 80, 0.06);
+        }
+
+        .card-header {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 10px;
+          align-items: start;
+        }
+
+        .card-title {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 6px;
+          min-width: 0;
+        }
+
+        .card-name {
+          margin: 0;
+          color: var(--text);
+          font-size: 16px;
+          line-height: 1.25;
+          overflow-wrap: anywhere;
+        }
+
+        .card-price {
+          min-width: 58px;
+          padding: 6px 8px;
+          border-radius: 8px;
+          background: #f4f6f8;
+          color: var(--primary);
+          font-size: 12px;
+          text-align: center;
+        }
+
+        .card-price strong {
+          display: block;
+          margin-top: 2px;
+          font-size: 17px;
+        }
+
+        .card-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          align-items: center;
+          margin: 9px 0 8px;
+        }
+
+        .card-desc-toggle {
+          position: relative;
+          padding-bottom: 20px;
+          cursor: pointer;
+        }
+
+        .card-desc-toggle::after {
+          content: "";
+          position: absolute;
+          right: 0;
+          bottom: 18px;
+          left: 0;
+          height: 28px;
+          background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+          pointer-events: none;
+        }
+
+        .card-desc {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 4;
+          overflow: hidden;
+          margin: 0;
+          color: #3e4b55;
+          font-size: 13px;
+          line-height: 1.55;
+        }
+
+        .staff-card.expanded .card-desc {
+          display: block;
+          -webkit-line-clamp: unset;
+        }
+
+        .staff-card.expanded .card-desc-toggle::after {
+          display: none;
+        }
+
+        .desc-toggle-hint {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          z-index: 1;
+          padding: 3px 8px;
+          border-radius: 999px;
+          background: #eef3f7;
+          color: #52616d;
+          font-size: 11px;
+          line-height: 1.2;
+          box-shadow: 0 1px 2px rgba(27, 45, 59, 0.08);
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>雨恋女陪殿</h1>
+    <section class="hero-panel" aria-labelledby="site-title">
+      <h1 id="site-title">雨恋女陪殿</h1>
 
-    <div class="alert-box">
-      <p style="color: var(--secondary); margin: 0 0 8px 0">
-        <b>认证企业微信！！</b>所有雨恋号置顶都是企微接待，已有被骗重点提醒！
-      </p>
-      <p style="font-size: 12px; color: #666; margin: 0">
-        如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！
-      </p>
-    </div>
+      <div class="alert-box">
+        <p style="color: var(--secondary); margin: 0 0 8px 0">
+          <b>认证企业微信！！</b>所有雨恋号置顶都是企微接待，已有被骗重点提醒！
+        </p>
+        <p style="font-size: 12px; color: #666; margin: 0">
+          如果暂时不点也可以添加关注雨恋下单优惠福利喔！！！
+        </p>
+      </div>
 
-    <button onclick="copyPageUrl()">复制网页链接</button>
+      <button onclick="copyPageUrl()">复制网页链接</button>
 
-    <img
-      class="qrcode"
-      src="assets/images/quan.png"
-      alt="雨恋福利号"
-      loading="lazy"
-    />
+      <img
+        class="qrcode"
+        src="assets/images/quan.png"
+        alt="雨恋福利号"
+        width="180"
+        height="180"
+        decoding="async"
+        loading="lazy"
+      />
+    </section>
 
     <div class="info-block">
       <p style="margin: 5px 0"><b>营业时间：</b>全天24小时（上午人不多）</p>
@@ -488,6 +800,9 @@
       />
     </div>
 
+    <div id="noResults" class="empty-state" hidden>没有找到匹配的陪陪</div>
+    <div id="cardList" class="card-list"></div>
+
     <table id="myTable">
       <thead>
         <tr>
@@ -506,9 +821,32 @@
     <script>
       const INFO_VERSION = "20251114";
       let DATA_VERSION = "20251114";
-      const DATA_CACHE_KEY = "staff_data_cache";
-      const DATA_CACHE_TIME_KEY = "staff_data_cache_time";
-      const DATA_CACHE_TTL = 1000 * 60 * 5; // 5分钟
+      const DATA_CACHE_KEY_PREFIX = "staff_data_cache:";
+      const DATA_CACHE_TIME_KEY_PREFIX = "staff_data_cache_time:";
+      const DATA_CACHE_TTL = 1000 * 60 * 60 * 24 * 7; // 7天
+      const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
+      const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
+      const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
+      const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
+      const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
+      const FEATURE_RULES = [
+        {
+          label: "音频定制",
+          pattern: /音频定制|定制音频|录音定制|定制录音|成品录音|音频|录音/,
+        },
+        {
+          label: "视频定制",
+          pattern: /视频定制|定制视频|小视频定制|定制小视频|照片定制|定制照片|小视频|照片|图包/,
+        },
+        { label: "视频", pattern: /视频|露脸|摄像头|胸视|腿视|漏视/ },
+        { label: "语聊", pattern: /语聊|连麦|哄睡|叫醒/ },
+        {
+          label: "游戏",
+          pattern: /手游|端游|王者|金铲铲|lol|云顶|瓦|吃鸡|csgo|永劫/i,
+        },
+        { label: "Cos", pattern: /cos|jk|lo裙|汉服|旗袍|制服/i },
+        { label: "虚恋", pattern: /虚恋|电子女友|恋人/ },
+      ];
       let currentSortColumn = null;
       let currentSortDirection = null;
       let tableData = null;
@@ -528,18 +866,159 @@
         return new URL(path, getSiteBaseUrl()).toString();
       }
 
+      function readLocalCache(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function writeLocalCache(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch (_) {}
+      }
+
+      function removeLocalCache(key) {
+        try {
+          localStorage.removeItem(key);
+        } catch (_) {}
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function getDataCacheKeys() {
+        return {
+          dataKey: `${DATA_CACHE_KEY_PREFIX}${DATA_VERSION}`,
+          timeKey: `${DATA_CACHE_TIME_KEY_PREFIX}${DATA_VERSION}`,
+        };
+      }
+
+      function getInfoCacheKey() {
+        return `${INFO_CACHE_KEY_PREFIX}${INFO_VERSION}`;
+      }
+
       // 提取 kp 价格
       function extractKpPrice(desc) {
         if (!desc) return null;
-        // 优先使用单独的 kp 字段（如果存在）
-        // 否则从 desc 中提取，支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
+        // 支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
         const match = desc.match(/(?:^|[^a-zA-Z])k(?:p)?(\d+)\//);
         return match ? parseInt(match[1], 10) : null;
       }
 
+      function getKpPrice(item) {
+        const fieldPrice = Number.parseInt(item.kp, 10);
+        if (Number.isFinite(fieldPrice)) return fieldPrice;
+        return extractKpPrice(item.desc);
+      }
+
+      function getFeatureTags(desc, kpPrice) {
+        const text = desc || "";
+        const labels = FEATURE_RULES.filter((rule) => rule.pattern.test(text))
+          .map((rule) => rule.label)
+          .slice(0, 4);
+        return kpPrice !== null ? ["KP", ...labels] : labels;
+      }
+
+      function prepareStaffItems(data) {
+        return (data.staff || []).map((item, index) => {
+          const kpPrice = getKpPrice(item);
+          const features = getFeatureTags(item.desc, kpPrice);
+          return {
+            ...item,
+            index,
+            kpPrice,
+            kpDisplay: kpPrice ? String(kpPrice) : "-",
+            features,
+            searchText: [
+              item.name,
+              item.tags,
+              item.desc,
+              kpPrice || "",
+              features.join(" "),
+            ].join(" "),
+          };
+        });
+      }
+
       function init() {
         document.getElementById("tagSelect").value = "all";
+        bindCardListActions();
+        applyUrlState();
+        syncSortControls();
+        warmVisualCache();
         loadVersion().finally(loadTableData);
+      }
+
+      function runWhenIdle(callback) {
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(callback, { timeout: 2500 });
+          return;
+        }
+        setTimeout(callback, 1200);
+      }
+
+      function warmVisualCache() {
+        runWhenIdle(() => {
+          cleanupOldMobileBackgroundCaches();
+          VISUAL_CACHE_ASSETS.forEach((assetPath) => {
+            fetch(buildRuntimeUrl(assetPath), { cache: "force-cache" }).catch(
+              () => {}
+            );
+          });
+
+          if (window.matchMedia("(max-width: 640px)").matches) {
+            cacheMobileBackground();
+          }
+        });
+      }
+
+      function cleanupOldMobileBackgroundCaches() {
+        try {
+          const keysToRemove = [];
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+            if (
+              key &&
+              key.startsWith("rainlove_mobile_bg_") &&
+              key !== MOBILE_BG_CACHE_KEY
+            ) {
+              keysToRemove.push(key);
+            }
+          }
+          keysToRemove.forEach(removeLocalCache);
+        } catch (_) {}
+      }
+
+      function cacheMobileBackground() {
+        if (readLocalCache(MOBILE_BG_CACHE_KEY)) return;
+
+        fetch(buildRuntimeUrl(MOBILE_BG_URL), { cache: "force-cache" })
+          .then((response) => (response.ok ? response.blob() : null))
+          .then((blob) => {
+            if (!blob || blob.size > 60000 || !window.FileReader) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+              const dataUrl = reader.result;
+              if (typeof dataUrl !== "string") return;
+              writeLocalCache(MOBILE_BG_CACHE_KEY, dataUrl);
+              document.documentElement.style.setProperty(
+                "--mobile-bg-image",
+                `url("${dataUrl}")`
+              );
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch(() => {});
       }
 
       async function loadVersion() {
@@ -560,91 +1039,143 @@
       // 动态加载说明内容
       function loadInfoContent() {
         const container = document.getElementById("info-container");
-        if (!container.innerHTML) {
-          document.getElementById("loading").style.display = "block";
-          fetch(
-            buildRuntimeUrl(
-              `assets/fragments/info-content.html?v=${INFO_VERSION}`,
-            ),
-            { cache: "reload" },
-          )
-            .then((response) => {
-              if (!response.ok) throw new Error("内容加载失败");
-              return response.text();
-            })
-            .then((html) => {
+        if (container.innerHTML) {
+          toggleInfo();
+          return;
+        }
+
+        const cacheKey = getInfoCacheKey();
+        const cachedHtml = readLocalCache(cacheKey);
+        if (cachedHtml) {
+          container.innerHTML = cachedHtml;
+          toggleInfo();
+          runWhenIdle(() =>
+            fetchInfoContent(container, cacheKey, false).catch(() => {})
+          );
+          return;
+        }
+
+        document.getElementById("loading").style.display = "block";
+        fetchInfoContent(container, cacheKey, true)
+          .catch((err) => console.error(err))
+          .finally(
+            () => (document.getElementById("loading").style.display = "none"),
+          );
+      }
+
+      function fetchInfoContent(container, cacheKey, shouldRender) {
+        return fetch(
+          buildRuntimeUrl(`assets/fragments/info-content.html?v=${INFO_VERSION}`),
+          { cache: "default" }
+        )
+          .then((response) => {
+            if (!response.ok) throw new Error("内容加载失败");
+            return response.text();
+          })
+          .then((html) => {
+            writeLocalCache(cacheKey, html);
+            if (shouldRender) {
               container.innerHTML = html;
               toggleInfo();
-            })
-            .catch((err) => console.error(err))
-            .finally(
-              () => (document.getElementById("loading").style.display = "none"),
-            );
-        } else {
-          toggleInfo();
-        }
+            }
+          });
       }
 
       // 数据加载函数
       function renderTable(data, applySort = true) {
         tableData = data;
-        let staff = [...data.staff];
+        let staff = prepareStaffItems(data);
 
-        // 如果需要应用排序
         if (applySort && currentSortColumn && currentSortDirection) {
-          staff.sort((a, b) => {
-            let aVal, bVal;
-            if (currentSortColumn === "kp") {
-              aVal = extractKpPrice(a.desc) || (a.kp ? parseInt(a.kp) : null);
-              bVal = extractKpPrice(b.desc) || (b.kp ? parseInt(b.kp) : null);
-              // 处理 null 值，放在最后
-              if (aVal === null && bVal === null) return 0;
-              if (aVal === null) return 1;
-              if (bVal === null) return -1;
-            } else {
-              aVal = a[currentSortColumn];
-              bVal = b[currentSortColumn];
-            }
-
-            if (currentSortDirection === "asc") {
-              return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-            } else {
-              return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
-            }
-          });
+          staff.sort(compareStaff);
         }
 
         const tbody = document.getElementById("tableBody");
-        tbody.innerHTML = staff
-          .map((item) => {
-            const kpPrice = item.kp
-              ? parseInt(item.kp)
-              : extractKpPrice(item.desc);
-            const kpDisplay = kpPrice ? kpPrice : "-";
-            return `
-                <tr data-tags="${item.tags}" class="${getTagClass(item.tags)}" data-kp="${kpPrice || ""}">
+        tbody.innerHTML = staff.map(renderStaffRow).join("");
+
+        document.getElementById("cardList").innerHTML = staff
+          .map(renderStaffCard)
+          .join("");
+
+        filterByTag();
+      }
+
+      function compareStaff(a, b) {
+        let aVal, bVal;
+        if (currentSortColumn === "kp") {
+          aVal = a.kpPrice;
+          bVal = b.kpPrice;
+          if (aVal === null && bVal === null) return 0;
+          if (aVal === null) return 1;
+          if (bVal === null) return -1;
+        } else {
+          aVal = a[currentSortColumn];
+          bVal = b[currentSortColumn];
+        }
+
+        if (currentSortDirection === "asc") {
+          return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        }
+        return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+      }
+
+      function renderStaffRow(item) {
+        const socialIcon = getSocialIcon(item.social);
+        return `
+                <tr class="staff-item staff-row ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice || ""}">
                     <td>
                         <div class="name-cell">
-                            <div class="name-text">${item.name}</div>
+                            <div class="name-text">${escapeHtml(item.name)}</div>
                             <div class="social-links compact">
-                                ${getSocialIcon(item.social)}
+                                ${socialIcon}
                             </div>
                         </div>
                     </td>
-                    <td class="kp-cell"><span class="kp-text">${kpDisplay}</span></td>
-                    <td><span class="desc-text">${item.desc}</span></td>
+                    <td class="kp-cell"><span class="kp-text">${item.kpDisplay}</span></td>
+                    <td>
+                      <span class="desc-text">${escapeHtml(item.desc)}</span>
+                      ${renderFeatureChips(item.features)}
+                    </td>
                 </tr>
             `;
-          })
-          .join("");
-        filterByTag();
+      }
+
+      function renderStaffCard(item) {
+        const socialIcon = getSocialIcon(item.social);
+        return `
+                <article id="staff-${item.index}" class="staff-item staff-card ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice || ""}">
+                  <div class="card-header">
+                    <div class="card-title">
+                      <h2 class="card-name">${escapeHtml(item.name)}</h2>
+                      ${socialIcon}
+                      ${renderTagBadge(item.tags)}
+                    </div>
+                    <div class="card-price">KP<strong>${item.kpDisplay}</strong></div>
+                  </div>
+                  <div class="card-meta">
+                    ${renderFeatureChips(item.features)}
+                  </div>
+                  <div class="card-desc-toggle" role="button" tabindex="0" aria-expanded="false" aria-label="展开完整介绍">
+                    <p class="card-desc">${escapeHtml(item.desc)}</p>
+                    <span class="desc-toggle-hint">展开</span>
+                  </div>
+                </article>
+            `;
+      }
+
+      function renderFeatureChips(features) {
+        if (!features.length) return "";
+        return `<div class="feature-chips">${features
+          .map((feature) => `<span class="feature-chip">${feature}</span>`)
+          .join("")}</div>`;
+      }
+
+      function renderTagBadge(tags) {
+        return `<span class="tag-badge ${getTagClass(tags)}-badge">${escapeHtml(tags)}</span>`;
       }
 
       // 排序函数
       function sortTable(column) {
-        const th = document.querySelector(`th[data-sort="${column}"]`);
-
-        // 切换排序方向
         if (currentSortColumn === column) {
           currentSortDirection =
             currentSortDirection === "asc" ? "desc" : "asc";
@@ -653,53 +1184,75 @@
           currentSortDirection = "asc";
         }
 
-        // 更新排序图标
-        document.querySelectorAll("th.sortable").forEach((header) => {
-          header.classList.remove("sort-asc", "sort-desc");
-        });
-        if (th) {
-          th.classList.add(`sort-${currentSortDirection}`);
-        }
+        syncSortControls();
 
-        // 重新渲染表格
         if (tableData) {
           renderTable(tableData, true);
         }
       }
 
+      function syncSortControls() {
+        document.querySelectorAll("th.sortable").forEach((header) => {
+          header.classList.remove("sort-asc", "sort-desc");
+        });
+        const th = currentSortColumn
+          ? document.querySelector(`th[data-sort="${currentSortColumn}"]`)
+          : null;
+        if (th && currentSortDirection) {
+          th.classList.add(`sort-${currentSortDirection}`);
+        }
+      }
+
       function loadTableData() {
         document.getElementById("loading").style.display = "block";
-        const cached = localStorage.getItem(DATA_CACHE_KEY);
-        const cachedTime = Number(
-          localStorage.getItem(DATA_CACHE_TIME_KEY) || 0,
-        );
+        const { dataKey, timeKey } = getDataCacheKeys();
+        const cached = readLocalCache(dataKey);
+        const cachedTime = Number(readLocalCache(timeKey) || 0);
         const now = Date.now();
+        let hasUsableCache = false;
 
         if (cached && now - cachedTime < DATA_CACHE_TTL) {
-          const cachedData = JSON.parse(cached);
-          renderTable(cachedData, false); // 首次加载不排序
+          try {
+            const cachedData = JSON.parse(cached);
+            hasUsableCache = true;
+            renderTable(cachedData, Boolean(currentSortColumn));
+            document.getElementById("loading").style.display = "none";
+            runWhenIdle(() =>
+              fetchTableData(dataKey, timeKey, false).catch(() => {})
+            );
+            return;
+          } catch (_) {
+            removeLocalCache(dataKey);
+            removeLocalCache(timeKey);
+          }
         }
 
-        fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), {
-          cache: "reload",
-        })
-          .then((response) => {
-            if (!response.ok) throw new Error("网络响应异常");
-            return response.json();
-          })
-          .then((data) => {
-            localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data));
-            localStorage.setItem(DATA_CACHE_TIME_KEY, String(Date.now()));
-            renderTable(data, false); // 首次加载不排序
-          })
+        fetchTableData(dataKey, timeKey, true)
           .catch((error) => {
-            if (!cached) {
+            if (!hasUsableCache) {
               console.error("数据加载失败:", error);
             }
           })
           .finally(
             () => (document.getElementById("loading").style.display = "none"),
           );
+      }
+
+      function fetchTableData(dataKey, timeKey, shouldRender) {
+        return fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), {
+          cache: "default",
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error("网络响应异常");
+            return response.json();
+          })
+          .then((data) => {
+            writeLocalCache(dataKey, JSON.stringify(data));
+            writeLocalCache(timeKey, String(Date.now()));
+            if (shouldRender) {
+              renderTable(data, Boolean(currentSortColumn));
+            }
+          });
       }
 
       // 统一筛选函数
@@ -709,37 +1262,73 @@
           .getElementById("keywordInput")
           .value.trim()
           .toUpperCase();
+        let matched = 0;
 
-        document.querySelectorAll("#myTable tbody tr").forEach((row) => {
+        document.querySelectorAll(".staff-item").forEach((item) => {
           const matchTag =
-            selectedTag === "all" || row.dataset.tags.includes(selectedTag);
-          const matchKeyword = Array.from(row.getElementsByTagName("td")).some(
-            (cell) => cell.textContent.toUpperCase().includes(keyword),
-          );
+            selectedTag === "all" || item.dataset.tags.includes(selectedTag);
+          const matchKeyword =
+            !keyword || item.dataset.search.toUpperCase().includes(keyword);
+          const isMatch = matchTag && matchKeyword;
 
-          row.style.display = matchTag && matchKeyword ? "" : "none";
+          item.hidden = !isMatch;
+          if (isMatch && item.classList.contains("staff-row")) matched += 1;
         });
+
+        updateResultSummary(matched);
+      }
+
+      function updateResultSummary(matched) {
+        const total = document.querySelectorAll(".staff-row").length;
+        const noResults = document.getElementById("noResults");
+        noResults.hidden = !total || matched > 0;
+      }
+
+      function applyUrlState() {
+        const params = new URLSearchParams(window.location.search);
+        const tag = params.get("tag");
+        const keyword = params.get("q");
+        const sort = params.get("sort");
+        const direction = params.get("dir");
+
+        if (tag && VALID_TAGS.includes(tag)) {
+          document.getElementById("tagSelect").value = tag;
+        }
+        if (keyword) {
+          document.getElementById("keywordInput").value = keyword;
+        }
+        if (sort === "kp" && ["asc", "desc"].includes(direction)) {
+          currentSortColumn = sort;
+          currentSortDirection = direction;
+        }
       }
 
       // 转换 Twitter 链接为 Intent API
       function convertTwitterUrl(url) {
-        if (url.includes("twitter://user?screen_name=")) {
-          const screenName = url.match(/screen_name=([^&]+)/)?.[1];
+        if (url && url.includes("twitter://user?screen_name=")) {
+          const screenName = getTwitterScreenName(url);
           if (screenName) {
-            return `https://twitter.com/intent/user?screen_name=${screenName}`;
+            return `https://twitter.com/intent/user?screen_name=${encodeURIComponent(screenName)}`;
           }
         }
         return url;
       }
 
+      function getTwitterScreenName(url) {
+        const screenName = url?.match(/screen_name=([^&]+)/)?.[1] || "";
+        return screenName.replace(/[^A-Za-z0-9_]/g, "");
+      }
+
       // 打开 Twitter Intent（移动端优先打开应用，失败则打开网页）
       function openTwitterWithIntent(screenName) {
+        if (!screenName) return;
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const intentUrl = `https://twitter.com/intent/user?screen_name=${screenName}`;
+        const encodedName = encodeURIComponent(screenName);
+        const intentUrl = `https://twitter.com/intent/user?screen_name=${encodedName}`;
 
         if (isMobile) {
           // 移动端：先尝试打开应用
-          window.location.href = `twitter://user?screen_name=${screenName}`;
+          window.location.href = `twitter://user?screen_name=${encodedName}`;
           // 如果应用未安装，500ms 后打开网页
           setTimeout(() => {
             window.location.href = intentUrl;
@@ -752,6 +1341,7 @@
 
       // 获取社交媒体图标
       function getSocialIcon(url) {
+        if (!url) return "";
         const platformMap = {
           snssdk1128: {
             class: "douyin-icon",
@@ -774,23 +1364,21 @@
 
         if (!config.class) return "";
 
-        // 如果是 Twitter 链接，转换为 Intent API
         let finalUrl = url;
         let onClick = "";
         if (platform === "twitter") {
+          const screenName = getTwitterScreenName(url);
+          if (!screenName) return "";
           finalUrl = convertTwitterUrl(url);
-          const screenName = url.match(/screen_name=([^&]+)/)?.[1];
-          if (screenName) {
-            onClick = `onclick="openTwitterWithIntent('${screenName}'); return false;"`;
-          }
+          onClick = `onclick="openTwitterWithIntent('${screenName}'); return false;"`;
         }
 
         return `
-                <a href="${finalUrl}" 
-                   class="social-icon ${config.class}" 
+                <a href="${escapeHtml(finalUrl)}"
+                   class="social-icon ${config.class}"
                    target="_blank"
                    ${onClick}
-                   title="${config.title}">
+                   title="${escapeHtml(config.title)}">
                    ${getSvgIcon(config.icon)}
                    <span class="social-text">${config.text}</span>
                 </a>
@@ -803,7 +1391,7 @@
           绿色陪: "green",
           女喘陪: "audio",
           视频陪: "video",
-          未进店: "unjoined", // 新增未进店样式
+          未进店: "unjoined",
         };
         return tagClasses[tags] || "";
       }
@@ -840,25 +1428,67 @@
       // 事件监听
       window.onload = init;
 
-      function copyPageUrl() {
-        if (navigator.clipboard && window.isSecureContext) {
-          navigator.clipboard
-            .writeText(window.location.href)
-            .then(() => alert("网页链接已复制到剪贴板"))
-            .catch(() => fallbackCopy());
-        } else {
-          fallbackCopy();
+      function bindCardListActions() {
+        const cardList = document.getElementById("cardList");
+        cardList.addEventListener("click", handleCardDescClick);
+        cardList.addEventListener("keydown", handleCardDescKeydown);
+      }
+
+      function handleCardDescClick(event) {
+        const target = event.target.closest(".card-desc-toggle");
+        if (!target || !event.currentTarget.contains(target)) return;
+        toggleCardDesc(target);
+      }
+
+      function handleCardDescKeydown(event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const target = event.target.closest(".card-desc-toggle");
+        if (!target || !event.currentTarget.contains(target)) return;
+        event.preventDefault();
+        toggleCardDesc(target);
+      }
+
+      function toggleCardDesc(target) {
+        const card = target.closest(".staff-card");
+        if (!card) return;
+        const isExpanded = card.classList.toggle("expanded");
+        target.setAttribute("aria-expanded", String(isExpanded));
+        target.setAttribute(
+          "aria-label",
+          isExpanded ? "收起完整介绍" : "展开完整介绍"
+        );
+        const hint = target.querySelector(".desc-toggle-hint");
+        if (hint) {
+          hint.textContent = isExpanded ? "收起" : "展开";
         }
       }
 
-      function fallbackCopy() {
-        const input = document.createElement("input");
-        input.value = window.location.href;
+      function copyPageUrl() {
+        copyText(window.location.href, "网页链接已复制到剪贴板");
+      }
+
+      function copyText(text, successMessage) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(text)
+            .then(() => alert(successMessage))
+            .catch(() => fallbackCopy(text, successMessage));
+        } else {
+          fallbackCopy(text, successMessage);
+        }
+      }
+
+      function fallbackCopy(text, successMessage) {
+        const input = document.createElement("textarea");
+        input.value = text;
+        input.setAttribute("readonly", "");
+        input.style.position = "fixed";
+        input.style.left = "-9999px";
         document.body.appendChild(input);
         input.select();
         document.execCommand("copy");
         document.body.removeChild(input);
-        alert("网页链接已复制到剪贴板");
+        alert(successMessage);
       }
     </script>
   </body>
