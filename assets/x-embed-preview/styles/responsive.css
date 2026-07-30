@@ -1,0 +1,173 @@
+@media (max-width: 880px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .hero-copy {
+    max-width: 650px;
+  }
+
+  .load-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rail-title {
+    grid-column: 1 / -1;
+  }
+
+  .rail-step:nth-child(2n) {
+    border-left: 0;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 14px;
+  }
+
+  .topbar {
+    margin-bottom: 38px;
+  }
+
+  .brand {
+    font-size: 12px;
+  }
+
+  .x-mark {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: clamp(38px, 13vw, 50px);
+  }
+
+  .hero-copy {
+    font-size: 14px;
+  }
+
+  .composer {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+
+  .load-rail {
+    grid-template-columns: 1fr;
+    margin-top: 24px;
+  }
+
+  .rail-title,
+  .rail-step {
+    min-height: 64px;
+  }
+
+  .rail-step,
+  .rail-step:nth-child(2n) {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    padding-left: 24px;
+  }
+
+  .rail-step::before {
+    top: 26px;
+    left: 11px;
+  }
+
+  .panel-header {
+    grid-template-columns: 1fr;
+    padding: 18px 16px 15px;
+  }
+
+  .panel-metrics {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .panel-description {
+    margin-top: -3px;
+  }
+
+  .preview-stage {
+    min-height: 250px;
+    padding: 12px;
+  }
+
+  .media-gallery-stage {
+    min-height: 0;
+  }
+
+  .gallery-mosaic {
+    border-radius: 14px;
+  }
+
+  .gallery-mosaic-expand {
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .gallery-lightbox-stage,
+  .gallery-lightbox-slide {
+    inset: 0;
+    padding: 54px 0 58px;
+  }
+
+  .gallery-lightbox-slide {
+    inset: 54px 0 58px;
+    padding: 0;
+  }
+
+  .gallery-lightbox-close {
+    top: 8px;
+    left: 8px;
+  }
+
+  .gallery-lightbox-nav--previous {
+    left: 8px;
+  }
+
+  .gallery-lightbox-nav--next {
+    right: 8px;
+  }
+
+  .gallery-source {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .card-actions {
+    align-items: flex-end;
+  }
+
+  .page-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
