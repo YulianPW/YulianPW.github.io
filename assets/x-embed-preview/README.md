@@ -10,6 +10,7 @@ x-embed-preview.html 只保留页面语义结构，样式与行为位于本目�
     │   ├── base.css            # 变量、重置、页头、表单
     │   ├── layout.css          # 加载轨道、对比面板与通用预览容器
     │   ├── media-gallery.css   # X 式拼图、播放器与全屏灯箱
+    │   ├── home-gallery.css    # 首页列表中的画廊边界与加载状态
     │   ├── cards.css           # 加载状态、本地卡片与页脚
     │   └── responsive.css      # 平板、移动端及减少动画适配
     └── scripts/
@@ -20,6 +21,7 @@ x-embed-preview.html 只保留页面语义结构，样式与行为位于本目�
         ├── repository.js       # 站内 data.json 查询
         ├── ui-state.js         # 加载轨道和错误状态
         ├── x-widgets.js        # X Publish 组件适配
+        ├── home-gallery.js     # 首页可见性加载、请求去重与失败重试
         ├── local-card.js       # 零组件卡片
         └── media/
             ├── api.js          # FxTwitter 请求与响应收敛
@@ -35,6 +37,8 @@ app.js 负责组合各模块；业务模块不反向引用入口。媒体调用�
                              ↘ media/gallery.js → media/lightbox.js
 
 新增功能时优先放入最接近职责的模块。只有跨模块共享的固定配置放入 config.js，共享数据形态放入 types.js，避免重新把页面入口变成大文件。
+
+首页 `index.html` 复用 `media-gallery.css`、`home-gallery.css` 和 `home-gallery.js`。首页只负责输出带推文链接的占位区；适配模块负责接近视口时读取媒体，并复用同一套拼图、原生播放器与灯箱组件。
 
 ## 本地验证
 

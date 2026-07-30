@@ -1,0 +1,242 @@
+.staff-media-row > td {
+  max-width: none;
+  overflow: visible;
+  padding: 0 10px 12px;
+  border-top: 0;
+  background: #f8fafc;
+  white-space: normal;
+  text-align: left;
+  text-overflow: clip;
+}
+
+.tweet-showcase {
+  --ink: #0f1419;
+  --muted: #536471;
+  --line: #dce4ea;
+  --paper: #f4f7f9;
+  --surface: #ffffff;
+  --x-blue: #1d9bf0;
+  --danger: #d9303e;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.tweet-showcase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tweet-showcase-hint {
+  color: #71808c;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.tweet-source-link {
+  flex: 0 0 auto;
+  color: var(--x-blue);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tweet-source-link:hover {
+  text-decoration: underline;
+}
+
+.tweet-gallery-host[data-state="waiting"],
+.tweet-gallery-host[data-state="queued"],
+.tweet-gallery-host[data-state="loading"],
+.tweet-gallery-host[data-state="error"] {
+  position: relative;
+  display: flex;
+  aspect-ratio: 16 / 9;
+  min-height: 170px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  background:
+    radial-gradient(circle at 74% 22%, rgba(29, 155, 240, 0.45), transparent 32%),
+    linear-gradient(145deg, #172a3a, #0b1117);
+  font-size: 12px;
+  text-align: center;
+}
+
+.tweet-gallery-loader {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.24);
+  border-top-color: #fff;
+  border-radius: 50%;
+}
+
+.tweet-gallery-host[data-state="queued"] .tweet-gallery-loader,
+.tweet-gallery-host[data-state="loading"] .tweet-gallery-loader {
+  animation: tweet-gallery-spin 0.85s linear infinite;
+}
+
+.tweet-gallery-status {
+  font-weight: 700;
+}
+
+.tweet-gallery-host[data-state="error"] {
+  flex-direction: column;
+  background: linear-gradient(145deg, #263746, #111a22);
+}
+
+.tweet-gallery-error-copy {
+  max-width: 280px;
+  line-height: 1.55;
+}
+
+.tweet-gallery-error-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tweet-gallery-retry,
+.tweet-gallery-error-actions a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.tweet-gallery-retry {
+  border: 0;
+  background: var(--x-blue);
+  color: #fff;
+}
+
+.tweet-gallery-error-actions a {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.tweet-showcase .gallery-mosaic {
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(15, 20, 25, 0.14);
+}
+
+/* 首页的全局 button 规则不能改变媒体拼图与顶层灯箱的几何尺寸。 */
+.tweet-showcase .gallery-mosaic-item,
+.tweet-showcase .gallery-mosaic-play,
+.tweet-showcase .gallery-mosaic-expand,
+.tweet-showcase .gallery-lightbox button {
+  margin: 0;
+  padding: 0;
+}
+
+.tweet-showcase .gallery-mosaic-item,
+.tweet-showcase .gallery-mosaic-play {
+  min-height: 0;
+  border-radius: 0;
+}
+
+.tweet-showcase .gallery-mosaic-expand {
+  min-height: 36px;
+}
+
+.tweet-showcase .gallery-lightbox-close,
+.tweet-showcase .gallery-lightbox-nav {
+  min-height: 46px;
+}
+
+body.gallery-lightbox-open {
+  overflow: hidden;
+}
+
+@keyframes tweet-gallery-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .staff-card .tweet-showcase {
+    margin-top: 12px;
+    padding: 10px 0 0;
+    border-width: 1px 0 0;
+    border-radius: 0;
+  }
+
+  .staff-card .tweet-showcase-header {
+    padding: 0 2px;
+  }
+
+  .tweet-gallery-host[data-state="waiting"],
+  .tweet-gallery-host[data-state="queued"],
+  .tweet-gallery-host[data-state="loading"],
+  .tweet-gallery-host[data-state="error"] {
+    min-height: 0;
+    border-radius: 8px;
+  }
+
+  .tweet-showcase .gallery-mosaic {
+    border-radius: 8px;
+  }
+
+  .tweet-showcase .gallery-mosaic-expand {
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 16px;
+  }
+
+  .tweet-showcase .gallery-lightbox-stage,
+  .tweet-showcase .gallery-lightbox-slide {
+    inset: 0;
+    padding: 54px 0 58px;
+  }
+
+  .tweet-showcase .gallery-lightbox-slide {
+    inset: 54px 0 58px;
+    padding: 0;
+  }
+
+  .tweet-showcase .gallery-lightbox-close {
+    top: 8px;
+    left: 8px;
+  }
+
+  .tweet-showcase .gallery-lightbox-nav--previous {
+    left: 8px;
+  }
+
+  .tweet-showcase .gallery-lightbox-nav--next {
+    right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tweet-gallery-loader {
+    animation: none !important;
+  }
+}

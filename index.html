@@ -33,6 +33,7 @@
     <meta name="twitter:url" content="https://yulianpw.github.io/" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
     <meta
       name="google-site-verification"
       content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s"
@@ -455,241 +456,6 @@
         color: #777;
       }
 
-      .staff-media-row > td {
-        max-width: none;
-        overflow: visible;
-        padding: 0 10px 12px;
-        border-top: 0;
-        background: #f8fafc;
-        white-space: normal;
-        text-align: left;
-        text-overflow: clip;
-      }
-
-      .tweet-showcase {
-        max-width: 560px;
-        margin: 0 auto;
-        padding: 10px;
-        border: 1px solid #dce4ea;
-        border-radius: 12px;
-        background: #fff;
-      }
-
-      .tweet-showcase-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 8px;
-      }
-
-      .tweet-showcase-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #31485d;
-        font-size: 12px;
-        font-weight: 700;
-      }
-
-      .tweet-showcase-label::before {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #1d9bf0;
-        content: "";
-      }
-
-      .tweet-source-link {
-        color: #536471;
-        font-size: 11px;
-      }
-
-      .tweet-source-link:hover {
-        color: #0f1419;
-        text-decoration: underline;
-      }
-
-      .tweet-video-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 8px;
-      }
-
-      .tweet-video-item {
-        position: relative;
-        min-width: 0;
-        overflow: hidden;
-        aspect-ratio: 16 / 9;
-        border-radius: 10px;
-        background: #0f1419;
-      }
-
-      .tweet-video-poster,
-      .tweet-embed-placeholder {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        min-height: 0;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        border: 0;
-        border-radius: 0;
-        background: #0f1419;
-      }
-
-      .tweet-video-poster img {
-        width: 100%;
-        height: 100%;
-        display: block;
-        object-fit: cover;
-      }
-
-      .tweet-video-poster {
-        touch-action: manipulation;
-      }
-
-      .tweet-video-poster:focus-visible {
-        outline: 3px solid rgba(29, 155, 240, 0.55);
-        outline-offset: -3px;
-      }
-
-      .tweet-play-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 44px;
-        height: 44px;
-        display: grid;
-        place-items: center;
-        border: 2px solid rgba(255, 255, 255, 0.95);
-        border-radius: 50%;
-        background: #1d9bf0;
-        box-shadow: 0 5px 18px rgba(15, 20, 25, 0.28);
-        transform: translate(-50%, -50%);
-      }
-
-      .tweet-play-icon::after {
-        width: 0;
-        height: 0;
-        margin-left: 3px;
-        border-top: 7px solid transparent;
-        border-bottom: 7px solid transparent;
-        border-left: 11px solid #fff;
-        content: "";
-      }
-
-      .tweet-video-number {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        padding: 4px 7px;
-        border-radius: 999px;
-        color: #fff;
-        background: rgba(15, 20, 25, 0.72);
-        font-size: 10px;
-        font-weight: 700;
-        line-height: 1;
-      }
-
-      .tweet-inline-video {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background: #000;
-        object-fit: contain;
-      }
-
-      .tweet-embed-placeholder {
-        display: grid;
-        place-items: center;
-        color: #fff;
-        background:
-          radial-gradient(circle at 74% 22%, rgba(29, 155, 240, 0.42), transparent 34%),
-          linear-gradient(145deg, #152432, #0f1419);
-      }
-
-      .tweet-embed-placeholder span {
-        padding: 8px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 999px;
-        background: rgba(15, 20, 25, 0.58);
-        font-size: 12px;
-        font-weight: 700;
-      }
-
-      .tweet-embed-mount {
-        width: 100%;
-        height: 100%;
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-size: 12px;
-      }
-
-      .tweet-embed-mount iframe {
-        max-width: 100% !important;
-      }
-
-      .tweet-video-error {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 18px;
-        color: #fff;
-        font-size: 12px;
-        text-align: center;
-      }
-
-      .tweet-video-actions {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .tweet-video-retry,
-      .tweet-video-error a {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        padding: 7px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1;
-        touch-action: manipulation;
-      }
-
-      .tweet-video-retry {
-        background: #1d9bf0;
-        color: #fff;
-      }
-
-      .tweet-video-error a {
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #fff;
-      }
-
-      .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-      }
-
       .card-list {
         display: none;
       }
@@ -905,41 +671,16 @@
           box-shadow: 0 1px 2px rgba(27, 45, 59, 0.08);
         }
 
-        .staff-card .tweet-showcase {
-          margin-top: 12px;
-          padding: 10px 0 0;
-          border-width: 1px 0 0;
-          border-radius: 0;
-        }
-
-        .staff-card .tweet-showcase-header {
-          padding: 0 2px;
-        }
-
-        .tweet-video-list {
-          display: flex;
-          gap: 8px;
-          overflow-x: auto;
-          padding: 0 2px 3px;
-          scroll-padding-inline: 2px;
-          scroll-snap-type: x mandatory;
-          scrollbar-width: none;
-        }
-
-        .tweet-video-list::-webkit-scrollbar {
-          display: none;
-        }
-
-        .tweet-video-item {
-          flex: 0 0 88%;
-          scroll-snap-align: start;
-        }
-
-        .tweet-video-item:only-child {
-          flex-basis: 100%;
-        }
       }
     </style>
+    <link
+      rel="stylesheet"
+      href="assets/x-embed-preview/styles/media-gallery.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/x-embed-preview/styles/home-gallery.css"
+    />
   </head>
   <body>
     <section class="hero-panel" aria-labelledby="site-title">
@@ -1098,8 +839,6 @@
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
       const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
-      const TWEET_EMBED_ROOT_MARGIN = "500px 0px";
-      const TWEET_EMBED_TIMEOUT = 10000;
       const FEATURE_RULES = [
         {
           label: "音频定制",
@@ -1121,10 +860,7 @@
       let currentSortColumn = null;
       let currentSortDirection = null;
       let tableData = null;
-      let xWidgetsPromise = null;
-      let tweetEmbedObserver = null;
-      let tweetEmbedQueue = [];
-      let activeTweetEmbedLoads = 0;
+      let homeGalleryModulePromise = null;
 
       function getSiteBaseUrl() {
         const { origin, pathname } = window.location;
@@ -1227,7 +963,6 @@
       function init() {
         document.getElementById("tagSelect").value = "all";
         bindCardListActions();
-        bindTweetMediaActions();
         applyUrlState();
         syncSortControls();
         warmVisualCache();
@@ -1374,7 +1109,7 @@
           .join("");
 
         filterByTag();
-        initTweetEmbedLazyLoading();
+        initializeHomeMediaGalleries();
       }
 
       function compareStaff(a, b) {
@@ -1465,76 +1200,37 @@
       function getTweetMedia(item) {
         const tweetUrl = getSafeUrl(item.tweet, ["x.com", "twitter.com"]);
         if (!tweetUrl) return null;
-
-        const videos = (Array.isArray(item.tweetVideos)
-          ? item.tweetVideos
-          : []
-        )
-          .map((video) => ({
-            url: getSafeUrl(video.url, ["video.twimg.com"]),
-            poster: getSafeUrl(video.poster, ["pbs.twimg.com"]),
-          }))
-          .filter((video) => video.url);
-        return { tweetUrl, videos };
+        return { tweetUrl };
       }
 
       function renderTweetShowcase(item) {
         const media = getTweetMedia(item);
         if (!media) return "";
 
-        const label = `${item.name} 的视频展示`;
-        const videoItems = media.videos.length
-          ? media.videos
-              .map(
-                (video, index) => `
-                  <div class="tweet-video-item">
-                    <button
-                      type="button"
-                      class="tweet-video-poster"
-                      data-video-src="${escapeHtml(video.url)}"
-                      data-video-poster="${escapeHtml(video.poster)}"
-                      data-tweet-url="${escapeHtml(media.tweetUrl)}"
-                      data-video-label="${escapeHtml(`${item.name} 视频 ${index + 1}`)}"
-                    >
-                      ${
-                        video.poster
-                          ? `<img src="${escapeHtml(video.poster)}" alt="${escapeHtml(`${item.name} 视频 ${index + 1} 封面`)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
-                          : ""
-                      }
-                      <span class="tweet-play-icon" aria-hidden="true"></span>
-                      ${
-                        media.videos.length > 1
-                          ? `<span class="tweet-video-number">${index + 1}/${media.videos.length}</span>`
-                          : ""
-                      }
-                      <span class="visually-hidden">播放${escapeHtml(`${item.name}的视频 ${index + 1}`)}</span>
-                    </button>
-                  </div>
-                `,
-              )
-              .join("")
-          : `
-              <div class="tweet-video-item">
-                <div
-                  class="tweet-embed-placeholder"
-                  data-tweet-url="${escapeHtml(media.tweetUrl)}"
-                  data-state="waiting"
-                  role="status"
-                  aria-live="polite"
-                  aria-label="${escapeHtml(item.name)}的 X 视频准备中"
-                >
-                  <span>视频准备中</span>
-                </div>
-              </div>
-            `;
+        const label = `${item.name} 的动态媒体画廊`;
 
         return `
           <section class="tweet-showcase" aria-label="${escapeHtml(label)}">
             <div class="tweet-showcase-header">
-              <span class="tweet-showcase-label">视频展示</span>
-              <a class="tweet-source-link" href="${escapeHtml(media.tweetUrl)}" target="_blank" rel="noreferrer">在 X 查看</a>
+              <span class="tweet-showcase-hint">图片可放大 · 视频可播放</span>
+              <a
+                class="tweet-source-link"
+                href="${escapeHtml(media.tweetUrl)}"
+                target="_blank"
+                rel="noreferrer"
+              >在 X 查看原推文 ↗</a>
             </div>
-            <div class="tweet-video-list">${videoItems}</div>
+            <div
+              class="tweet-gallery-host"
+              data-tweet-url="${escapeHtml(media.tweetUrl)}"
+              data-state="waiting"
+              role="status"
+              aria-live="polite"
+              aria-label="${escapeHtml(item.name)}的媒体准备中"
+            >
+              <span class="tweet-gallery-loader" aria-hidden="true"></span>
+              <span class="tweet-gallery-status">滚动到这里加载素材</span>
+            </div>
           </section>
         `;
       }
@@ -1813,234 +1509,36 @@
         cardList.addEventListener("keydown", handleCardDescKeydown);
       }
 
-      function bindTweetMediaActions() {
-        ["tableBody", "cardList"].forEach((containerId) => {
-          document
-            .getElementById(containerId)
-            .addEventListener("click", handleTweetMediaClick);
-        });
-      }
-
-      function handleTweetMediaClick(event) {
-        const poster = event.target.closest(".tweet-video-poster");
-        if (poster && event.currentTarget.contains(poster)) {
-          playTweetVideo(poster);
-          return;
-        }
-
-        const retry = event.target.closest(".tweet-video-retry");
-        if (retry && event.currentTarget.contains(retry)) {
-          loadTweetVideoEmbed(retry);
-        }
-      }
-
-      function initTweetEmbedLazyLoading() {
-        if (tweetEmbedObserver) {
-          tweetEmbedObserver.disconnect();
-        }
-        tweetEmbedQueue = tweetEmbedQueue.filter((item) => item.isConnected);
-
-        const placeholders = document.querySelectorAll(
-          ".tweet-embed-placeholder[data-state='waiting']",
-        );
-        if (!placeholders.length) return;
-
-        if (!("IntersectionObserver" in window)) {
-          placeholders.forEach(queueTweetEmbed);
-          return;
-        }
-
-        tweetEmbedObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) return;
-              tweetEmbedObserver.unobserve(entry.target);
-              queueTweetEmbed(entry.target);
-            });
-          },
-          { rootMargin: TWEET_EMBED_ROOT_MARGIN, threshold: 0.01 },
-        );
-        placeholders.forEach((placeholder) => {
-          tweetEmbedObserver.observe(placeholder);
-        });
-      }
-
-      function queueTweetEmbed(placeholder) {
-        if (!placeholder.isConnected || placeholder.dataset.state !== "waiting") {
-          return;
-        }
-        placeholder.dataset.state = "queued";
-        tweetEmbedQueue.push(placeholder);
-        drainTweetEmbedQueue();
-      }
-
-      function drainTweetEmbedQueue() {
-        if (activeTweetEmbedLoads) return;
-
-        const placeholder = tweetEmbedQueue.shift();
-        if (!placeholder) return;
-        if (!placeholder.isConnected || placeholder.offsetParent === null) {
-          if (placeholder.isConnected) {
-            placeholder.dataset.state = "waiting";
-            tweetEmbedObserver?.observe(placeholder);
-          }
-          drainTweetEmbedQueue();
-          return;
-        }
-
-        activeTweetEmbedLoads = 1;
-        placeholder.dataset.state = "loading";
-        const status = placeholder.querySelector("span");
-        if (status) status.textContent = "正在加载 X 视频…";
-        loadTweetVideoEmbed(placeholder).finally(() => {
-          activeTweetEmbedLoads = 0;
-          drainTweetEmbedQueue();
-        });
-      }
-
-      function playTweetVideo(poster) {
-        const item = poster.closest(".tweet-video-item");
-        if (!item) return;
-
-        document.querySelectorAll(".tweet-inline-video").forEach((video) => {
-          video.pause();
-        });
-
-        const video = document.createElement("video");
-        video.className = "tweet-inline-video";
-        video.controls = true;
-        video.playsInline = true;
-        video.preload = "metadata";
-        video.autoplay = true;
-        video.src = poster.dataset.videoSrc;
-        video.poster = poster.dataset.videoPoster || "";
-        video.setAttribute("aria-label", poster.dataset.videoLabel || "陪陪视频");
-        video.addEventListener("error", () => {
-          renderTweetVideoError(item, poster.dataset.tweetUrl);
-        });
-        item.replaceChildren(video);
-        video.play().catch(() => {});
-      }
-
-      function loadXWidgets() {
-        if (window.twttr?.widgets) return Promise.resolve(window.twttr);
-        if (xWidgetsPromise) return xWidgetsPromise;
-
-        xWidgetsPromise = new Promise((resolve, reject) => {
-          const existingScript = document.getElementById("x-wjs");
-          const script = existingScript || document.createElement("script");
-          const timeoutId = window.setTimeout(
-            () => reject(new Error("X 组件加载超时")),
-            TWEET_EMBED_TIMEOUT,
+      /**
+       * 加载首页画廊适配器，并扫描本轮渲染产生的媒体占位区。
+       *
+       * @description 模块 Promise 在排序和筛选导致的重复渲染之间复用，避免重复下载代码；
+       * 具体的可见性观察、请求去重和播放器交互由独立模块负责。
+       *
+       * @returns {void}
+       */
+      function initializeHomeMediaGalleries() {
+        if (!homeGalleryModulePromise) {
+          homeGalleryModulePromise = import(
+            buildRuntimeUrl(
+              "assets/x-embed-preview/scripts/home-gallery.js",
+            )
           );
-
-          window.twttr = window.twttr || {
-            _e: [],
-            ready(callback) {
-              this._e.push(callback);
-            },
-          };
-          window.twttr.ready((widgetsApi) => {
-            window.clearTimeout(timeoutId);
-            resolve(widgetsApi);
-          });
-
-          if (!existingScript) {
-            script.id = "x-wjs";
-            script.async = true;
-            script.src = "https://platform.x.com/widgets.js";
-            script.charset = "utf-8";
-            script.addEventListener("error", () => {
-              window.clearTimeout(timeoutId);
-              reject(new Error("X 组件加载失败"));
-            });
-            document.head.appendChild(script);
-          }
-        }).catch((error) => {
-          document.getElementById("x-wjs")?.remove();
-          xWidgetsPromise = null;
-          throw error;
-        });
-
-        return xWidgetsPromise;
-      }
-
-      function waitForTweetWidget(mount) {
-        return new Promise((resolve, reject) => {
-          if (mount.querySelector("iframe")) {
-            resolve();
-            return;
-          }
-
-          const observer = new MutationObserver(() => {
-            if (!mount.querySelector("iframe")) return;
-            observer.disconnect();
-            window.clearTimeout(timeoutId);
-            resolve();
-          });
-          const timeoutId = window.setTimeout(() => {
-            observer.disconnect();
-            reject(new Error("X 视频加载超时"));
-          }, TWEET_EMBED_TIMEOUT);
-          observer.observe(mount, { childList: true, subtree: true });
-        });
-      }
-
-      async function loadTweetVideoEmbed(target) {
-        const item = target.closest(".tweet-video-item");
-        const tweetUrl = target.dataset.tweetUrl;
-        if (!item || !tweetUrl) return false;
-
-        const mount = document.createElement("div");
-        mount.className = "tweet-embed-mount";
-        mount.setAttribute("aria-live", "polite");
-        mount.textContent = "正在加载 X 视频…";
-        item.replaceChildren(mount);
-
-        try {
-          const widgetsApi = await loadXWidgets();
-          if (!item.isConnected) return false;
-          const blockquote = document.createElement("blockquote");
-          blockquote.className = "twitter-tweet";
-          blockquote.dataset.mediaMaxWidth = "560";
-          blockquote.dataset.dnt = "true";
-          blockquote.dataset.lang = "zh-cn";
-          const link = document.createElement("a");
-          link.href = tweetUrl;
-          blockquote.appendChild(link);
-          mount.replaceChildren(blockquote);
-          widgetsApi.widgets.load(mount);
-          await waitForTweetWidget(mount);
-          return true;
-        } catch (_) {
-          if (item.isConnected) {
-            renderTweetVideoError(item, tweetUrl);
-          }
-          return false;
         }
-      }
 
-      function renderTweetVideoError(item, tweetUrl) {
-        const state = document.createElement("div");
-        state.className = "tweet-video-error";
-        const text = document.createElement("span");
-        text.textContent = "X 视频加载失败";
-        const actions = document.createElement("div");
-        actions.className = "tweet-video-actions";
-        const retry = document.createElement("button");
-        retry.type = "button";
-        retry.className = "tweet-video-retry";
-        retry.dataset.tweetUrl = tweetUrl;
-        retry.textContent = "重新加载";
-        const link = document.createElement("a");
-        link.href = tweetUrl;
-        link.target = "_blank";
-        link.rel = "noreferrer";
-        link.textContent = "在 X 查看";
-        actions.append(retry, link);
-        state.appendChild(text);
-        state.appendChild(actions);
-        item.replaceChildren(state);
+        homeGalleryModulePromise
+          .then(({ refreshHomeMediaGalleries }) => {
+            refreshHomeMediaGalleries(document);
+          })
+          .catch(() => {
+            document
+              .querySelectorAll(".tweet-gallery-host[data-state='waiting']")
+              .forEach((mount) => {
+                mount.dataset.state = "error";
+                const status = mount.querySelector(".tweet-gallery-status");
+                if (status) status.textContent = "画廊组件加载失败，请刷新重试";
+              });
+          });
       }
 
       function handleCardDescClick(event) {

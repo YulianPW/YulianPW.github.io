@@ -85,7 +85,7 @@ function normalizeDynamicMedia(payload) {
  * 根据推文链接从无密钥兼容接口读取完整媒体清单。
  *
  * @param {Pick<import("../types.js").TweetReference, "id" | "handle">} tweet - 已校验的推文信息。
- * @param {AbortSignal} signal - 新一轮预览开始时用于取消旧请求的信号。
+ * @param {AbortSignal} [signal] - 可选的取消信号；交互式预览会用它终止旧请求。
  * @returns {Promise<import("../types.js").DynamicMedia>} 可渲染的媒体数据。
  */
 export async function fetchDynamicMedia(tweet, signal) {
