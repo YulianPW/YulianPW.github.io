@@ -1,0 +1,1540 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="用同一条 X 推文对比完整原生推文、仅视频、本地封面卡片与按需展开四种展示方式。"
+    />
+    <title>X 推文展示预览 · 雨恋女陪殿</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0f1419;
+        --muted: #536471;
+        --quiet: #8b98a5;
+        --line: #cfd9de;
+        --paper: #f7f9f9;
+        --surface: #ffffff;
+        --x-blue: #1d9bf0;
+        --x-blue-soft: #e8f5fd;
+        --ready: #00a86b;
+        --ready-soft: #e8f7f1;
+        --warning: #b76e00;
+        --warning-soft: #fff4df;
+        --danger: #f4212e;
+        --shadow: 0 18px 50px rgba(15, 20, 25, 0.08);
+        --radius: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(15, 20, 25, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 20, 25, 0.035) 1px, transparent 1px),
+          var(--paper);
+        background-size: 28px 28px;
+        font-family:
+          "Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC",
+          sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 3px solid rgba(29, 155, 240, 0.35);
+        outline-offset: 3px;
+      }
+
+      .page-shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 22px 0 72px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 54px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .x-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--ink);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .back-link {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .back-link:hover {
+        color: var(--x-blue);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+        gap: clamp(32px, 7vw, 92px);
+        align-items: end;
+        margin-bottom: 34px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 16px;
+        color: var(--x-blue);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        width: 28px;
+        height: 2px;
+        background: currentColor;
+        content: "";
+      }
+
+      h1 {
+        max-width: 720px;
+        margin: 0;
+        font-family:
+          "Arial Black", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: clamp(40px, 7vw, 82px);
+        font-weight: 900;
+        letter-spacing: -0.065em;
+        line-height: 0.96;
+      }
+
+      h1 span {
+        display: block;
+        color: var(--x-blue);
+      }
+
+      .hero-copy {
+        max-width: 460px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .composer {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid rgba(15, 20, 25, 0.1);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .input-wrap {
+        min-width: 0;
+      }
+
+      .input-wrap label {
+        display: block;
+        margin: 0 14px 5px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .input-wrap input {
+        width: 100%;
+        min-height: 48px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 12px;
+        color: var(--ink);
+        background: var(--paper);
+        font-size: 15px;
+      }
+
+      .submit-button {
+        align-self: end;
+        min-height: 48px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--ink);
+        color: white;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(15, 20, 25, 0.16);
+      }
+
+      .submit-button:hover {
+        background: var(--x-blue);
+      }
+
+      .form-message {
+        min-height: 22px;
+        margin: 9px 14px 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .form-message.is-error {
+        color: var(--danger);
+      }
+
+      .load-rail {
+        display: grid;
+        grid-template-columns: 170px repeat(4, minmax(0, 1fr));
+        gap: 0;
+        align-items: stretch;
+        margin: 34px 0 24px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+      }
+
+      .rail-title,
+      .rail-step {
+        min-height: 76px;
+        padding: 15px 16px;
+      }
+
+      .rail-title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--ink);
+        color: white;
+      }
+
+      .rail-title strong {
+        font-size: 14px;
+      }
+
+      .rail-title span {
+        margin-top: 4px;
+        color: #aab8c2;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+      }
+
+      .rail-step {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-left: 1px solid var(--line);
+      }
+
+      .rail-step::before {
+        position: absolute;
+        top: 18px;
+        left: -5px;
+        width: 9px;
+        height: 9px;
+        border: 2px solid var(--surface);
+        border-radius: 50%;
+        background: var(--quiet);
+        content: "";
+      }
+
+      .rail-step strong {
+        font-size: 12px;
+      }
+
+      .rail-step span {
+        margin-top: 5px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+      }
+
+      .rail-step[data-state="loading"]::before {
+        background: var(--x-blue);
+        box-shadow: 0 0 0 5px var(--x-blue-soft);
+        animation: rail-pulse 1.2s ease-in-out infinite;
+      }
+
+      .rail-step[data-state="ready"]::before {
+        background: var(--ready);
+        box-shadow: 0 0 0 5px var(--ready-soft);
+      }
+
+      .rail-step[data-state="dormant"]::before {
+        background: var(--warning);
+        box-shadow: 0 0 0 5px var(--warning-soft);
+      }
+
+      .rail-step[data-state="error"]::before {
+        background: var(--danger);
+      }
+
+      @keyframes rail-pulse {
+        50% {
+          box-shadow: 0 0 0 9px rgba(29, 155, 240, 0.08);
+        }
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .preview-panel {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+
+      .preview-panel.recommended {
+        border-color: var(--x-blue);
+        box-shadow: 0 0 0 1px var(--x-blue);
+      }
+
+      .panel-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: start;
+        padding: 22px 22px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel-kicker {
+        margin: 0 0 5px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .panel-title-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      .recommend-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--x-blue);
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .panel-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 5px;
+        max-width: 145px;
+      }
+
+      .metric {
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: var(--paper);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .panel-description {
+        grid-column: 1 / -1;
+        margin: -7px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .preview-stage {
+        min-height: 300px;
+        padding: 20px;
+        background:
+          linear-gradient(135deg, rgba(29, 155, 240, 0.035), transparent 48%),
+          #fbfdff;
+      }
+
+      .native-stage {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .native-mount {
+        width: 100%;
+        max-width: 550px;
+      }
+
+      .loading-state,
+      .error-state {
+        display: grid;
+        min-height: 260px;
+        place-items: center;
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .loading-state span,
+      .error-state span {
+        display: block;
+        max-width: 280px;
+        padding: 24px;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .loading-state span::before {
+        display: block;
+        width: 28px;
+        height: 28px;
+        margin: 0 auto 14px;
+        border: 3px solid var(--x-blue-soft);
+        border-top-color: var(--x-blue);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        content: "";
+      }
+
+      .error-state a {
+        color: var(--x-blue);
+        font-weight: 700;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .local-card {
+        width: min(100%, 470px);
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: 0 14px 34px rgba(15, 20, 25, 0.09);
+      }
+
+      .cover-frame {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 74% 23%, rgba(29, 155, 240, 0.9), transparent 28%),
+          linear-gradient(135deg, #101820, #233647);
+      }
+
+      .cover-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .cover-image[hidden] {
+        display: none;
+      }
+
+      .cover-placeholder {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+      }
+
+      .cover-placeholder[hidden] {
+        display: none;
+      }
+
+      .cover-placeholder strong {
+        display: block;
+        font-family: Arial, sans-serif;
+        font-size: 54px;
+        line-height: 1;
+      }
+
+      .cover-placeholder span {
+        display: block;
+        margin-top: 8px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .cover-label {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: rgba(15, 20, 25, 0.74);
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+        backdrop-filter: blur(8px);
+      }
+
+      .play-mark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: grid;
+        width: 52px;
+        height: 52px;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 50%;
+        background: rgba(15, 20, 25, 0.68);
+        color: white;
+        transform: translate(-50%, -50%);
+        backdrop-filter: blur(8px);
+      }
+
+      .play-mark::before {
+        width: 0;
+        height: 0;
+        margin-left: 4px;
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+        border-left: 11px solid currentColor;
+        content: "";
+      }
+
+      .local-card.has-cover .play-mark {
+        left: 19%;
+      }
+
+      .card-body {
+        padding: 15px;
+      }
+
+      .author-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .author-avatar,
+      .author-monogram {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+      }
+
+      .author-avatar {
+        object-fit: cover;
+        background: var(--paper);
+      }
+
+      .author-monogram {
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+        color: white;
+        font-weight: 800;
+      }
+
+      .author-copy {
+        min-width: 0;
+      }
+
+      .author-name,
+      .author-handle {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .author-name {
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .author-handle {
+        margin-top: 1px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .card-text {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        min-height: 42px;
+        overflow: hidden;
+        margin: 13px 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .card-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .card-note {
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+      }
+
+      .card-action {
+        min-height: 38px;
+        padding: 0 15px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--ink);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      a.card-action {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .card-action:hover {
+        background: var(--x-blue);
+      }
+
+      .card-action:disabled {
+        cursor: wait;
+        opacity: 0.56;
+      }
+
+      .deferred-native {
+        margin-top: 18px;
+      }
+
+      .deferred-native:empty {
+        display: none;
+      }
+
+      .method-note {
+        margin: 18px 4px 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .method-note strong {
+        color: var(--ink);
+      }
+
+      .page-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-top: 28px;
+        padding: 20px 4px 0;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .page-footer a {
+        color: var(--x-blue);
+        font-weight: 700;
+      }
+
+      @media (max-width: 880px) {
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 22px;
+        }
+
+        .hero-copy {
+          max-width: 650px;
+        }
+
+        .load-rail {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .rail-title {
+          grid-column: 1 / -1;
+        }
+
+        .rail-step:nth-child(2n) {
+          border-left: 0;
+        }
+
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .page-shell {
+          width: min(100% - 20px, 1180px);
+          padding-top: 14px;
+        }
+
+        .topbar {
+          margin-bottom: 38px;
+        }
+
+        .brand {
+          font-size: 12px;
+        }
+
+        .x-mark {
+          width: 30px;
+          height: 30px;
+          font-size: 15px;
+        }
+
+        h1 {
+          font-size: clamp(38px, 13vw, 50px);
+        }
+
+        .hero-copy {
+          font-size: 14px;
+        }
+
+        .composer {
+          grid-template-columns: 1fr;
+          padding: 10px;
+        }
+
+        .submit-button {
+          width: 100%;
+        }
+
+        .load-rail {
+          grid-template-columns: 1fr;
+          margin-top: 24px;
+        }
+
+        .rail-title,
+        .rail-step {
+          min-height: 64px;
+        }
+
+        .rail-step,
+        .rail-step:nth-child(2n) {
+          border-top: 1px solid var(--line);
+          border-left: 0;
+          padding-left: 24px;
+        }
+
+        .rail-step::before {
+          top: 26px;
+          left: 11px;
+        }
+
+        .panel-header {
+          grid-template-columns: 1fr;
+          padding: 18px 16px 15px;
+        }
+
+        .panel-metrics {
+          justify-content: flex-start;
+          max-width: none;
+        }
+
+        .panel-description {
+          margin-top: -3px;
+        }
+
+        .preview-stage {
+          min-height: 250px;
+          padding: 12px;
+        }
+
+        .card-actions {
+          align-items: flex-end;
+        }
+
+        .page-footer {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <nav class="topbar" aria-label="页面导航">
+        <a class="brand" href="index.html">
+          <span class="x-mark" aria-hidden="true">X</span>
+          <span>雨恋 · 内容展示实验台</span>
+        </a>
+        <a class="back-link" href="index.html">返回首页 ↗</a>
+      </nav>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">One post · four views</p>
+          <h1 id="page-title">一条推文，<span>四种打开方式。</span></h1>
+        </div>
+        <p class="hero-copy">
+          粘贴一条含视频的 X 推文，直接比较原生完整推文、仅视频、轻量封面卡片和按需展开。
+          每种方案的网络代价也会同步显示。
+        </p>
+      </section>
+
+      <form id="previewForm" aria-describedby="formMessage" novalidate>
+        <div class="composer">
+          <div class="input-wrap">
+            <label for="tweetUrl">推文链接</label>
+            <input
+              id="tweetUrl"
+              name="tweetUrl"
+              type="url"
+              value="https://x.com/waffles_r_gone/status/2082097551633687021"
+              placeholder="https://x.com/账号/status/推文ID"
+              inputmode="url"
+              autocomplete="url"
+              spellcheck="false"
+              required
+            />
+          </div>
+          <button class="submit-button" type="submit">生成四种预览</button>
+        </div>
+        <p id="formMessage" class="form-message" aria-live="polite">
+          已填入站内现有示例；也可以替换成任意公开的视频推文。
+        </p>
+      </form>
+
+      <section class="load-rail" aria-label="四种方案的加载状态">
+        <div class="rail-title">
+          <strong>加载轨道</strong>
+          <span>NETWORK COST</span>
+        </div>
+        <div id="fullRail" class="rail-step" data-state="loading">
+          <strong>完整原生推文</strong>
+          <span>等待 X 组件</span>
+        </div>
+        <div id="videoRail" class="rail-step" data-state="loading">
+          <strong>仅展示视频</strong>
+          <span>等待 X 组件</span>
+        </div>
+        <div id="localRail" class="rail-step" data-state="ready">
+          <strong>本地封面卡片</strong>
+          <span>0 个 X 组件</span>
+        </div>
+        <div id="deferredRail" class="rail-step" data-state="dormant">
+          <strong>点击后展开</strong>
+          <span>尚未请求推文</span>
+        </div>
+      </section>
+
+      <section class="comparison-grid" aria-label="X 推文展示方式对比">
+        <article class="preview-panel">
+          <header class="panel-header">
+            <div>
+              <p class="panel-kicker">Official · Full</p>
+              <div class="panel-title-row">
+                <h2 class="panel-title">完整原生推文</h2>
+              </div>
+            </div>
+            <div class="panel-metrics" aria-label="速度中等，占用空间大">
+              <span class="metric">速度 · 中</span>
+              <span class="metric">空间 · 大</span>
+            </div>
+            <p class="panel-description">
+              作者、正文、媒体和互动入口全部保留，适合少量重点内容。
+            </p>
+          </header>
+          <div id="fullPreview" class="preview-stage native-stage">
+            <div class="loading-state"><span>正在连接 X 完整推文组件…</span></div>
+          </div>
+        </article>
+
+        <article class="preview-panel">
+          <header class="panel-header">
+            <div>
+              <p class="panel-kicker">Official · Media</p>
+              <div class="panel-title-row">
+                <h2 class="panel-title">仅展示视频</h2>
+              </div>
+            </div>
+            <div class="panel-metrics" aria-label="速度中等，占用空间中等">
+              <span class="metric">速度 · 中</span>
+              <span class="metric">空间 · 中</span>
+            </div>
+            <p class="panel-description">
+              使用 X Publish 的媒体模式，弱化正文，适合以视频为主的选人场景。
+            </p>
+          </header>
+          <div id="videoPreview" class="preview-stage native-stage">
+            <div class="loading-state"><span>正在连接 X 视频组件…</span></div>
+          </div>
+        </article>
+
+        <article class="preview-panel">
+          <header class="panel-header">
+            <div>
+              <p class="panel-kicker">Local · Compact</p>
+              <div class="panel-title-row">
+                <h2 class="panel-title">本地封面卡片</h2>
+              </div>
+            </div>
+            <div class="panel-metrics" aria-label="速度最快，占用空间小">
+              <span class="metric">速度 · 最快</span>
+              <span class="metric">空间 · 小</span>
+            </div>
+            <p class="panel-description">
+              页面只显示已入库的封面、作者和一句文案，点击后直接前往 X。
+            </p>
+          </header>
+          <div id="localPreview" class="preview-stage"></div>
+        </article>
+
+        <article class="preview-panel recommended">
+          <header class="panel-header">
+            <div>
+              <p class="panel-kicker">Local first · On demand</p>
+              <div class="panel-title-row">
+                <h2 class="panel-title">点击后加载原生推文</h2>
+                <span class="recommend-badge">最推荐</span>
+              </div>
+            </div>
+            <div class="panel-metrics" aria-label="初始速度快，占用空间可控">
+              <span class="metric">初始 · 快</span>
+              <span class="metric">空间 · 可控</span>
+            </div>
+            <p class="panel-description">
+              默认保持轻量，用户明确点击“展开完整推文”后才生成 X 组件。
+            </p>
+          </header>
+          <div class="preview-stage">
+            <div id="deferredPreview"></div>
+            <div
+              id="deferredNative"
+              class="deferred-native native-mount"
+              aria-live="polite"
+            ></div>
+            <p class="method-note">
+              <strong>列表页建议：</strong>
+              首页先批量渲染这种轻量卡片，只给用户真正想看的条目加载原生推文。
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <footer class="page-footer">
+        <span>演示页不会发布、点赞或修改任何 X 内容。</span>
+        <span>
+          原生组件由
+          <a href="https://publish.x.com/" target="_blank" rel="noreferrer"
+            >X Publish</a
+          >
+          提供。
+        </span>
+      </footer>
+    </main>
+
+    <script>
+      (() => {
+        const DEFAULT_TWEET_URL =
+          "https://x.com/waffles_r_gone/status/2082097551633687021";
+        const LOCAL_COVER_BY_TWEET_ID = {
+          "2082097551633687021": "assets/images/x-embed-demo-cover.svg",
+        };
+        const previewForm = document.getElementById("previewForm");
+        const tweetUrlInput = document.getElementById("tweetUrl");
+        const formMessage = document.getElementById("formMessage");
+        const fullPreview = document.getElementById("fullPreview");
+        const videoPreview = document.getElementById("videoPreview");
+        const localPreview = document.getElementById("localPreview");
+        const deferredPreview = document.getElementById("deferredPreview");
+        const deferredNative = document.getElementById("deferredNative");
+        let xWidgetsPromise = null;
+        let repositoryDataPromise = null;
+        let activeRenderId = 0;
+
+        /**
+         * 校验并规范化 X 推文链接。
+         *
+         * @param {string} rawValue - 用户输入的 x.com 或 twitter.com 链接。
+         * @returns {{id: string, handle: string, url: string} | null} 可用于组件加载的推文信息。
+         */
+        function parseTweetUrl(rawValue) {
+          try {
+            const parsedUrl = new URL(rawValue.trim());
+            const hostname = parsedUrl.hostname
+              .toLowerCase()
+              .replace(/^www\./, "")
+              .replace(/^mobile\./, "");
+            if (hostname !== "x.com" && hostname !== "twitter.com") {
+              return null;
+            }
+
+            const segments = parsedUrl.pathname.split("/").filter(Boolean);
+            const isStatusPath =
+              segments.length >= 3 &&
+              segments[1] === "status" &&
+              /^\d+$/.test(segments[2]);
+            if (!isStatusPath) return null;
+
+            const handle = segments[0] === "i" ? "" : segments[0];
+            const id = segments[2];
+            const canonicalHandle = handle || "i";
+            return {
+              id,
+              handle,
+              url: `https://x.com/${canonicalHandle}/status/${id}`,
+            };
+          } catch (_) {
+            return null;
+          }
+        }
+
+        /**
+         * 按需加载 X 官方 widgets.js，并复用同一个加载 Promise。
+         *
+         * @returns {Promise<object>} X Widgets 全局对象。
+         */
+        function loadXWidgets() {
+          if (window.twttr?.widgets) return Promise.resolve(window.twttr);
+          if (xWidgetsPromise) return xWidgetsPromise;
+
+          xWidgetsPromise = new Promise((resolve, reject) => {
+            const existingScript = document.getElementById("x-wjs");
+            const script = existingScript || document.createElement("script");
+            const timeoutId = window.setTimeout(() => {
+              reject(new Error("X 组件加载超时"));
+            }, 15000);
+
+            window.twttr = window.twttr || {
+              _e: [],
+              ready(callback) {
+                this._e.push(callback);
+              },
+            };
+
+            window.twttr.ready((widgetsApi) => {
+              window.clearTimeout(timeoutId);
+              resolve(widgetsApi);
+            });
+
+            if (!existingScript) {
+              script.id = "x-wjs";
+              script.async = true;
+              script.src = "https://platform.x.com/widgets.js";
+              script.charset = "utf-8";
+              script.addEventListener("error", () => {
+                window.clearTimeout(timeoutId);
+                reject(new Error("无法连接 X 组件"));
+              });
+              document.head.appendChild(script);
+            }
+          }).catch((error) => {
+            xWidgetsPromise = null;
+            throw error;
+          });
+
+          return xWidgetsPromise;
+        }
+
+        /**
+         * 读取站内推文卡片资料，用于零组件的轻量预览。
+         *
+         * @param {{id: string}} tweet - 当前推文。
+         * @returns {Promise<object | null>} 与推文 ID 匹配的数据条目。
+         */
+        async function findRepositoryTweet(tweet) {
+          try {
+            repositoryDataPromise ??= fetch("assets/data/data.json", {
+              cache: "default",
+            }).then((response) => {
+              if (!response.ok) throw new Error("站内数据读取失败");
+              return response.json();
+            });
+
+            const data = await repositoryDataPromise;
+            return (
+              (data.staff || []).find((item) => {
+                const storedTweet = parseTweetUrl(item.tweet || "");
+                return storedTweet?.id === tweet.id;
+              }) || null
+            );
+          } catch (_) {
+            return null;
+          }
+        }
+
+        /**
+         * 更新顶部加载轨道中的单项状态。
+         *
+         * @param {string} elementId - 轨道节点 ID。
+         * @param {"loading" | "ready" | "dormant" | "error"} state - 当前状态。
+         * @param {string} label - 展示给用户的状态文案。
+         */
+        function setRailState(elementId, state, label) {
+          const rail = document.getElementById(elementId);
+          rail.dataset.state = state;
+          rail.querySelector("span").textContent = label;
+        }
+
+        /**
+         * 创建原生组件加载占位。
+         *
+         * @param {string} label - 当前加载动作。
+         * @returns {HTMLDivElement} 加载状态节点。
+         */
+        function createLoadingState(label) {
+          const state = document.createElement("div");
+          state.className = "loading-state";
+          const text = document.createElement("span");
+          text.textContent = label;
+          state.appendChild(text);
+          return state;
+        }
+
+        /**
+         * 在原生组件不可用时显示明确的降级入口。
+         *
+         * @param {HTMLElement} container - 状态容器。
+         * @param {{url: string}} tweet - 当前推文。
+         * @param {string} message - 失败原因说明。
+         */
+        function renderWidgetError(container, tweet, message) {
+          const state = document.createElement("div");
+          state.className = "error-state";
+          const text = document.createElement("span");
+          text.append(`${message} `);
+          const link = document.createElement("a");
+          link.href = tweet.url;
+          link.target = "_blank";
+          link.rel = "noreferrer";
+          link.textContent = "直接在 X 查看";
+          text.appendChild(link);
+          state.appendChild(text);
+          container.replaceChildren(state);
+        }
+
+        /**
+         * 生成完整原生推文组件。
+         *
+         * @param {{id: string, url: string}} tweet - 当前推文。
+         * @param {HTMLElement} container - 组件挂载容器。
+         * @param {number} renderId - 本轮渲染标识，用于丢弃过期结果。
+         * @returns {Promise<boolean>} 是否成功生成组件。
+         */
+        async function renderFullTweet(tweet, container, renderId) {
+          const mount = document.createElement("div");
+          mount.className = "native-mount";
+          mount.appendChild(createLoadingState("正在连接 X 完整推文组件…"));
+          container.replaceChildren(mount);
+
+          try {
+            const widgetsApi = await loadXWidgets();
+            if (renderId !== activeRenderId) return false;
+            mount.replaceChildren();
+            const widget = await widgetsApi.widgets.createTweet(tweet.id, mount, {
+              align: "center",
+              conversation: "none",
+              dnt: true,
+              lang: "zh-cn",
+            });
+            if (!widget) throw new Error("X 未返回可显示的推文");
+            return true;
+          } catch (error) {
+            if (renderId !== activeRenderId) return false;
+            renderWidgetError(mount, tweet, "完整推文暂时无法加载。");
+            return false;
+          }
+        }
+
+        /**
+         * 等待 X Publish 把媒体模式标记转换为 iframe。
+         *
+         * @param {HTMLElement} mount - 视频组件挂载点。
+         * @returns {Promise<void>} iframe 出现时完成。
+         */
+        function waitForWidgetFrame(mount) {
+          return new Promise((resolve, reject) => {
+            if (mount.querySelector("iframe")) {
+              resolve();
+              return;
+            }
+
+            const observer = new MutationObserver(() => {
+              if (!mount.querySelector("iframe")) return;
+              observer.disconnect();
+              window.clearTimeout(timeoutId);
+              resolve();
+            });
+            const timeoutId = window.setTimeout(() => {
+              observer.disconnect();
+              reject(new Error("X 视频组件加载超时"));
+            }, 15000);
+            observer.observe(mount, { childList: true, subtree: true });
+          });
+        }
+
+        /**
+         * 使用 X Publish 的 data-media-max-width 模式生成仅视频预览。
+         *
+         * @param {{url: string}} tweet - 当前推文。
+         * @param {HTMLElement} container - 组件挂载容器。
+         * @param {number} renderId - 本轮渲染标识，用于丢弃过期结果。
+         * @returns {Promise<boolean>} 是否成功生成组件。
+         */
+        async function renderVideoTweet(tweet, container, renderId) {
+          const mount = document.createElement("div");
+          mount.className = "native-mount";
+          mount.appendChild(createLoadingState("正在连接 X 视频组件…"));
+          container.replaceChildren(mount);
+
+          try {
+            const widgetsApi = await loadXWidgets();
+            if (renderId !== activeRenderId) return false;
+
+            const blockquote = document.createElement("blockquote");
+            blockquote.className = "twitter-tweet";
+            blockquote.dataset.mediaMaxWidth = "560";
+            blockquote.dataset.dnt = "true";
+            blockquote.dataset.lang = "zh-cn";
+            const link = document.createElement("a");
+            link.href = tweet.url;
+            blockquote.appendChild(link);
+            mount.replaceChildren(blockquote);
+
+            widgetsApi.widgets.load(mount);
+            await waitForWidgetFrame(mount);
+            return true;
+          } catch (error) {
+            if (renderId !== activeRenderId) return false;
+            renderWidgetError(
+              mount,
+              tweet,
+              "这条推文没有可嵌入视频，或 X 视频组件暂时不可用。",
+            );
+            return false;
+          }
+        }
+
+        /**
+         * 从站内条目整理轻量卡片所需字段。
+         *
+         * @param {{id: string, handle: string}} tweet - 当前推文。
+         * @param {object | null} repositoryItem - 可选的站内数据条目。
+         * @returns {{name: string, handle: string, avatar: string, text: string, cover: string, hasLocalData: boolean}}
+         * 卡片展示数据。
+         */
+        function getLocalCardData(tweet, repositoryItem) {
+          const card = repositoryItem?.tweetCard || {};
+          const handle = card.handle || tweet.handle || "x";
+          const localCover = LOCAL_COVER_BY_TWEET_ID[tweet.id] || "";
+          return {
+            name: card.name || repositoryItem?.name || `@${handle}`,
+            handle,
+            avatar: "",
+            text:
+              card.text ||
+              "这条推文尚未保存本地文案；入库后可在列表中显示一句简介。",
+            cover: localCover,
+            hasLocalData: Boolean(repositoryItem && localCover),
+          };
+        }
+
+        /**
+         * 创建一张不依赖 X 组件的轻量卡片。
+         *
+         * @param {{url: string}} tweet - 当前推文。
+         * @param {ReturnType<typeof getLocalCardData>} data - 卡片展示数据。
+         * @param {"link" | "expand"} actionType - 点击跳转或按需展开。
+         * @param {number} renderId - 当前渲染标识。
+         * @returns {HTMLElement} 完整卡片节点。
+         */
+        function createLocalCard(tweet, data, actionType, renderId) {
+          const card = document.createElement("article");
+          card.className = data.hasLocalData
+            ? "local-card has-cover"
+            : "local-card";
+
+          const coverFrame = document.createElement("div");
+          coverFrame.className = "cover-frame";
+          const placeholder = document.createElement("div");
+          placeholder.className = "cover-placeholder";
+          placeholder.hidden = Boolean(data.cover);
+          const placeholderCopy = document.createElement("div");
+          const placeholderMark = document.createElement("strong");
+          placeholderMark.textContent = "X";
+          const placeholderText = document.createElement("span");
+          placeholderText.textContent = "封面待保存到站内";
+          placeholderCopy.append(placeholderMark, placeholderText);
+          placeholder.appendChild(placeholderCopy);
+
+          const coverImage = document.createElement("img");
+          coverImage.className = "cover-image";
+          coverImage.alt = data.hasLocalData
+            ? `${data.name} 的视频封面`
+            : "推文封面待入库";
+          coverImage.loading = "lazy";
+          coverImage.decoding = "async";
+          coverImage.hidden = !data.cover;
+          if (data.cover) coverImage.src = data.cover;
+          coverImage.addEventListener("error", () => {
+            coverImage.hidden = true;
+            placeholder.hidden = false;
+          });
+
+          const coverLabel = document.createElement("span");
+          coverLabel.className = "cover-label";
+          coverLabel.textContent = data.hasLocalData ? "站内已有封面" : "结构预览";
+          const playMark = document.createElement("span");
+          playMark.className = "play-mark";
+          playMark.setAttribute("aria-hidden", "true");
+          coverFrame.append(placeholder, coverImage, coverLabel, playMark);
+
+          const cardBody = document.createElement("div");
+          cardBody.className = "card-body";
+          const authorLine = document.createElement("div");
+          authorLine.className = "author-line";
+          let avatar;
+          if (data.avatar) {
+            avatar = document.createElement("img");
+            avatar.className = "author-avatar";
+            avatar.src = data.avatar;
+            avatar.alt = "";
+            avatar.loading = "lazy";
+            avatar.addEventListener("error", () => {
+              avatar.hidden = true;
+            });
+          } else {
+            avatar = document.createElement("span");
+            avatar.className = "author-monogram";
+            avatar.textContent = data.name.slice(0, 1).toUpperCase();
+            avatar.setAttribute("aria-hidden", "true");
+          }
+
+          const authorCopy = document.createElement("div");
+          authorCopy.className = "author-copy";
+          const authorName = document.createElement("strong");
+          authorName.className = "author-name";
+          authorName.textContent = data.name;
+          const authorHandle = document.createElement("span");
+          authorHandle.className = "author-handle";
+          authorHandle.textContent = `@${data.handle}`;
+          authorCopy.append(authorName, authorHandle);
+          authorLine.append(avatar, authorCopy);
+
+          const cardText = document.createElement("p");
+          cardText.className = "card-text";
+          cardText.textContent = data.text;
+
+          const actions = document.createElement("div");
+          actions.className = "card-actions";
+          const note = document.createElement("span");
+          note.className = "card-note";
+          note.textContent = "0 个 X 组件";
+          let action;
+          if (actionType === "expand") {
+            action = document.createElement("button");
+            action.type = "button";
+            action.className = "card-action";
+            action.textContent = "展开完整推文";
+            action.addEventListener("click", async () => {
+              action.disabled = true;
+              action.textContent = "正在展开…";
+              setRailState("deferredRail", "loading", "正在请求推文");
+              const isReady = await renderFullTweet(
+                tweet,
+                deferredNative,
+                renderId,
+              );
+              if (renderId !== activeRenderId) return;
+              setRailState(
+                "deferredRail",
+                isReady ? "ready" : "error",
+                isReady ? "已按需加载" : "加载失败",
+              );
+              action.textContent = isReady ? "已展开" : "重新展开";
+              action.disabled = isReady;
+            });
+          } else {
+            action = document.createElement("a");
+            action.className = "card-action";
+            action.href = tweet.url;
+            action.target = "_blank";
+            action.rel = "noreferrer";
+            action.textContent = "在 X 打开";
+          }
+          actions.append(note, action);
+          cardBody.append(authorLine, cardText, actions);
+          card.append(coverFrame, cardBody);
+          return card;
+        }
+
+        /**
+         * 根据当前链接同时刷新四种预览。
+         *
+         * @param {{id: string, handle: string, url: string}} tweet - 已校验的推文信息。
+         * @returns {Promise<void>} 四种预览完成首轮状态更新时结束。
+         */
+        async function renderAllPreviews(tweet) {
+          const renderId = ++activeRenderId;
+          formMessage.classList.remove("is-error");
+          formMessage.textContent = `正在预览 ${tweet.url}`;
+          setRailState("fullRail", "loading", "正在请求推文");
+          setRailState("videoRail", "loading", "正在请求视频");
+          setRailState("localRail", "ready", "0 个 X 组件");
+          setRailState("deferredRail", "dormant", "尚未请求推文");
+          deferredNative.replaceChildren();
+
+          const repositoryItemPromise = findRepositoryTweet(tweet);
+          const fullPromise = renderFullTweet(tweet, fullPreview, renderId);
+          const videoPromise = renderVideoTweet(tweet, videoPreview, renderId);
+          const repositoryItem = await repositoryItemPromise;
+          if (renderId !== activeRenderId) return;
+
+          const cardData = getLocalCardData(tweet, repositoryItem);
+          localPreview.replaceChildren(
+            createLocalCard(tweet, cardData, "link", renderId),
+          );
+          deferredPreview.replaceChildren(
+            createLocalCard(tweet, cardData, "expand", renderId),
+          );
+          formMessage.textContent = cardData.hasLocalData
+            ? "已匹配站内封面与作者资料；原生组件的加载状态见下方轨道。"
+            : "这条推文尚无站内封面资料，先展示卡片结构；原生组件仍会使用真实推文。";
+
+          const [fullReady, videoReady] = await Promise.all([
+            fullPromise,
+            videoPromise,
+          ]);
+          if (renderId !== activeRenderId) return;
+          setRailState(
+            "fullRail",
+            fullReady ? "ready" : "error",
+            fullReady ? "X 组件已加载" : "组件加载失败",
+          );
+          setRailState(
+            "videoRail",
+            videoReady ? "ready" : "error",
+            videoReady ? "X 视频已加载" : "视频不可用",
+          );
+        }
+
+        previewForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const tweet = parseTweetUrl(tweetUrlInput.value);
+          if (!tweet) {
+            formMessage.classList.add("is-error");
+            formMessage.textContent =
+              "请输入有效的 x.com 或 twitter.com 推文链接，例如 https://x.com/账号/status/推文ID";
+            tweetUrlInput.focus();
+            return;
+          }
+
+          tweetUrlInput.value = tweet.url;
+          renderAllPreviews(tweet);
+        });
+
+        const initialTweet = parseTweetUrl(
+          new URLSearchParams(window.location.search).get("tweet") ||
+            DEFAULT_TWEET_URL,
+        );
+        if (initialTweet) {
+          tweetUrlInput.value = initialTweet.url;
+          renderAllPreviews(initialTweet);
+        }
+      })();
+    </script>
+  </body>
+</html>
