@@ -24,6 +24,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Validate tweet media manifest
+        run: node scripts/refresh-tweet-media.mjs --check
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -56,4 +59,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
-

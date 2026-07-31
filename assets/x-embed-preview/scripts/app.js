@@ -1,9 +1,9 @@
-import { DEFAULT_TWEET_URL } from "./config.js";
+import { DEFAULT_TWEET_URL } from "./config.js?v=2026073110";
 import {
   createLocalCard,
   getLocalCardData,
-} from "./local-card.js";
-import { renderDynamicMediaGallery } from "./media/preview.js";
+} from "./local-card.js?v=2026073110";
+import { renderDynamicMediaGallery } from "./media/preview.js?v=2026073110";
 import { findRepositoryTweet } from "./repository.js";
 import { parseTweetUrl } from "./tweet-url.js";
 import { setRailState } from "./ui-state.js";
@@ -91,8 +91,8 @@ export function initializePreviewPage() {
       createLocalCard(tweet, cardData, "expand", expandTweet),
     );
     const repositoryMessage = cardData.hasLocalData
-      ? "已匹配站内封面与作者资料；原生组件的加载状态见下方轨道。"
-      : "这条推文尚无站内封面资料，先展示卡片结构；原生组件仍会使用真实推文。";
+      ? "已匹配站内作者资料；原生组件的加载状态见下方轨道。"
+      : "这条推文尚无站内文字资料，先展示卡片结构；原生组件仍会使用真实推文。";
 
     const [fullReady, videoReady, galleryResult] = await Promise.all([
       fullPromise,

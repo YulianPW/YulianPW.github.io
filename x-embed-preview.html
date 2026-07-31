@@ -4,9 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
+    <link rel="dns-prefetch" href="//api.fxtwitter.com" />
+    <link rel="preconnect" href="https://pbs.twimg.com" />
+    <link rel="preconnect" href="https://video.twimg.com" />
+    <link
+      rel="preload"
+      href="assets/data/tweet-media.json?v=2026073110"
+      as="fetch"
+      type="application/json"
+      crossorigin="anonymous"
+    />
     <meta
       name="description"
-      content="用同一条 X 推文对比完整原生推文、仅视频、动态媒体画廊、本地封面卡片与按需展开五种展示方式。"
+      content="用同一条 X 推文对比完整原生推文、仅视频、动态媒体画廊、本地文字卡片与按需展开五种展示方式。"
     />
     <title>X 推文展示预览 · 雨恋女陪殿</title>
     <link rel="stylesheet" href="assets/x-embed-preview/styles/base.css" />
@@ -38,7 +48,7 @@
         </div>
         <p class="hero-copy">
           粘贴一条含媒体的 X 推文，直接比较原生完整推文、官方单视频、动态媒体画廊、
-          轻量封面卡片和按需展开。每种方案的网络代价也会同步显示。
+          轻量文字卡片和按需展开。每种方案的网络代价也会同步显示。
         </p>
       </section>
 
@@ -50,7 +60,7 @@
               id="tweetUrl"
               name="tweetUrl"
               type="url"
-              value="https://x.com/waffles_r_gone/status/2082097551633687021"
+              value="https://x.com/loli_yl/status/2083117823048515721"
               placeholder="https://x.com/账号/status/推文ID"
               inputmode="url"
               autocomplete="url"
@@ -80,10 +90,10 @@
         </div>
         <div id="galleryRail" class="rail-step" data-state="loading">
           <strong>动态媒体画廊</strong>
-          <span>等待媒体 API</span>
+          <span>等待站内媒体清单</span>
         </div>
         <div id="localRail" class="rail-step" data-state="ready">
-          <strong>本地封面卡片</strong>
+          <strong>本地文字卡片</strong>
           <span>0 个 X 组件</span>
         </div>
         <div id="deferredRail" class="rail-step" data-state="dormant">
@@ -138,7 +148,7 @@
         <article class="preview-panel media-gallery-panel">
           <header class="panel-header">
             <div>
-              <p class="panel-kicker">Dynamic · Media API</p>
+              <p class="panel-kicker">Local manifest · X media</p>
               <div class="panel-title-row">
                 <h2 class="panel-title">动态媒体画廊</h2>
                 <span class="recommend-badge">实验</span>
@@ -151,7 +161,7 @@
             </div>
             <p class="panel-description">
               默认按 X 的多素材拼图展示；视频可直接播放，图片和视频都能放大到完整比例轮播。
-              当前实验依赖 FxTwitter 兼容接口，不是 X 官方组件。
+              已入库推文优先读取站内元数据清单，图片、封面和视频仍由浏览器直接请求 X CDN；清单缺失时才回退 FxTwitter。
             </p>
           </header>
           <div
@@ -168,7 +178,7 @@
             <div>
               <p class="panel-kicker">Local · Compact</p>
               <div class="panel-title-row">
-                <h2 class="panel-title">本地封面卡片</h2>
+                <h2 class="panel-title">本地文字卡片</h2>
               </div>
             </div>
             <div class="panel-metrics" aria-label="速度最快，占用空间小">
@@ -176,7 +186,7 @@
               <span class="metric">空间 · 小</span>
             </div>
             <p class="panel-description">
-              页面只显示已入库的封面、作者和一句文案，点击后直接前往 X。
+              页面只显示站内作者和一句文案，不请求推文媒体；点击后直接前往 X。
             </p>
           </header>
           <div id="localPreview" class="preview-stage"></div>
@@ -226,6 +236,9 @@
       </footer>
     </main>
 
-    <script type="module" src="assets/x-embed-preview/scripts/app.js"></script>
+    <script
+      type="module"
+      src="assets/x-embed-preview/scripts/app.js?v=2026073110"
+    ></script>
   </body>
 </html>

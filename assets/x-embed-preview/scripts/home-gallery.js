@@ -1,8 +1,18 @@
-import { createMediaGallery } from "./media/gallery.js?v=2026073107";
-import { fetchDynamicMedia } from "./media/api.js";
+import {
+  createMediaGallery,
+  preloadMediaGalleryVideos,
+} from "./media/gallery.js?v=2026073110";
+import { fetchDynamicMedia } from "./media/api.js?v=2026073110";
 import { parseTweetUrl } from "./tweet-url.js";
 
 const MEDIA_REQUEST_TIMEOUT_MS = 15000;
+const GALLERY_PRELOAD_VIEWPORTS = 1.5;
+const VIDEO_METADATA_PRELOAD_VIEWPORTS = 0.75;
+const VIDEO_CONTENT_PRELOAD_VIEWPORTS = 0.25;
+const MEDIA_ORIGINS = Object.freeze([
+  "https://pbs.twimg.com",
+  "https://video.twimg.com",
+]);
 
 /** @type {Map<string, Promise<import("./types.js").DynamicMedia>>} */
 const mediaRequestCache = new Map();
@@ -11,16 +21,23 @@ const mediaRequestCache = new Map();
 let pendingMounts = [];
 let activeLoads = 0;
 let galleryObserver = null;
+let videoMetadataObserver = null;
+let videoContentObserver = null;
+let mediaOriginsWarmed = false;
 
 /**
- * 为当前断点保留恰好够下一屏使用的预加载距离。
+ * 将视口倍数换算成当前设备可用的 IntersectionObserver 边距。
  *
+ * @param {number} viewportMultiplier - 需要提前介入的视口高度倍数。
  * @returns {string} IntersectionObserver 的 rootMargin。
  */
-function getObserverRootMargin() {
-  return window.matchMedia("(max-width: 640px)").matches
-    ? "240px 0px"
-    : "360px 0px";
+function getObserverRootMargin(viewportMultiplier) {
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  const verticalMargin = Math.max(
+    1,
+    Math.round(viewportHeight * viewportMultiplier),
+  );
+  return `${verticalMargin}px 0px`;
 }
 
 /**
@@ -30,6 +47,118 @@ function getObserverRootMargin() {
  */
 function getMaxConcurrentLoads() {
   return window.matchMedia("(max-width: 640px)").matches ? 1 : 2;
+}
+
+/**
+ * 在正文完成首轮绘制后预先建立 X 媒体 CDN 连接。
+ *
+ * @description 首页头部只做 DNS 预取，避免第三方握手争抢首屏；画廊模块开始
+ * 工作后再注入 preconnect，使视频进入预载距离时可以直接发起媒体请求。
+ *
+ * @returns {void}
+ */
+function warmMediaOrigins() {
+  if (mediaOriginsWarmed) return;
+  mediaOriginsWarmed = true;
+
+  MEDIA_ORIGINS.forEach((origin) => {
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = origin;
+    document.head.appendChild(link);
+  });
+}
+
+/**
+ * 判断当前网络是否适合在用户点击前缓冲第一段视频内容。
+ *
+ * @description 省流量及 2G/3G 网络仍会提前读取 metadata，但不会主动下载
+ * 视频内容；明确点击播放时不受此限制。
+ *
+ * @returns {boolean} 是否允许近视口内容预载。
+ */
+function canPreloadVideoContent() {
+  const connection = navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection;
+  return !connection?.saveData &&
+    !["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
+}
+
+/**
+ * 把已生成的画廊接入视频 metadata 和首段内容的两级观察器。
+ *
+ * @param {HTMLElement} gallery - 已挂载的共享媒体画廊。
+ * @returns {void}
+ */
+function observeGalleryVideoPreload(gallery) {
+  if (!gallery.querySelector("video.gallery-mosaic-video")) return;
+
+  if (!("IntersectionObserver" in window)) {
+    preloadMediaGalleryVideos(gallery, "metadata");
+    if (canPreloadVideoContent()) {
+      preloadMediaGalleryVideos(gallery, "auto");
+    }
+    return;
+  }
+
+  videoMetadataObserver?.observe(gallery);
+  videoContentObserver?.observe(gallery);
+}
+
+/**
+ * 按当前视口重建分阶段视频预载观察器，并接管已渲染画廊。
+ *
+ * @param {ParentNode} root - 当前页面或局部扫描根节点。
+ * @returns {void}
+ */
+function rebuildVideoPreloadObservers(root) {
+  videoMetadataObserver?.disconnect();
+  videoContentObserver?.disconnect();
+  videoMetadataObserver = null;
+  videoContentObserver = null;
+
+  if (!("IntersectionObserver" in window)) return;
+
+  videoMetadataObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        videoMetadataObserver?.unobserve(entry.target);
+        preloadMediaGalleryVideos(entry.target, "metadata");
+      });
+    },
+    {
+      rootMargin: getObserverRootMargin(
+        VIDEO_METADATA_PRELOAD_VIEWPORTS,
+      ),
+      threshold: 0.01,
+    },
+  );
+
+  if (canPreloadVideoContent()) {
+    videoContentObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          videoContentObserver?.unobserve(entry.target);
+          preloadMediaGalleryVideos(entry.target, "auto");
+        });
+      },
+      {
+        rootMargin: getObserverRootMargin(
+          VIDEO_CONTENT_PRELOAD_VIEWPORTS,
+        ),
+        threshold: 0.01,
+      },
+    );
+  }
+
+  root
+    .querySelectorAll(
+      ".tweet-gallery-host[data-state='ready'] .media-gallery",
+    )
+    .forEach((gallery) => observeGalleryVideoPreload(gallery));
 }
 
 /**
@@ -200,6 +329,7 @@ async function hydrateMount(mount) {
     // 首页已在紧凑头部提供原推文入口，移除共享组件的来源栏以避免重复信息。
     gallery.querySelector(".gallery-source")?.remove();
     mount.replaceChildren(gallery);
+    observeGalleryVideoPreload(gallery);
   } catch (_) {
     if (mount.isConnected) renderGalleryError(mount, tweet);
   }
@@ -216,7 +346,7 @@ function drainQueue() {
     if (!mount?.isConnected) continue;
 
     if (mount.offsetParent === null) {
-      setMountState(mount, "waiting", "滑到这里自动加载");
+      setMountState(mount, "waiting", "接近这里自动预载");
       galleryObserver?.observe(mount);
       continue;
     }
@@ -252,7 +382,9 @@ function queueMount(mount) {
  * @returns {void}
  */
 export function refreshHomeMediaGalleries(root = document) {
+  warmMediaOrigins();
   galleryObserver?.disconnect();
+  rebuildVideoPreloadObservers(root);
   pendingMounts = pendingMounts.filter(
     (mount) => mount.isConnected && mount.dataset.state === "queued",
   );
@@ -275,7 +407,10 @@ export function refreshHomeMediaGalleries(root = document) {
         queueMount(entry.target);
       });
     },
-    { rootMargin: getObserverRootMargin(), threshold: 0.01 },
+    {
+      rootMargin: getObserverRootMargin(GALLERY_PRELOAD_VIEWPORTS),
+      threshold: 0.01,
+    },
   );
   mounts.forEach((mount) => galleryObserver.observe(mount));
 }

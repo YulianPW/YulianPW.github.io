@@ -1,5 +1,3 @@
-import { LOCAL_COVER_BY_TWEET_ID } from "./config.js";
-
 /**
  * 从站内条目整理轻量卡片所需字段。
  *
@@ -10,7 +8,7 @@ import { LOCAL_COVER_BY_TWEET_ID } from "./config.js";
 export function getLocalCardData(tweet, repositoryItem) {
   const card = repositoryItem?.tweetCard || {};
   const handle = card.handle || tweet.handle || "x";
-  const localCover = LOCAL_COVER_BY_TWEET_ID[tweet.id] || "";
+  const cover = typeof card.cover === "string" ? card.cover : "";
   return {
     name: card.name || repositoryItem?.name || "@" + handle,
     handle,
@@ -18,8 +16,8 @@ export function getLocalCardData(tweet, repositoryItem) {
     text:
       card.text ||
       "这条推文尚未保存本地文案；入库后可在列表中显示一句简介。",
-    cover: localCover,
-    hasLocalData: Boolean(repositoryItem && localCover),
+    cover,
+    hasLocalData: Boolean(repositoryItem),
   };
 }
 
@@ -39,7 +37,7 @@ export function createLocalCard(
   onExpand = null,
 ) {
   const card = document.createElement("article");
-  card.className = data.hasLocalData
+  card.className = data.cover
     ? "local-card has-cover"
     : "local-card";
 
@@ -52,15 +50,15 @@ export function createLocalCard(
   const placeholderMark = document.createElement("strong");
   placeholderMark.textContent = "X";
   const placeholderText = document.createElement("span");
-  placeholderText.textContent = "封面待保存到站内";
+  placeholderText.textContent = "媒体不保存到站内";
   placeholderCopy.append(placeholderMark, placeholderText);
   placeholder.appendChild(placeholderCopy);
 
   const coverImage = document.createElement("img");
   coverImage.className = "cover-image";
-  coverImage.alt = data.hasLocalData
+  coverImage.alt = data.cover
     ? data.name + " 的视频封面"
-    : "推文封面待入库";
+    : "此文字卡片不加载推文媒体";
   coverImage.loading = "lazy";
   coverImage.decoding = "async";
   coverImage.hidden = !data.cover;
@@ -72,9 +70,7 @@ export function createLocalCard(
 
   const coverLabel = document.createElement("span");
   coverLabel.className = "cover-label";
-  coverLabel.textContent = data.hasLocalData
-    ? "站内已有封面"
-    : "结构预览";
+  coverLabel.textContent = data.cover ? "自定义封面" : "文字卡片";
   const playMark = document.createElement("span");
   playMark.className = "play-mark";
   playMark.setAttribute("aria-hidden", "true");

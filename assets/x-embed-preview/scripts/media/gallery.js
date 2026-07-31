@@ -1,4 +1,10 @@
-import { createMediaLightbox } from "./lightbox.js?v=2026073107";
+import { createMediaLightbox } from "./lightbox.js?v=2026073110";
+
+const VIDEO_PRELOAD_PRIORITY = Object.freeze({
+  none: 0,
+  metadata: 1,
+  auto: 2,
+});
 
 /**
  * 解析媒体深链接在画廊中的初始位置。
@@ -21,6 +27,105 @@ function resolveInitialMedia(tweet, data) {
     index: matches ? requestedIndex : 0,
     matches,
   };
+}
+
+/**
+ * 为当前展示尺寸和网络偏好选择列表播放码率。
+ *
+ * @description 移动端拼图使用最低 MP4 档位，桌面端使用不高于 832kbps 的
+ * 最清晰档位；省流量或 2G/3G 网络统一选择最低档。灯箱不调用本函数，仍加载
+ * item.url 指向的高清文件。
+ *
+ * @param {import("../types.js").MediaItem} item - 当前视频素材。
+ * @returns {{url: string, bitrate: number}} 列表播放器使用的地址和码率。
+ */
+function selectInlineVideoSource(item) {
+  const variants = [...(item.variants || [])].sort(
+    (left, right) => left.bitrate - right.bitrate,
+  );
+  if (!variants.length) return { url: item.url, bitrate: 0 };
+
+  const connection = navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection;
+  const constrainedNetwork =
+    connection?.saveData ||
+    ["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
+  const targetBitrate =
+    constrainedNetwork || window.matchMedia("(max-width: 640px)").matches
+      ? 288000
+      : 832000;
+  const withinTarget = variants.filter(
+    (variant) => variant.bitrate <= targetBitrate,
+  );
+  return withinTarget.at(-1) || variants[0];
+}
+
+/**
+ * 为拼图选择 X 图片 CDN 的适配尺寸，保留灯箱使用的原图地址。
+ *
+ * @description 移动端拼图宽度有限，small 已足够清晰；桌面端使用 medium。
+ * 这里只改写 X 图片的 name 参数，不生成或保存站内派生图片。
+ *
+ * @param {import("../types.js").MediaItem} item - 当前图片素材。
+ * @returns {string} 拼图使用的 X CDN 图片地址。
+ */
+function selectInlinePhotoSource(item) {
+  try {
+    const source = new URL(item.url);
+    if (
+      source.hostname === "pbs.twimg.com" &&
+      source.pathname.startsWith("/media/")
+    ) {
+      source.searchParams.set(
+        "name",
+        window.matchMedia("(max-width: 640px)").matches
+          ? "small"
+          : "medium",
+      );
+    }
+    return source.href;
+  } catch (_) {
+    return item.url;
+  }
+}
+
+/**
+ * 将视频提升到指定预加载等级，且不重复重置已采用更高等级的缓冲。
+ *
+ * @param {HTMLVideoElement} video - 拼图内的视频节点。
+ * @param {"metadata" | "auto"} preloadMode - 目标预加载等级。
+ * @returns {void}
+ */
+function attachMosaicVideoSource(video, preloadMode) {
+  const source = video.dataset.inlineSrc;
+  if (!source) return;
+
+  const currentMode = video.dataset.preloadMode || "none";
+  if (
+    VIDEO_PRELOAD_PRIORITY[currentMode] >=
+      VIDEO_PRELOAD_PRIORITY[preloadMode] &&
+    video.getAttribute("src")
+  ) {
+    return;
+  }
+
+  const sourceWasAttached = Boolean(video.getAttribute("src"));
+  video.preload = preloadMode;
+  if (!sourceWasAttached) video.src = source;
+  video.dataset.preloadMode = preloadMode;
+
+  // 已有可持续播放的缓冲时不重启媒体选择，避免升级 preload 反而丢掉进度。
+  const shouldLoad =
+    !sourceWasAttached ||
+    (preloadMode === "auto" &&
+      video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA);
+  if (!shouldLoad) return;
+
+  // preload 只是浏览器提示；首次挂载或缓冲不足时显式进入媒体选择流程。
+  try {
+    video.load();
+  } catch (_) {}
 }
 
 /**
@@ -61,7 +166,7 @@ function createMosaicPhoto(item, index, openLightbox) {
     status.dataset.state = "error";
     status.textContent = "X 媒体未加载 · 请确认已开🪜";
   });
-  image.src = item.url;
+  image.src = selectInlinePhotoSource(item);
 
   mosaicItem.append(image, status);
   mosaicItem.addEventListener("click", () => {
@@ -111,6 +216,10 @@ function createMosaicVideo(
     video.disableRemotePlayback = true;
   }
   if (item.poster) video.poster = item.poster;
+  const inlineSource = selectInlineVideoSource(item);
+  video.dataset.inlineSrc = inlineSource.url;
+  video.dataset.inlineBitrate = String(inlineSource.bitrate);
+  video.dataset.preloadMode = "none";
   video.setAttribute(
     "aria-label",
     author.name + " 的第 " + (index + 1) + " 段视频",
@@ -139,8 +248,6 @@ function createMosaicVideo(
   status.textContent = "加载中 · 来源 X · 需开🪜";
 
   let hasPreviewFrame = false;
-  let hasPlaybackError = false;
-  let sourceAttached = false;
 
   /**
    * 恢复只显示站内播放与放大入口的预览态。
@@ -148,7 +255,6 @@ function createMosaicVideo(
    * @returns {void}
    */
   function showPreviewControls() {
-    if (hasPlaybackError) return;
     video.removeAttribute("controls");
     playButton.hidden = false;
     expandButton.hidden = false;
@@ -185,12 +291,20 @@ function createMosaicVideo(
           status.textContent = "点按播放 · 来源 X · 需开🪜";
         }
       },
-      { once: true },
     );
     posterProbe.src = item.poster;
   } else {
     status.textContent = "点按播放 · 来源 X · 需开🪜";
   }
+
+  const warmForIntent = () => {
+    attachMosaicVideoSource(video, "auto");
+  };
+  playButton.addEventListener("pointerenter", warmForIntent);
+  playButton.addEventListener("pointerdown", warmForIntent, {
+    passive: true,
+  });
+  playButton.addEventListener("focus", warmForIntent);
 
   playButton.addEventListener("click", () => {
     pauseOtherVideos(video);
@@ -200,10 +314,7 @@ function createMosaicVideo(
     status.textContent = "加载中 · 来源 X · 需开🪜";
     status.hidden = false;
 
-    if (!sourceAttached) {
-      video.src = item.url;
-      sourceAttached = true;
-    }
+    attachMosaicVideoSource(video, "auto");
 
     try {
       const playback = video.play();
@@ -236,13 +347,20 @@ function createMosaicVideo(
     if (video.paused) status.hidden = true;
   });
   video.addEventListener("error", () => {
-    hasPlaybackError = true;
-    video.hidden = true;
-    playButton.hidden = true;
-    expandButton.hidden = true;
+    video.pause();
+    video.removeAttribute("controls");
+    video.removeAttribute("src");
+    video.dataset.preloadMode = "none";
+    playButton.hidden = false;
+    expandButton.hidden = false;
     status.hidden = false;
     status.dataset.state = "error";
-    status.textContent = "X 媒体未加载 · 请确认已开🪜";
+    status.textContent = "点按重试 · X 视频尚未连接";
+
+    // 清除失败的媒体选择，下一次明确点按时可以重新发起请求。
+    try {
+      video.load();
+    } catch (_) {}
   });
   expandButton.addEventListener("click", () => {
     openLightbox(index, expandButton);
@@ -372,4 +490,30 @@ export function createMediaGallery(tweet, data) {
     lightbox.element,
   );
   return gallery;
+}
+
+/**
+ * 分阶段预热一个画廊中的列表视频。
+ *
+ * @description metadata 阶段只连接所有视频并读取基础信息；auto 阶段仅提升
+ * 第一段视频，避免四宫格一次下载多段内容。用户明确指向其他播放按钮时，按钮
+ * 自身会把对应视频提升到 auto。
+ *
+ * @param {HTMLElement} gallery - 已挂载的媒体画廊。
+ * @param {"metadata" | "auto"} preloadMode - 本轮预热等级。
+ * @returns {void}
+ */
+export function preloadMediaGalleryVideos(gallery, preloadMode) {
+  const videos = Array.from(
+    gallery.querySelectorAll("video.gallery-mosaic-video"),
+  );
+  if (preloadMode === "auto") {
+    const firstVideo = videos[0];
+    if (firstVideo) attachMosaicVideoSource(firstVideo, "auto");
+    return;
+  }
+
+  videos.forEach((video) => {
+    attachMosaicVideoSource(video, "metadata");
+  });
 }

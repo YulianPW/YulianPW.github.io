@@ -4,16 +4,25 @@
  * @type {string}
  */
 export const DEFAULT_TWEET_URL =
-  "https://x.com/waffles_r_gone/status/2082097551633687021";
+  "https://x.com/loli_yl/status/2083117823048515721";
 
 /**
- * 已保存到站内的推文封面映射。
+ * 媒体静态清单和模块缓存共同使用的发布版本。
  *
- * @type {Readonly<Record<string, string>>}
+ * @description 首页会在解析 X 链接前预取同版本清单；修改清单结构或媒体加载
+ * 逻辑时应同步递增，避免 GitHub Pages 的旧缓存混用。
+ *
+ * @type {string}
  */
-export const LOCAL_COVER_BY_TWEET_ID = Object.freeze({
-  "2082097551633687021": "assets/images/x-embed-demo-cover.svg",
-});
+export const MEDIA_ASSET_VERSION = "2026073110";
+
+/**
+ * 已随站点发布的推文媒体清单。
+ *
+ * @type {string}
+ */
+export const MEDIA_MANIFEST_URL =
+  `assets/data/tweet-media.json?v=${MEDIA_ASSET_VERSION}`;
 
 /**
  * 外部媒体接口允许返回的 X 官方 CDN 主机。

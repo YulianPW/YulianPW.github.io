@@ -34,6 +34,16 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
+    <link rel="dns-prefetch" href="//api.fxtwitter.com" />
+    <link rel="dns-prefetch" href="//pbs.twimg.com" />
+    <link rel="dns-prefetch" href="//video.twimg.com" />
+    <link
+      rel="preload"
+      href="assets/data/tweet-media.json?v=2026073110"
+      as="fetch"
+      type="application/json"
+      crossorigin="anonymous"
+    />
     <meta
       name="google-site-verification"
       content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s"
@@ -837,7 +847,7 @@
       const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
       const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
-      const MEDIA_GALLERY_VERSION = "2026073107";
+      const MEDIA_GALLERY_VERSION = "2026073110";
       const MEDIA_SOURCE_PROFILE_URL =
         "https://twitter.com/intent/user?screen_name=yl_YuTang";
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
@@ -1304,7 +1314,7 @@
               aria-label="${escapeHtml(item.name)}的媒体准备中"
             >
               <span class="tweet-gallery-loader" aria-hidden="true"></span>
-              <span class="tweet-gallery-status">滑到这里自动加载</span>
+              <span class="tweet-gallery-status">接近这里自动预载</span>
             </div>
           </section>
         `;
