@@ -675,11 +675,11 @@
     </style>
     <link
       rel="stylesheet"
-      href="assets/x-embed-preview/styles/media-gallery.css"
+      href="assets/x-embed-preview/styles/media-gallery.css?v=2026073103"
     />
     <link
       rel="stylesheet"
-      href="assets/x-embed-preview/styles/home-gallery.css"
+      href="assets/x-embed-preview/styles/home-gallery.css?v=2026073105"
     />
   </head>
   <body>
@@ -837,6 +837,9 @@
       const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
       const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
+      const MEDIA_GALLERY_VERSION = "2026073105";
+      const MEDIA_SOURCE_PROFILE_URL =
+        "https://twitter.com/intent/user?screen_name=yl_YuTang";
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
       const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
       const FEATURE_RULES = [
@@ -1200,7 +1203,7 @@
       function getTweetMedia(item) {
         const tweetUrl = getSafeUrl(item.tweet, ["x.com", "twitter.com"]);
         if (!tweetUrl) return null;
-        return { tweetUrl };
+        return { tweetUrl, sourceUrl: MEDIA_SOURCE_PROFILE_URL };
       }
 
       function renderTweetShowcase(item) {
@@ -1218,8 +1221,21 @@
                 href="${escapeHtml(media.tweetUrl)}"
                 target="_blank"
                 rel="noreferrer"
-              >在 X 查看原推文 ↗</a>
+              >原推文 ↗</a>
             </div>
+            <template class="tweet-connection-source-template">
+              <a
+                class="tweet-profile-link"
+                href="${escapeHtml(media.sourceUrl)}"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="打开来源 X 主页"
+              >
+                ${getSvgIcon("twitter")}
+                <span>twi</span>
+              </a>
+              <span class="tweet-network-note">需开🪜</span>
+            </template>
             <div
               class="tweet-gallery-host"
               data-tweet-url="${escapeHtml(media.tweetUrl)}"
@@ -1229,7 +1245,7 @@
               aria-label="${escapeHtml(item.name)}的媒体准备中"
             >
               <span class="tweet-gallery-loader" aria-hidden="true"></span>
-              <span class="tweet-gallery-status">滚动到这里加载素材</span>
+              <span class="tweet-gallery-status">滑到这里自动加载</span>
             </div>
           </section>
         `;
@@ -1521,7 +1537,7 @@
         if (!homeGalleryModulePromise) {
           homeGalleryModulePromise = import(
             buildRuntimeUrl(
-              "assets/x-embed-preview/scripts/home-gallery.js",
+              `assets/x-embed-preview/scripts/home-gallery.js?v=${MEDIA_GALLERY_VERSION}`,
             )
           );
         }
@@ -1536,7 +1552,7 @@
               .forEach((mount) => {
                 mount.dataset.state = "error";
                 const status = mount.querySelector(".tweet-gallery-status");
-                if (status) status.textContent = "画廊组件加载失败，请刷新重试";
+                if (status) status.textContent = "连接 X 失败，请刷新重试";
               });
           });
       }

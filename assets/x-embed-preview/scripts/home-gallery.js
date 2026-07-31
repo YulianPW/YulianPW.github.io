@@ -1,9 +1,10 @@
-import { createMediaGallery } from "./media/gallery.js";
+import { createMediaGallery } from "./media/gallery.js?v=2026073103";
 import { fetchDynamicMedia } from "./media/api.js";
 import { parseTweetUrl } from "./tweet-url.js";
 
 const ROOT_MARGIN = "480px 0px";
 const MAX_CONCURRENT_LOADS = 2;
+const MEDIA_REQUEST_TIMEOUT_MS = 15000;
 
 /** @type {Map<string, Promise<import("./types.js").DynamicMedia>>} */
 const mediaRequestCache = new Map();
@@ -18,13 +19,49 @@ let galleryObserver = null;
  *
  * @param {HTMLElement} mount - 当前画廊挂载点。
  * @param {"waiting" | "queued" | "loading" | "ready" | "error"} state - 当前加载状态。
- * @param {string} message - 提供给用户和读屏软件的状态说明。
+ * @param {string} message - 常规状态的完整文案，或连接状态的前置说明。
  * @returns {void}
  */
 function setMountState(mount, state, message) {
   mount.dataset.state = state;
   const status = mount.querySelector(".tweet-gallery-status");
-  if (status) status.textContent = message;
+  if (!status) return;
+
+  if (state === "queued" || state === "loading") {
+    renderConnectionStatus(mount, status, message);
+    return;
+  }
+
+  status.className = "tweet-gallery-status";
+  status.textContent = message;
+}
+
+/**
+ * 使用画廊自带的 X 来源模板渲染连接状态。
+ *
+ * @description 从不参与布局的模板克隆来源链接与网络提示，让加载区保留连接
+ * 说明，同时使左上角继续显示原有的媒体操作提示。
+ *
+ * @param {HTMLElement} mount - 当前画廊挂载点。
+ * @param {HTMLElement} status - 用于承载连接状态的元素。
+ * @param {string} message - 显示在来源徽标前的连接说明。
+ * @returns {void}
+ */
+function renderConnectionStatus(mount, status, message) {
+  const showcase = mount.closest(".tweet-showcase");
+  const sourceTemplate = showcase?.querySelector(
+    ".tweet-connection-source-template",
+  );
+
+  status.className = "tweet-gallery-status tweet-gallery-status--connection";
+  if (!(sourceTemplate instanceof HTMLTemplateElement)) {
+    status.textContent = `${message} X · 需开🪜`;
+    return;
+  }
+
+  const copy = document.createElement("span");
+  copy.textContent = message;
+  status.replaceChildren(copy, sourceTemplate.content.cloneNode(true));
 }
 
 /**
@@ -40,18 +77,19 @@ function renderLoadingState(mount) {
 
   const status = document.createElement("span");
   status.className = "tweet-gallery-status";
-  status.textContent = "正在读取素材…";
 
   mount.setAttribute("role", "status");
   mount.setAttribute("aria-live", "polite");
   mount.replaceChildren(loader, status);
+  renderConnectionStatus(mount, status, "正在连接");
 }
 
 /**
  * 按推文 ID 复用媒体请求。
  *
  * @description 首页同时保留桌面表格和移动卡片 DOM，同一条推文可能出现两次；
- * 缓存 Promise 可避免响应返回前产生重复请求，失败时则清除缓存以允许重试。
+ * 缓存 Promise 可避免响应返回前产生重复请求；单次请求最多等待 15 秒，失败时
+ * 清除缓存以允许用户重试。
  *
  * @param {import("./types.js").TweetReference} tweet - 已校验的推文引用。
  * @returns {Promise<import("./types.js").DynamicMedia>} 可供多个挂载点复用的媒体数据。
@@ -60,10 +98,18 @@ function getCachedDynamicMedia(tweet) {
   const cachedRequest = mediaRequestCache.get(tweet.id);
   if (cachedRequest) return cachedRequest;
 
-  const request = fetchDynamicMedia(tweet).catch((error) => {
-    mediaRequestCache.delete(tweet.id);
-    throw error;
-  });
+  const requestController = new AbortController();
+  const timeoutId = window.setTimeout(() => {
+    requestController.abort();
+  }, MEDIA_REQUEST_TIMEOUT_MS);
+  const request = fetchDynamicMedia(tweet, requestController.signal)
+    .catch((error) => {
+      mediaRequestCache.delete(tweet.id);
+      throw error;
+    })
+    .finally(() => {
+      window.clearTimeout(timeoutId);
+    });
   mediaRequestCache.set(tweet.id, request);
   return request;
 }
@@ -81,7 +127,7 @@ function renderGalleryError(mount, tweet) {
 
   const copy = document.createElement("span");
   copy.className = "tweet-gallery-error-copy";
-  copy.textContent = "暂时无法读取媒体，可以重试或前往 X 查看。";
+  copy.textContent = "X 媒体未加载，请确认已开🪜后重试。";
 
   const actions = document.createElement("span");
   actions.className = "tweet-gallery-error-actions";
@@ -92,7 +138,7 @@ function renderGalleryError(mount, tweet) {
   retry.textContent = "重新加载";
   retry.addEventListener("click", () => {
     renderLoadingState(mount);
-    setMountState(mount, "waiting", "正在读取素材…");
+    setMountState(mount, "waiting", "正在重新连接 X…");
     queueMount(mount);
   });
   actions.appendChild(retry);
@@ -102,7 +148,7 @@ function renderGalleryError(mount, tweet) {
     sourceLink.href = tweet.deepLink || tweet.url;
     sourceLink.target = "_blank";
     sourceLink.rel = "noreferrer";
-    sourceLink.textContent = "在 X 查看";
+    sourceLink.textContent = "打开原推文";
     actions.appendChild(sourceLink);
   }
 
@@ -122,7 +168,7 @@ async function hydrateMount(mount) {
     return;
   }
 
-  setMountState(mount, "loading", "正在读取图片和视频…");
+  setMountState(mount, "loading", "正在连接");
   try {
     const media = await getCachedDynamicMedia(tweet);
     if (!mount.isConnected) return;
@@ -152,7 +198,7 @@ function drainQueue() {
     if (!mount?.isConnected) continue;
 
     if (mount.offsetParent === null) {
-      setMountState(mount, "waiting", "滚动到这里加载素材");
+      setMountState(mount, "waiting", "滑到这里自动加载");
       galleryObserver?.observe(mount);
       continue;
     }
@@ -173,7 +219,7 @@ function drainQueue() {
  */
 function queueMount(mount) {
   if (!mount.isConnected || mount.dataset.state !== "waiting") return;
-  setMountState(mount, "queued", "即将读取图片和视频…");
+  setMountState(mount, "queued", "即将连接");
   pendingMounts.push(mount);
   drainQueue();
 }

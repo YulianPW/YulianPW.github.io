@@ -70,6 +70,15 @@
   object-fit: cover;
 }
 
+.gallery-mosaic-image {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.gallery-mosaic-image.is-loaded {
+  opacity: 1;
+}
+
 .gallery-mosaic-play {
   position: absolute;
   z-index: 2;
@@ -137,20 +146,26 @@
   background: rgba(29, 155, 240, 0.92);
 }
 
-.gallery-mosaic-error {
+.gallery-mosaic-status {
   position: absolute;
   inset: 0;
   display: grid;
   padding: 18px;
   place-items: center;
-  color: rgba(255, 255, 255, 0.72);
+  background: linear-gradient(145deg, #172a3a, #0b1117);
+  color: rgba(255, 255, 255, 0.86);
   font-size: 11px;
+  font-weight: 700;
   line-height: 1.5;
   text-align: center;
 }
 
-.gallery-mosaic-error[hidden] {
+.gallery-mosaic-status[hidden] {
   display: none;
+}
+
+.gallery-mosaic-status[data-state="error"] {
+  color: #fff;
 }
 
 .gallery-mosaic-overflow {
@@ -224,12 +239,36 @@
 }
 
 .gallery-lightbox-error {
+  display: flex;
   max-width: 320px;
   padding: 24px;
+  align-items: center;
+  flex-direction: column;
+  gap: 14px;
   color: rgba(255, 255, 255, 0.76);
   font-size: 13px;
   line-height: 1.6;
   text-align: center;
+}
+
+.gallery-lightbox-error a {
+  display: inline-flex;
+  min-height: 42px;
+  padding: 9px 16px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(29, 155, 240, 0.92);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.gallery-lightbox-error a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 .gallery-lightbox-close,
@@ -315,4 +354,10 @@
   color: var(--x-blue);
   font-weight: 700;
   text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-mosaic-image {
+    transition: none;
+  }
 }

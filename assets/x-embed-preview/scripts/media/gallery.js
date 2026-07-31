@@ -1,4 +1,4 @@
-import { createMediaLightbox } from "./lightbox.js";
+import { createMediaLightbox } from "./lightbox.js?v=2026073103";
 
 /**
  * 解析媒体深链接在画廊中的初始位置。
@@ -43,20 +43,27 @@ function createMosaicPhoto(item, index, openLightbox) {
 
   const image = document.createElement("img");
   image.className = "gallery-mosaic-image";
-  image.src = item.url;
   image.alt = "";
   image.loading = index === 0 ? "eager" : "lazy";
+  image.decoding = "async";
 
-  const error = document.createElement("span");
-  error.className = "gallery-mosaic-error";
-  error.hidden = true;
-  error.textContent = "图片暂时无法加载";
+  const status = document.createElement("span");
+  status.className = "gallery-mosaic-status";
+  status.dataset.state = "loading";
+  status.textContent = "来源 X · 需开🪜";
+  image.addEventListener("load", () => {
+    image.classList.add("is-loaded");
+    status.hidden = true;
+  });
   image.addEventListener("error", () => {
     image.hidden = true;
-    error.hidden = false;
+    status.hidden = false;
+    status.dataset.state = "error";
+    status.textContent = "X 媒体未加载 · 请确认已开🪜";
   });
+  image.src = item.url;
 
-  mosaicItem.append(image, error);
+  mosaicItem.append(image, status);
   mosaicItem.addEventListener("click", () => {
     openLightbox(index, mosaicItem);
   });
@@ -91,7 +98,6 @@ function createMosaicVideo(
 
   const video = document.createElement("video");
   video.className = "gallery-mosaic-video";
-  video.src = item.url;
   video.playsInline = true;
   video.preload = "metadata";
   if (item.poster) video.poster = item.poster;
@@ -117,10 +123,10 @@ function createMosaicVideo(
   );
   expandButton.textContent = "⤢";
 
-  const error = document.createElement("span");
-  error.className = "gallery-mosaic-error";
-  error.hidden = true;
-  error.textContent = "视频暂时无法加载";
+  const status = document.createElement("span");
+  status.className = "gallery-mosaic-status";
+  status.dataset.state = "loading";
+  status.textContent = "来源 X · 需开🪜";
 
   playButton.addEventListener("click", () => {
     pauseOtherVideos(video);
@@ -142,16 +148,22 @@ function createMosaicVideo(
       "再次播放第 " + (index + 1) + " 段视频",
     );
   });
+  video.addEventListener("loadedmetadata", () => {
+    status.hidden = true;
+  });
   video.addEventListener("error", () => {
     video.hidden = true;
     playButton.hidden = true;
-    error.hidden = false;
+    status.hidden = false;
+    status.dataset.state = "error";
+    status.textContent = "X 媒体未加载 · 请确认已开🪜";
   });
   expandButton.addEventListener("click", () => {
     openLightbox(index, expandButton);
   });
+  video.src = item.url;
 
-  mosaicItem.append(video, playButton, expandButton, error);
+  mosaicItem.append(video, playButton, expandButton, status);
   return { element: mosaicItem, video };
 }
 
@@ -228,6 +240,7 @@ export function createMediaGallery(tweet, data) {
     data,
     initialMedia.index,
     pauseMosaicVideos,
+    tweet,
   );
 
   data.items.forEach((item, index) => {

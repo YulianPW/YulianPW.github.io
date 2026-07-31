@@ -5,9 +5,10 @@
  * @param {number} index - 当前媒体索引。
  * @param {import("../types.js").DynamicMedia} data - 完整媒体数据。
  * @param {number} initialIndex - 初次打开时的目标索引。
+ * @param {import("../types.js").TweetReference} tweet - 原推文及媒体深链接。
  * @returns {HTMLDivElement} 可放入灯箱舞台的媒体页。
  */
-function createLightboxSlide(item, index, data, initialIndex) {
+function createLightboxSlide(item, index, data, initialIndex, tweet) {
   const typeLabel = item.type === "photo" ? "图片" : "视频";
   const slide = document.createElement("div");
   slide.className = "gallery-lightbox-slide";
@@ -22,13 +23,11 @@ function createLightboxSlide(item, index, data, initialIndex) {
   );
   media.className = "gallery-lightbox-media";
   if (item.type === "photo") {
-    media.src = item.url;
     media.alt =
       item.alt || data.author.name + " 的第 " + (index + 1) + " 张图片";
     media.loading = index === initialIndex ? "eager" : "lazy";
     media.decoding = "async";
   } else {
-    media.src = item.url;
     media.controls = true;
     media.playsInline = true;
     media.preload = "metadata";
@@ -39,15 +38,22 @@ function createLightboxSlide(item, index, data, initialIndex) {
     );
   }
 
-  const mediaError = document.createElement("span");
+  const mediaError = document.createElement("div");
   mediaError.className = "gallery-lightbox-error";
   mediaError.hidden = true;
-  mediaError.textContent =
-    "这个媒体地址暂时无法加载，可以关闭后通过下方链接在 X 查看原内容。";
+  const errorCopy = document.createElement("span");
+  errorCopy.textContent = "X 媒体未加载，请确认已开🪜。";
+  const sourceLink = document.createElement("a");
+  sourceLink.href = tweet.deepLink || tweet.url;
+  sourceLink.target = "_blank";
+  sourceLink.rel = "noreferrer";
+  sourceLink.textContent = "打开原推文 ↗";
+  mediaError.append(errorCopy, sourceLink);
   media.addEventListener("error", () => {
     media.hidden = true;
     mediaError.hidden = false;
   });
+  media.src = item.url;
 
   slide.append(media, mediaError);
   return slide;
@@ -62,10 +68,11 @@ function createLightboxSlide(item, index, data, initialIndex) {
  * @param {import("../types.js").DynamicMedia} data - 已校验的媒体数据。
  * @param {number} initialIndex - 深链接对应的初始素材索引。
  * @param {() => void} onBeforeOpen - 打开前用于暂停拼图视频的回调。
+ * @param {import("../types.js").TweetReference} tweet - 原推文及媒体深链接。
  * @returns {{element: HTMLDialogElement, open: (index: number, trigger: HTMLElement) => void}}
  * 灯箱节点及其打开方法。
  */
-export function createMediaLightbox(data, initialIndex, onBeforeOpen) {
+export function createMediaLightbox(data, initialIndex, onBeforeOpen, tweet) {
   const lightbox = document.createElement("dialog");
   lightbox.className = "gallery-lightbox";
   lightbox.setAttribute(
@@ -103,7 +110,7 @@ export function createMediaLightbox(data, initialIndex, onBeforeOpen) {
   nextButton.textContent = "›";
 
   const slides = data.items.map((item, index) =>
-    createLightboxSlide(item, index, data, initialIndex),
+    createLightboxSlide(item, index, data, initialIndex, tweet),
   );
   stage.append(...slides);
   shell.append(
