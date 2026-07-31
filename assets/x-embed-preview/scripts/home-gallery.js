@@ -9,10 +9,6 @@ const MEDIA_REQUEST_TIMEOUT_MS = 15000;
 const GALLERY_PRELOAD_VIEWPORTS = 1.5;
 const VIDEO_METADATA_PRELOAD_VIEWPORTS = 0.75;
 const VIDEO_CONTENT_PRELOAD_VIEWPORTS = 0.25;
-const MEDIA_ORIGINS = Object.freeze([
-  "https://pbs.twimg.com",
-  "https://video.twimg.com",
-]);
 
 /** @type {Map<string, Promise<import("./types.js").DynamicMedia>>} */
 const mediaRequestCache = new Map();
@@ -23,7 +19,6 @@ let activeLoads = 0;
 let galleryObserver = null;
 let videoMetadataObserver = null;
 let videoContentObserver = null;
-let mediaOriginsWarmed = false;
 
 /**
  * 将视口倍数换算成当前设备可用的 IntersectionObserver 边距。
@@ -47,26 +42,6 @@ function getObserverRootMargin(viewportMultiplier) {
  */
 function getMaxConcurrentLoads() {
   return window.matchMedia("(max-width: 640px)").matches ? 1 : 2;
-}
-
-/**
- * 在正文完成首轮绘制后预先建立 X 媒体 CDN 连接。
- *
- * @description 首页头部只做 DNS 预取，避免第三方握手争抢首屏；画廊模块开始
- * 工作后再注入 preconnect，使视频进入预载距离时可以直接发起媒体请求。
- *
- * @returns {void}
- */
-function warmMediaOrigins() {
-  if (mediaOriginsWarmed) return;
-  mediaOriginsWarmed = true;
-
-  MEDIA_ORIGINS.forEach((origin) => {
-    const link = document.createElement("link");
-    link.rel = "preconnect";
-    link.href = origin;
-    document.head.appendChild(link);
-  });
 }
 
 /**
@@ -382,7 +357,6 @@ function queueMount(mount) {
  * @returns {void}
  */
 export function refreshHomeMediaGalleries(root = document) {
-  warmMediaOrigins();
   galleryObserver?.disconnect();
   rebuildVideoPreloadObservers(root);
   pendingMounts = pendingMounts.filter(

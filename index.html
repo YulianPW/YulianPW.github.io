@@ -850,6 +850,10 @@
       const MEDIA_GALLERY_VERSION = "2026073110";
       const MEDIA_SOURCE_PROFILE_URL =
         "https://twitter.com/intent/user?screen_name=yl_YuTang";
+      const HOME_MEDIA_ORIGINS = Object.freeze([
+        "https://pbs.twimg.com",
+        "https://video.twimg.com",
+      ]);
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
       const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
       const FEATURE_RULES = [
@@ -876,6 +880,7 @@
       let lastRenderedDataJson = "";
       let homeGalleryModulePromise = null;
       let homeGalleryRefreshGeneration = 0;
+      let homeMediaOriginsWarmed = false;
 
       function getSiteBaseUrl() {
         const { origin, pathname } = window.location;
@@ -1612,6 +1617,26 @@
       }
 
       /**
+       * 在画廊模块延迟加载期间并行建立 X 媒体 CDN 连接。
+       *
+       * @description 正文已经生成后才注入 preconnect，既不阻塞首轮内容渲染，
+       * 又让图片、视频请求无需等到画廊模块执行时才开始握手。
+       *
+       * @returns {void}
+       */
+      function warmHomeMediaOrigins() {
+        if (homeMediaOriginsWarmed) return;
+        homeMediaOriginsWarmed = true;
+
+        HOME_MEDIA_ORIGINS.forEach((origin) => {
+          const link = document.createElement("link");
+          link.rel = "preconnect";
+          link.href = origin;
+          document.head.appendChild(link);
+        });
+      }
+
+      /**
        * 让正文至少完成一帧绘制后，再导入并扫描 X 媒体画廊。
        *
        * @description 生成号会取消快速排序或数据刷新留下的旧任务，避免扫描已经
@@ -1621,6 +1646,7 @@
        */
       function scheduleHomeMediaGalleries() {
         const generation = ++homeGalleryRefreshGeneration;
+        warmHomeMediaOrigins();
         window.requestAnimationFrame(() => {
           window.requestAnimationFrame(() => {
             window.setTimeout(() => {
