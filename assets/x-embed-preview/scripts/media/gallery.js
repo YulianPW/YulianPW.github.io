@@ -1,4 +1,4 @@
-import { createMediaLightbox } from "./lightbox.js?v=2026073103";
+import { createMediaLightbox } from "./lightbox.js?v=2026073107";
 
 /**
  * 解析媒体深链接在画廊中的初始位置。
@@ -50,7 +50,7 @@ function createMosaicPhoto(item, index, openLightbox) {
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = "来源 X · 需开🪜";
+  status.textContent = "加载中 · 来源 X · 需开🪜";
   image.addEventListener("load", () => {
     image.classList.add("is-loaded");
     status.hidden = true;
@@ -78,7 +78,8 @@ function createMosaicPhoto(item, index, openLightbox) {
  * @param {import("../types.js").DynamicMedia["author"]} author - 作者信息。
  * @param {(activeVideo: HTMLVideoElement) => void} pauseOtherVideos - 播放前暂停其他视频。
  * @param {(index: number, trigger: HTMLElement) => void} openLightbox - 灯箱入口。
- * @returns {{element: HTMLDivElement, video: HTMLVideoElement}} 拼图节点及播放器。
+ * @returns {{element: HTMLDivElement, video: HTMLVideoElement, reset: () => void}}
+ * 拼图节点、播放器及恢复预览态的方法。
  */
 function createMosaicVideo(
   item,
@@ -99,7 +100,16 @@ function createMosaicVideo(
   const video = document.createElement("video");
   video.className = "gallery-mosaic-video";
   video.playsInline = true;
-  video.preload = "metadata";
+  video.preload = "none";
+  video.setAttribute("webkit-playsinline", "");
+  video.setAttribute("disablepictureinpicture", "");
+  video.setAttribute("controlslist", "nodownload noremoteplayback");
+  if ("disablePictureInPicture" in video) {
+    video.disablePictureInPicture = true;
+  }
+  if ("disableRemotePlayback" in video) {
+    video.disableRemotePlayback = true;
+  }
   if (item.poster) video.poster = item.poster;
   video.setAttribute(
     "aria-label",
@@ -126,34 +136,110 @@ function createMosaicVideo(
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = "来源 X · 需开🪜";
+  status.textContent = "加载中 · 来源 X · 需开🪜";
+
+  let hasPreviewFrame = false;
+  let hasPlaybackError = false;
+  let sourceAttached = false;
+
+  /**
+   * 恢复只显示站内播放与放大入口的预览态。
+   *
+   * @returns {void}
+   */
+  function showPreviewControls() {
+    if (hasPlaybackError) return;
+    video.removeAttribute("controls");
+    playButton.hidden = false;
+    expandButton.hidden = false;
+    status.hidden = hasPreviewFrame || video.readyState >= 2;
+  }
+
+  /**
+   * 暂停当前视频并移除原生控件，供其他视频或灯箱接管交互。
+   *
+   * @returns {void}
+   */
+  function resetPlayback() {
+    video.pause();
+    showPreviewControls();
+  }
+
+  if (item.poster) {
+    const posterProbe = new Image();
+    posterProbe.decoding = "async";
+    posterProbe.addEventListener(
+      "load",
+      () => {
+        hasPreviewFrame = true;
+        if (video.paused && !video.hasAttribute("controls")) {
+          status.hidden = true;
+        }
+      },
+      { once: true },
+    );
+    posterProbe.addEventListener(
+      "error",
+      () => {
+        if (video.paused && !video.hasAttribute("controls")) {
+          status.textContent = "点按播放 · 来源 X · 需开🪜";
+        }
+      },
+      { once: true },
+    );
+    posterProbe.src = item.poster;
+  } else {
+    status.textContent = "点按播放 · 来源 X · 需开🪜";
+  }
 
   playButton.addEventListener("click", () => {
     pauseOtherVideos(video);
-    video.controls = true;
-    const playback = video.play();
-    if (playback) {
-      playback.catch(() => {
-        playButton.hidden = false;
-      });
+    playButton.hidden = true;
+    expandButton.hidden = true;
+    status.dataset.state = "loading";
+    status.textContent = "加载中 · 来源 X · 需开🪜";
+    status.hidden = false;
+
+    if (!sourceAttached) {
+      video.src = item.url;
+      sourceAttached = true;
+    }
+
+    try {
+      const playback = video.play();
+      if (playback) playback.catch(resetPlayback);
+    } catch (_) {
+      resetPlayback();
     }
   });
-  video.addEventListener("play", () => {
+  video.addEventListener("playing", () => {
+    hasPreviewFrame = true;
+    status.hidden = true;
+    video.controls = true;
     playButton.hidden = true;
+    expandButton.hidden = true;
+  });
+  video.addEventListener("pause", () => {
+    if (!video.hasAttribute("controls") && !video.ended) {
+      showPreviewControls();
+    }
   });
   video.addEventListener("ended", () => {
-    playButton.hidden = false;
+    showPreviewControls();
     playButton.setAttribute(
       "aria-label",
       "再次播放第 " + (index + 1) + " 段视频",
     );
   });
-  video.addEventListener("loadedmetadata", () => {
-    status.hidden = true;
+  video.addEventListener("loadeddata", () => {
+    hasPreviewFrame = true;
+    if (video.paused) status.hidden = true;
   });
   video.addEventListener("error", () => {
+    hasPlaybackError = true;
     video.hidden = true;
     playButton.hidden = true;
+    expandButton.hidden = true;
     status.hidden = false;
     status.dataset.state = "error";
     status.textContent = "X 媒体未加载 · 请确认已开🪜";
@@ -161,10 +247,9 @@ function createMosaicVideo(
   expandButton.addEventListener("click", () => {
     openLightbox(index, expandButton);
   });
-  video.src = item.url;
 
   mosaicItem.append(video, playButton, expandButton, status);
-  return { element: mosaicItem, video };
+  return { element: mosaicItem, video, reset: resetPlayback };
 }
 
 /**
@@ -232,9 +317,9 @@ export function createMediaGallery(tweet, data) {
   );
 
   const initialMedia = resolveInitialMedia(tweet, data);
-  const mosaicVideos = [];
+  const mosaicVideoPlayers = [];
   const pauseMosaicVideos = () => {
-    mosaicVideos.forEach((video) => video.pause());
+    mosaicVideoPlayers.forEach((player) => player.reset());
   };
   const lightbox = createMediaLightbox(
     data,
@@ -255,14 +340,14 @@ export function createMediaGallery(tweet, data) {
         index,
         data.author,
         (activeVideo) => {
-          mosaicVideos.forEach((video) => {
-            if (video !== activeVideo) video.pause();
+          mosaicVideoPlayers.forEach((player) => {
+            if (player.video !== activeVideo) player.reset();
           });
         },
         lightbox.open,
       );
       mosaicItem = videoResult.element;
-      mosaicVideos[index] = videoResult.video;
+      mosaicVideoPlayers.push(videoResult);
     }
 
     if (initialMedia.matches && index === initialMedia.index) {

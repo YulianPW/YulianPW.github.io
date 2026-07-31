@@ -675,7 +675,7 @@
     </style>
     <link
       rel="stylesheet"
-      href="assets/x-embed-preview/styles/media-gallery.css?v=2026073103"
+      href="assets/x-embed-preview/styles/media-gallery.css?v=2026073107"
     />
     <link
       rel="stylesheet"
@@ -837,7 +837,7 @@
       const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
       const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
-      const MEDIA_GALLERY_VERSION = "2026073105";
+      const MEDIA_GALLERY_VERSION = "2026073107";
       const MEDIA_SOURCE_PROFILE_URL =
         "https://twitter.com/intent/user?screen_name=yl_YuTang";
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
@@ -863,7 +863,9 @@
       let currentSortColumn = null;
       let currentSortDirection = null;
       let tableData = null;
+      let lastRenderedDataJson = "";
       let homeGalleryModulePromise = null;
+      let homeGalleryRefreshGeneration = 0;
 
       function getSiteBaseUrl() {
         const { origin, pathname } = window.location;
@@ -969,7 +971,11 @@
         applyUrlState();
         syncSortControls();
         warmVisualCache();
-        loadVersion().finally(loadTableData);
+        const hasCachedContent = renderLatestCachedTableData();
+        if (!hasCachedContent) {
+          document.getElementById("loading").style.display = "block";
+        }
+        loadVersion().finally(() => loadTableData(hasCachedContent));
       }
 
       function runWhenIdle(callback) {
@@ -1050,6 +1056,59 @@
         }
       }
 
+      /**
+       * 从已有版本缓存中选出最近一次有效数据，先于网络版本校验渲染正文。
+       *
+       * @description 版本号仍由 version.json 决定；这里的缓存只承担首屏快照，
+       * 后续会按当前版本重新校验，且暂不启动 X 媒体请求。
+       *
+       * @returns {boolean} 是否已渲染可用的正文快照。
+       */
+      function renderLatestCachedTableData() {
+        const now = Date.now();
+        let latest = null;
+
+        try {
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const timeKey = localStorage.key(index);
+            if (!timeKey?.startsWith(DATA_CACHE_TIME_KEY_PREFIX)) continue;
+
+            const cachedTime = Number(readLocalCache(timeKey) || 0);
+            if (
+              !Number.isFinite(cachedTime) ||
+              now - cachedTime >= DATA_CACHE_TTL ||
+              cachedTime <= (latest?.cachedTime || 0)
+            ) {
+              continue;
+            }
+
+            const version = timeKey.slice(DATA_CACHE_TIME_KEY_PREFIX.length);
+            const dataKey = `${DATA_CACHE_KEY_PREFIX}${version}`;
+            const serializedData = readLocalCache(dataKey);
+            if (!serializedData) continue;
+            latest = { cachedTime, dataKey, timeKey, serializedData };
+          }
+        } catch (_) {
+          return false;
+        }
+
+        if (!latest) return false;
+        try {
+          lastRenderedDataJson = latest.serializedData;
+          renderTable(
+            JSON.parse(latest.serializedData),
+            Boolean(currentSortColumn),
+            false,
+          );
+          return true;
+        } catch (_) {
+          lastRenderedDataJson = "";
+          removeLocalCache(latest.dataKey);
+          removeLocalCache(latest.timeKey);
+          return false;
+        }
+      }
+
       // 动态加载说明内容
       function loadInfoContent() {
         const container = document.getElementById("info-container");
@@ -1096,7 +1155,7 @@
       }
 
       // 数据加载函数
-      function renderTable(data, applySort = true) {
+      function renderTable(data, applySort = true, initializeMedia = true) {
         tableData = data;
         let staff = prepareStaffItems(data);
 
@@ -1112,7 +1171,7 @@
           .join("");
 
         filterByTag();
-        initializeHomeMediaGalleries();
+        if (initializeMedia) scheduleHomeMediaGalleries();
       }
 
       function compareStaff(a, b) {
@@ -1291,19 +1350,24 @@
         }
       }
 
-      function loadTableData() {
-        document.getElementById("loading").style.display = "block";
+      function loadTableData(hasRenderedContent = Boolean(tableData)) {
+        if (!hasRenderedContent) {
+          document.getElementById("loading").style.display = "block";
+        }
         const { dataKey, timeKey } = getDataCacheKeys();
         const cached = readLocalCache(dataKey);
         const cachedTime = Number(readLocalCache(timeKey) || 0);
         const now = Date.now();
-        let hasUsableCache = false;
 
         if (cached && now - cachedTime < DATA_CACHE_TTL) {
           try {
             const cachedData = JSON.parse(cached);
-            hasUsableCache = true;
-            renderTable(cachedData, Boolean(currentSortColumn));
+            if (cached !== lastRenderedDataJson) {
+              lastRenderedDataJson = cached;
+              renderTable(cachedData, Boolean(currentSortColumn));
+            } else {
+              scheduleHomeMediaGalleries();
+            }
             document.getElementById("loading").style.display = "none";
             runWhenIdle(() =>
               fetchTableData(dataKey, timeKey, false).catch(() => {})
@@ -1317,8 +1381,10 @@
 
         fetchTableData(dataKey, timeKey, true)
           .catch((error) => {
-            if (!hasUsableCache) {
+            if (!tableData) {
               console.error("数据加载失败:", error);
+            } else {
+              scheduleHomeMediaGalleries();
             }
           })
           .finally(
@@ -1335,10 +1401,16 @@
             return response.json();
           })
           .then((data) => {
-            writeLocalCache(dataKey, JSON.stringify(data));
+            const serializedData = JSON.stringify(data);
+            writeLocalCache(dataKey, serializedData);
             writeLocalCache(timeKey, String(Date.now()));
             if (shouldRender) {
-              renderTable(data, Boolean(currentSortColumn));
+              if (serializedData !== lastRenderedDataJson) {
+                lastRenderedDataJson = serializedData;
+                renderTable(data, Boolean(currentSortColumn));
+              } else {
+                scheduleHomeMediaGalleries();
+              }
             }
           });
       }
@@ -1516,13 +1588,37 @@
         }
       }
 
-      // 事件监听
-      window.onload = init;
+      // DOM 就绪即开始正文加载，不等待图片等非关键资源完成。
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
+      } else {
+        init();
+      }
 
       function bindCardListActions() {
         const cardList = document.getElementById("cardList");
         cardList.addEventListener("click", handleCardDescClick);
         cardList.addEventListener("keydown", handleCardDescKeydown);
+      }
+
+      /**
+       * 让正文至少完成一帧绘制后，再导入并扫描 X 媒体画廊。
+       *
+       * @description 生成号会取消快速排序或数据刷新留下的旧任务，避免扫描已经
+       * 被替换的占位节点。
+       *
+       * @returns {void}
+       */
+      function scheduleHomeMediaGalleries() {
+        const generation = ++homeGalleryRefreshGeneration;
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            window.setTimeout(() => {
+              if (generation !== homeGalleryRefreshGeneration) return;
+              initializeHomeMediaGalleries();
+            }, 0);
+          });
+        });
       }
 
       /**

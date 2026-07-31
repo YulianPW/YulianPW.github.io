@@ -53,7 +53,7 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
     media.hidden = true;
     mediaError.hidden = false;
   });
-  media.src = item.url;
+  media.dataset.src = item.url;
 
   slide.append(media, mediaError);
   return slide;
@@ -127,6 +127,20 @@ export function createMediaLightbox(data, initialIndex, onBeforeOpen, tweet) {
   let touchStartX = null;
 
   /**
+   * 首次显示某个灯箱页时才连接对应的 X 媒体地址。
+   *
+   * @param {number} index - 要加载的素材索引。
+   * @returns {void}
+   */
+  function ensureSlideMediaLoaded(index) {
+    const media = slides[index]?.querySelector(".gallery-lightbox-media");
+    const source = media?.dataset.src;
+    if (!media || !source) return;
+    media.src = source;
+    delete media.dataset.src;
+  }
+
+  /**
    * 切换当前素材，并暂停刚离开的原生视频。
    *
    * @param {number} nextIndex - 下一项在媒体清单中的索引。
@@ -149,6 +163,7 @@ export function createMediaLightbox(data, initialIndex, onBeforeOpen, tweet) {
       activeIndex + 1 + " / " + data.items.length + " · " + typeLabel;
     previousButton.disabled = activeIndex === 0;
     nextButton.disabled = activeIndex === data.items.length - 1;
+    if (lightbox.open) ensureSlideMediaLoaded(activeIndex);
   }
 
   /**
@@ -166,6 +181,7 @@ export function createMediaLightbox(data, initialIndex, onBeforeOpen, tweet) {
       document.body.classList.add("gallery-lightbox-open");
       lightbox.showModal();
     }
+    ensureSlideMediaLoaded(activeIndex);
   }
 
   closeButton.addEventListener("click", () => {

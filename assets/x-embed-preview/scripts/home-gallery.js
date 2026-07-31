@@ -1,9 +1,7 @@
-import { createMediaGallery } from "./media/gallery.js?v=2026073103";
+import { createMediaGallery } from "./media/gallery.js?v=2026073107";
 import { fetchDynamicMedia } from "./media/api.js";
 import { parseTweetUrl } from "./tweet-url.js";
 
-const ROOT_MARGIN = "480px 0px";
-const MAX_CONCURRENT_LOADS = 2;
 const MEDIA_REQUEST_TIMEOUT_MS = 15000;
 
 /** @type {Map<string, Promise<import("./types.js").DynamicMedia>>} */
@@ -13,6 +11,26 @@ const mediaRequestCache = new Map();
 let pendingMounts = [];
 let activeLoads = 0;
 let galleryObserver = null;
+
+/**
+ * 为当前断点保留恰好够下一屏使用的预加载距离。
+ *
+ * @returns {string} IntersectionObserver 的 rootMargin。
+ */
+function getObserverRootMargin() {
+  return window.matchMedia("(max-width: 640px)").matches
+    ? "240px 0px"
+    : "360px 0px";
+}
+
+/**
+ * 移动端一次只连接一条推文，避免 X 请求与正文滚动争抢带宽。
+ *
+ * @returns {number} 当前允许的最大并发连接数。
+ */
+function getMaxConcurrentLoads() {
+  return window.matchMedia("(max-width: 640px)").matches ? 1 : 2;
+}
 
 /**
  * 更新画廊占位区的状态文案。
@@ -193,7 +211,7 @@ async function hydrateMount(mount) {
  * @returns {void}
  */
 function drainQueue() {
-  while (activeLoads < MAX_CONCURRENT_LOADS && pendingMounts.length) {
+  while (activeLoads < getMaxConcurrentLoads() && pendingMounts.length) {
     const mount = pendingMounts.shift();
     if (!mount?.isConnected) continue;
 
@@ -257,7 +275,7 @@ export function refreshHomeMediaGalleries(root = document) {
         queueMount(entry.target);
       });
     },
-    { rootMargin: ROOT_MARGIN, threshold: 0.01 },
+    { rootMargin: getObserverRootMargin(), threshold: 0.01 },
   );
   mounts.forEach((mount) => galleryObserver.observe(mount));
 }

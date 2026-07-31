@@ -79,6 +79,13 @@
   opacity: 1;
 }
 
+/* iOS 在无 controls 时仍可能绘制原生启动按钮，预览态只保留站内控件。 */
+.gallery-mosaic-video:not([controls])::-webkit-media-controls,
+.gallery-mosaic-video:not([controls])::-webkit-media-controls-overlay-play-button,
+.gallery-mosaic-video:not([controls])::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
 .gallery-mosaic-play {
   position: absolute;
   z-index: 2;
@@ -146,8 +153,13 @@
   background: rgba(29, 155, 240, 0.92);
 }
 
+.gallery-mosaic-expand[hidden] {
+  display: none;
+}
+
 .gallery-mosaic-status {
   position: absolute;
+  z-index: 1;
   inset: 0;
   display: grid;
   padding: 18px;
@@ -158,6 +170,7 @@
   font-weight: 700;
   line-height: 1.5;
   text-align: center;
+  pointer-events: none;
 }
 
 .gallery-mosaic-status[hidden] {
