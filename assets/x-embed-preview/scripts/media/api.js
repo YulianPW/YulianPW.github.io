@@ -1,7 +1,7 @@
 import {
   ALLOWED_MEDIA_HOSTS,
   MEDIA_MANIFEST_URL,
-} from "../config.js?v=2026073110";
+} from "../config.js?v=2026080104";
 
 const MEDIA_CACHE_KEY_PREFIX = "tweet_media_cache:v1:";
 const MEDIA_CACHE_TTL_MS = 1000 * 60 * 60 * 6;

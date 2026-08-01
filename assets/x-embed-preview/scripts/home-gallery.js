@@ -1,7 +1,7 @@
 import {
   createMediaGallery,
   preloadMediaGalleryVideos,
-} from "./media/gallery.js?v=2026080102";
+} from "./media/gallery.js?v=2026080104";
 import { fetchLocalMedia } from "./media/local.js?v=2026080102";
 import { parseTweetUrl } from "./tweet-url.js";
 
@@ -263,7 +263,7 @@ function getCachedDynamicMedia(tweet) {
     `x:${tweet.id}`,
     async (signal) => {
       const { fetchDynamicMedia } = await import(
-        "./media/api.js?v=2026080102"
+        "./media/api.js?v=2026080104"
       );
       return fetchDynamicMedia(tweet, signal);
     },

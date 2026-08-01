@@ -1,3 +1,8 @@
+import {
+  claimMediaPlayback,
+  releaseMediaPlayback,
+} from "./playback-controller.js?v=2026080104";
+
 /**
  * 创建灯箱中的一个完整比例媒体页。
  *
@@ -36,6 +41,17 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
       "aria-label",
       data.author.name + " 的第 " + (index + 1) + " 段放大视频",
     );
+    media.addEventListener("play", () => {
+      claimMediaPlayback(media, {
+        pause: () => media.pause(),
+      });
+    });
+    media.addEventListener("pause", () => {
+      releaseMediaPlayback(media);
+    });
+    media.addEventListener("ended", () => {
+      releaseMediaPlayback(media);
+    });
   }
 
   const mediaError = document.createElement("div");
@@ -55,6 +71,7 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
     mediaError.appendChild(sourceLink);
   }
   media.addEventListener("error", () => {
+    if (media instanceof HTMLVideoElement) releaseMediaPlayback(media);
     media.hidden = true;
     mediaError.hidden = false;
   });

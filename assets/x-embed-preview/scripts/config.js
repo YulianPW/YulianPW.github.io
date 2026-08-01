@@ -14,7 +14,7 @@ export const DEFAULT_TWEET_URL =
  *
  * @type {string}
  */
-export const MEDIA_ASSET_VERSION = "2026073110";
+export const MEDIA_ASSET_VERSION = "2026080104";
 
 /**
  * 随站点保留的 X 推文媒体清单入口。

@@ -1,4 +1,9 @@
-import { createMediaLightbox } from "./lightbox.js?v=2026080102";
+import { createMediaLightbox } from "./lightbox.js?v=2026080104";
+import {
+  claimMediaPlayback,
+  pauseActiveMediaPlayback,
+  releaseMediaPlayback,
+} from "./playback-controller.js?v=2026080104";
 
 const VIDEO_PRELOAD_PRIORITY = Object.freeze({
   none: 0,
@@ -146,8 +151,9 @@ function attachMosaicVideoSource(video, preloadMode) {
 /**
  * 释放尚未形成可播放缓冲的推测下载。
  *
- * @description 只中止暂停、仍在联网且尚未达到 HAVE_FUTURE_DATA 的 auto 请求；
- * 已经可播放的视频保留缓冲，避免为了抢占带宽反而浪费已经完成的下载。
+ * @description 只中止暂停、尚无播放进度、仍在联网且未达到 HAVE_FUTURE_DATA
+ * 的 auto 请求；已经开始或可播放的视频保留进度和缓冲，避免为了抢占带宽
+ * 反而浪费已经完成的下载。
  *
  * @param {HTMLVideoElement} video - 可能占用主加载槽的视频。
  * @returns {void}
@@ -156,6 +162,7 @@ function releaseUnreadySpeculativeLoad(video) {
   const isUnreadyAutoLoad =
     video.dataset.preloadMode === "auto" &&
     video.paused &&
+    video.currentTime === 0 &&
     video.networkState === HTMLMediaElement.NETWORK_LOADING &&
     video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
   if (!isUnreadyAutoLoad) return;
@@ -349,6 +356,10 @@ function createMosaicVideo(
     "aria-label",
     "播放第 " + (index + 1) + " 段视频",
   );
+  const playLabel = document.createElement("span");
+  playLabel.className = "gallery-mosaic-play-label";
+  playLabel.hidden = true;
+  playButton.appendChild(playLabel);
 
   const expandButton = document.createElement("button");
   expandButton.type = "button";
@@ -365,13 +376,39 @@ function createMosaicVideo(
   status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
 
   let hasPreviewFrame = false;
+  let previewAction = "play";
+
+  /**
+   * 同步预览按钮的可见文案和无障碍名称。
+   *
+   * @param {"play" | "continue" | "replay"} action - 当前允许的播放动作。
+   * @returns {void}
+   */
+  function setPreviewAction(action) {
+    previewAction = action;
+    const actionLabel = action === "continue"
+      ? "继续播放"
+      : action === "replay"
+        ? "再次播放"
+        : "播放";
+    playButton.dataset.action = action;
+    playButton.setAttribute(
+      "aria-label",
+      actionLabel + "第 " + (index + 1) + " 段视频",
+    );
+    playLabel.textContent = actionLabel;
+    playLabel.hidden = action === "play";
+  }
+  setPreviewAction("play");
 
   /**
    * 恢复只显示站内播放与放大入口的预览态。
    *
+   * @param {"play" | "continue" | "replay"} [action=previewAction] - 恢复后的播放动作。
    * @returns {void}
    */
-  function showPreviewControls() {
+  function showPreviewControls(action = previewAction) {
+    setPreviewAction(action);
     video.removeAttribute("controls");
     playButton.hidden = false;
     expandButton.hidden = false;
@@ -384,9 +421,14 @@ function createMosaicVideo(
    * @returns {void}
    */
   function resetPlayback() {
+    const nextAction = video.ended
+      ? "replay"
+      : video.currentTime > 0
+        ? "continue"
+        : "play";
     video.pause();
     videoLoadController.deactivate(video);
-    showPreviewControls();
+    showPreviewControls(nextAction);
   }
 
   if (item.poster) {
@@ -446,6 +488,12 @@ function createMosaicVideo(
       resetPlayback();
     }
   });
+  video.addEventListener("play", () => {
+    claimMediaPlayback(video, {
+      pause: resetPlayback,
+      observeVisibility: true,
+    });
+  });
   video.addEventListener("playing", () => {
     hasPreviewFrame = true;
     status.hidden = true;
@@ -454,24 +502,26 @@ function createMosaicVideo(
     expandButton.hidden = true;
   });
   video.addEventListener("pause", () => {
+    releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
-    if (!video.hasAttribute("controls") && !video.ended) {
-      showPreviewControls();
+    const hiddenByFilter = video.closest(".staff-item")?.hidden;
+    if (hiddenByFilter && video.currentTime > 0 && !video.ended) {
+      showPreviewControls("continue");
+    } else if (!video.hasAttribute("controls") && !video.ended) {
+      showPreviewControls(previewAction);
     }
   });
   video.addEventListener("ended", () => {
+    releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
-    showPreviewControls();
-    playButton.setAttribute(
-      "aria-label",
-      "再次播放第 " + (index + 1) + " 段视频",
-    );
+    showPreviewControls("replay");
   });
   video.addEventListener("loadeddata", () => {
     hasPreviewFrame = true;
     if (video.paused) status.hidden = true;
   });
   video.addEventListener("error", () => {
+    releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
     video.pause();
     video.removeAttribute("controls");
@@ -479,6 +529,7 @@ function createMosaicVideo(
     video.dataset.preloadMode = "none";
     playButton.hidden = false;
     expandButton.hidden = false;
+    setPreviewAction("play");
     status.hidden = false;
     status.dataset.state = "error";
     status.textContent = source === "local"
@@ -567,6 +618,7 @@ export function createMediaGallery(tweet, data) {
   const videoLoadController = createMosaicVideoLoadController();
   galleryVideoLoadControllers.set(gallery, videoLoadController);
   const pauseMosaicVideos = () => {
+    pauseActiveMediaPlayback("lightbox-open");
     mosaicVideoPlayers.forEach((player) => player.reset());
   };
   const lightbox = createMediaLightbox(
