@@ -11,6 +11,7 @@
 /**
  * @typedef {Object} MediaVariant
  * @property {string} url - 列表播放器使用的 MP4 地址。
+ * @property {string} [fallbackUrl] - 主地址失败后使用的同文件备用地址。
  * @property {number} bitrate - 每秒比特率，用于按展示尺寸选择清晰度。
  */
 
@@ -18,8 +19,11 @@
  * @typedef {Object} MediaItem
  * @property {"photo" | "video" | "gif"} type - 素材类型。
  * @property {string} url - 灯箱使用的高清媒体地址。
+ * @property {string} [fallbackUrl] - 高清媒体主地址失败后的备用地址。
  * @property {string} preview - 可选的列表图片地址；为空时复用 url。
+ * @property {string} [fallbackPreview] - 列表图片主地址失败后的备用地址。
  * @property {string} poster - 视频或动图封面地址。
+ * @property {string} [fallbackPoster] - 视频封面主地址失败后的备用地址。
  * @property {MediaVariant[]} variants - 可供列表播放器选择的 MP4 码率档位。
  * @property {number} width - 原始媒体宽度。
  * @property {number} height - 原始媒体高度。

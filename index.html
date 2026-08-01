@@ -831,21 +831,24 @@
     <script>
       const INFO_VERSION = "20251114";
       let DATA_VERSION = "20251114";
+      let MEDIA_VERSION = "";
       const DATA_CACHE_KEY_PREFIX = "staff_data_cache:";
       const DATA_CACHE_TIME_KEY_PREFIX = "staff_data_cache_time:";
       const DATA_CACHE_TTL = 1000 * 60 * 60 * 24 * 7; // 7天
       const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
       const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
-      const MEDIA_GALLERY_VERSION = "2026080104";
+      const MEDIA_GALLERY_VERSION = "2026080105";
       // 首页 X 推文画廊当前停用；保留运行时代码供未来明确恢复。
       const ENABLE_TWEET_MEDIA = false;
       const MEDIA_SOURCE_PROFILE_URL =
         "https://twitter.com/intent/user?screen_name=yl_YuTang";
-      const HOME_MEDIA_ORIGINS = Object.freeze([
+      const LOCAL_MEDIA_CDN_ORIGIN = "https://cdn.jsdelivr.net";
+      const X_MEDIA_ORIGINS = Object.freeze([
         "https://pbs.twimg.com",
         "https://video.twimg.com",
       ]);
+      const MEDIA_COMMIT_PATTERN = /^[0-9a-f]{40}$/i;
       const LOCAL_MEDIA_FOLDER_PATTERN =
         /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
@@ -1060,9 +1063,32 @@
           if (data.dataVersion) {
             DATA_VERSION = data.dataVersion;
           }
+          if (
+            typeof data.mediaVersion === "string" &&
+            MEDIA_COMMIT_PATTERN.test(data.mediaVersion)
+          ) {
+            MEDIA_VERSION = data.mediaVersion;
+          }
+          syncRenderedMediaVersion();
         } catch (_) {
           // 本地开发时正常情况，不打印警告
         }
+      }
+
+      /**
+       * 把异步取得的媒体 commit 同步给已经从正文缓存渲染的画廊占位区。
+       *
+       * @description 正文快照可能早于 version.json 出现在页面中；只更新版本属性
+       * 即可保留首屏内容，同时确保稍后加载的媒体使用固定 commit CDN 地址。
+       *
+       * @returns {void}
+       */
+      function syncRenderedMediaVersion() {
+        document
+          .querySelectorAll(".tweet-gallery-host[data-media-folder]")
+          .forEach((mount) => {
+            mount.dataset.mediaVersion = MEDIA_VERSION;
+          });
       }
 
       /**
@@ -1355,7 +1381,7 @@
               class="tweet-gallery-host"
               data-tweet-url="${escapeHtml(media.tweetUrl)}"
               data-media-folder="${escapeHtml(media.mediaFolder)}"
-              data-media-version="${escapeHtml(DATA_VERSION)}"
+              data-media-version="${escapeHtml(MEDIA_VERSION)}"
               data-staff-name="${escapeHtml(item.name)}"
               data-active-source="${initialSource}"
               data-state="waiting"
@@ -1662,27 +1688,47 @@
       }
 
       /**
-       * 在画廊模块延迟加载期间并行建立可选 X 回退源的 CDN 连接。
+       * 在画廊模块延迟加载期间建立当前页面可能使用的媒体连接。
        *
-       * @description 正文已经生成后才注入 preconnect，既不阻塞首轮内容渲染，
-       * 又让图片、视频请求无需等到画廊模块执行时才开始握手。
+       * @description 正文已经生成后才注入 preconnect；正常网络为本地素材预连
+       * jsDelivr，省流量及 2G/3G 保持单一同源连接。X 来源仍只在明确存在时预连。
        *
        * @returns {void}
        */
       function warmHomeMediaOrigins() {
         if (homeMediaOriginsWarmed) return;
-        const hasPrimaryXGallery = Array.from(
+        const mounts = Array.from(
           document.querySelectorAll(".tweet-gallery-host"),
-        ).some(
-          (mount) => !mount.dataset.mediaFolder && mount.dataset.tweetUrl,
         );
-        if (!hasPrimaryXGallery) return;
+        const connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection;
+        const constrainedNetwork =
+          connection?.saveData ||
+          ["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
+        const origins = new Set();
+        if (
+          !constrainedNetwork &&
+          MEDIA_COMMIT_PATTERN.test(MEDIA_VERSION) &&
+          mounts.some((mount) => mount.dataset.mediaFolder)
+        ) {
+          origins.add(LOCAL_MEDIA_CDN_ORIGIN);
+        }
+        if (
+          mounts.some(
+            (mount) => !mount.dataset.mediaFolder && mount.dataset.tweetUrl,
+          )
+        ) {
+          X_MEDIA_ORIGINS.forEach((origin) => origins.add(origin));
+        }
+        if (!origins.size) return;
         homeMediaOriginsWarmed = true;
 
-        HOME_MEDIA_ORIGINS.forEach((origin) => {
+        origins.forEach((origin) => {
           const link = document.createElement("link");
           link.rel = "preconnect";
           link.href = origin;
+          link.crossOrigin = "anonymous";
           document.head.appendChild(link);
         });
       }

@@ -1,4 +1,4 @@
-import { createMediaLightbox } from "./lightbox.js?v=2026080104";
+import { createMediaLightbox } from "./lightbox.js?v=2026080105";
 import {
   claimMediaPlayback,
   pauseActiveMediaPlayback,
@@ -46,13 +46,20 @@ function resolveInitialMedia(tweet, data) {
  * item.url 指向的高清文件。
  *
  * @param {import("../types.js").MediaItem} item - 当前视频素材。
- * @returns {{url: string, bitrate: number}} 列表播放器使用的地址和码率。
+ * @returns {{url: string, fallbackUrl?: string, bitrate: number}}
+ * 列表播放器使用的主地址、备用地址和码率。
  */
 function selectInlineVideoSource(item) {
   const variants = [...(item.variants || [])].sort(
     (left, right) => left.bitrate - right.bitrate,
   );
-  if (!variants.length) return { url: item.url, bitrate: 0 };
+  if (!variants.length) {
+    return {
+      url: item.url,
+      fallbackUrl: item.fallbackUrl || "",
+      bitrate: 0,
+    };
+  }
 
   const connection = navigator.connection ||
     navigator.mozConnection ||
@@ -77,10 +84,11 @@ function selectInlineVideoSource(item) {
  * 这里只改写 X 图片的 name 参数，不生成或保存站内派生图片。
  *
  * @param {import("../types.js").MediaItem} item - 当前图片素材。
- * @returns {string} 拼图使用的 X CDN 图片地址。
+ * @returns {{url: string, fallbackUrl: string}} 拼图使用的主地址和备用地址。
  */
-function selectInlinePhotoSource(item) {
-  if (item.preview) return item.preview;
+function selectInlinePhotoSources(item) {
+  const fallbackUrl = item.fallbackPreview || item.fallbackUrl || "";
+  if (item.preview) return { url: item.preview, fallbackUrl };
   try {
     const source = new URL(item.url);
     if (
@@ -94,9 +102,9 @@ function selectInlinePhotoSource(item) {
           : "medium",
       );
     }
-    return source.href;
+    return { url: source.href, fallbackUrl };
   } catch (_) {
-    return item.url;
+    return { url: item.url, fallbackUrl };
   }
 }
 
@@ -278,6 +286,16 @@ function createMosaicPhoto(item, index, source, openLightbox) {
     status.hidden = true;
   });
   image.addEventListener("error", () => {
+    const fallbackSource = image.dataset.fallbackSrc;
+    if (fallbackSource) {
+      delete image.dataset.fallbackSrc;
+      status.hidden = false;
+      status.dataset.state = "loading";
+      status.textContent = "正在切换 Pages 备用源";
+      image.src = fallbackSource;
+      return;
+    }
+
     image.hidden = true;
     status.hidden = false;
     status.dataset.state = "error";
@@ -285,7 +303,11 @@ function createMosaicPhoto(item, index, source, openLightbox) {
       ? "本站图片加载失败"
       : "X 媒体未加载 · 请确认已开🪜";
   });
-  image.src = selectInlinePhotoSource(item);
+  const inlineSources = selectInlinePhotoSources(item);
+  if (inlineSources.fallbackUrl) {
+    image.dataset.fallbackSrc = inlineSources.fallbackUrl;
+  }
+  image.src = inlineSources.url;
 
   mosaicItem.append(image, status);
   mosaicItem.addEventListener("click", () => {
@@ -342,6 +364,9 @@ function createMosaicVideo(
   if (item.poster) video.poster = item.poster;
   const inlineSource = selectInlineVideoSource(item);
   video.dataset.inlineSrc = inlineSource.url;
+  if (inlineSource.fallbackUrl) {
+    video.dataset.inlineFallbackSrc = inlineSource.fallbackUrl;
+  }
   video.dataset.inlineBitrate = String(inlineSource.bitrate);
   video.dataset.preloadMode = "none";
   video.setAttribute(
@@ -377,6 +402,8 @@ function createMosaicVideo(
 
   let hasPreviewFrame = false;
   let previewAction = "play";
+  let playbackRequested = false;
+  let switchingSource = false;
 
   /**
    * 同步预览按钮的可见文案和无障碍名称。
@@ -426,13 +453,81 @@ function createMosaicVideo(
       : video.currentTime > 0
         ? "continue"
         : "play";
+    playbackRequested = false;
     video.pause();
     videoLoadController.deactivate(video);
     showPreviewControls(nextAction);
   }
 
+  /**
+   * 在 CDN 视频失败后切换到同文件的 Pages 地址。
+   *
+   * @description 预载失败只继续读取备用源；用户已经点过播放时尝试恢复播放，
+   * 并在完整视频中保留已走过的时间点。备用源只消费一次，避免错误循环。
+   *
+   * @returns {boolean} 是否找到了尚未尝试的备用地址。
+   */
+  function switchToFallbackSource() {
+    const fallbackSource = video.dataset.inlineFallbackSrc;
+    if (!fallbackSource) return false;
+
+    delete video.dataset.inlineFallbackSrc;
+    const resumeTime = Number.isFinite(video.currentTime)
+      ? video.currentTime
+      : 0;
+    const shouldResume = playbackRequested;
+    const preloadMode = shouldResume
+      ? "auto"
+      : video.dataset.preloadMode === "none"
+        ? "metadata"
+        : video.dataset.preloadMode;
+
+    switchingSource = true;
+    releaseMediaPlayback(video);
+    videoLoadController.deactivate(video);
+    video.dataset.inlineSrc = fallbackSource;
+    video.dataset.preloadMode = preloadMode;
+    video.preload = preloadMode;
+    video.src = fallbackSource;
+    status.hidden = false;
+    status.dataset.state = "loading";
+    status.textContent = "正在切换 Pages 备用源";
+
+    if (resumeTime > 0) {
+      video.addEventListener(
+        "loadedmetadata",
+        () => {
+          if (Number.isFinite(video.duration)) {
+            video.currentTime = Math.min(resumeTime, video.duration);
+          }
+        },
+        { once: true },
+      );
+    }
+
+    try {
+      video.load();
+      if (shouldResume) {
+        const playback = video.play();
+        if (playback) {
+          playback.catch(() => {
+            switchingSource = false;
+            resetPlayback();
+          });
+        }
+      } else {
+        switchingSource = false;
+      }
+    } catch (_) {
+      switchingSource = false;
+      resetPlayback();
+    }
+    return true;
+  }
+
   if (item.poster) {
     const posterProbe = new Image();
+    let fallbackPoster = item.fallbackPoster || "";
     posterProbe.decoding = "async";
     posterProbe.addEventListener(
       "load",
@@ -447,6 +542,14 @@ function createMosaicVideo(
     posterProbe.addEventListener(
       "error",
       () => {
+        if (fallbackPoster) {
+          const nextPoster = fallbackPoster;
+          fallbackPoster = "";
+          video.poster = nextPoster;
+          status.textContent = "正在切换 Pages 备用封面";
+          posterProbe.src = nextPoster;
+          return;
+        }
         if (video.paused && !video.hasAttribute("controls")) {
           status.textContent = `点按播放 · ${getMediaSourceNote(source)}`;
         }
@@ -472,6 +575,7 @@ function createMosaicVideo(
   });
 
   playButton.addEventListener("click", () => {
+    playbackRequested = true;
     pauseOtherVideos(video);
     playButton.hidden = true;
     expandButton.hidden = true;
@@ -489,12 +593,14 @@ function createMosaicVideo(
     }
   });
   video.addEventListener("play", () => {
+    playbackRequested = true;
     claimMediaPlayback(video, {
       pause: resetPlayback,
       observeVisibility: true,
     });
   });
   video.addEventListener("playing", () => {
+    switchingSource = false;
     hasPreviewFrame = true;
     status.hidden = true;
     video.controls = true;
@@ -502,6 +608,8 @@ function createMosaicVideo(
     expandButton.hidden = true;
   });
   video.addEventListener("pause", () => {
+    if (switchingSource) return;
+    if (!video.error) playbackRequested = false;
     releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
     const hiddenByFilter = video.closest(".staff-item")?.hidden;
@@ -512,6 +620,7 @@ function createMosaicVideo(
     }
   });
   video.addEventListener("ended", () => {
+    playbackRequested = false;
     releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
     showPreviewControls("replay");
@@ -521,6 +630,10 @@ function createMosaicVideo(
     if (video.paused) status.hidden = true;
   });
   video.addEventListener("error", () => {
+    if (switchToFallbackSource()) return;
+
+    playbackRequested = false;
+    switchingSource = false;
     releaseMediaPlayback(video);
     videoLoadController.deactivate(video);
     video.pause();

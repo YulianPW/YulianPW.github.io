@@ -36,7 +36,21 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
     media.controls = true;
     media.playsInline = true;
     media.preload = "metadata";
-    if (item.poster) media.poster = item.poster;
+    if (item.poster) {
+      media.poster = item.poster;
+      if (item.fallbackPoster) {
+        const posterProbe = new Image();
+        posterProbe.decoding = "async";
+        posterProbe.addEventListener(
+          "error",
+          () => {
+            media.poster = item.fallbackPoster;
+          },
+          { once: true },
+        );
+        posterProbe.src = item.poster;
+      }
+    }
     media.setAttribute(
       "aria-label",
       data.author.name + " 的第 " + (index + 1) + " 段放大视频",
@@ -71,11 +85,42 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
     mediaError.appendChild(sourceLink);
   }
   media.addEventListener("error", () => {
+    const fallbackSource = media.dataset.fallbackSrc;
+    if (fallbackSource) {
+      delete media.dataset.fallbackSrc;
+      media.hidden = false;
+      mediaError.hidden = true;
+
+      if (media instanceof HTMLVideoElement) {
+        const resumeTime = Number.isFinite(media.currentTime)
+          ? media.currentTime
+          : 0;
+        releaseMediaPlayback(media);
+        media.src = fallbackSource;
+        if (resumeTime > 0) {
+          media.addEventListener(
+            "loadedmetadata",
+            () => {
+              if (Number.isFinite(media.duration)) {
+                media.currentTime = Math.min(resumeTime, media.duration);
+              }
+            },
+            { once: true },
+          );
+        }
+        media.load();
+      } else {
+        media.src = fallbackSource;
+      }
+      return;
+    }
+
     if (media instanceof HTMLVideoElement) releaseMediaPlayback(media);
     media.hidden = true;
     mediaError.hidden = false;
   });
   media.dataset.src = item.url;
+  if (item.fallbackUrl) media.dataset.fallbackSrc = item.fallbackUrl;
 
   slide.append(media, mediaError);
   return slide;

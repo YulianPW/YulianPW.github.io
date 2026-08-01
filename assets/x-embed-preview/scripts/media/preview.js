@@ -1,6 +1,6 @@
 import { createLoadingState, renderWidgetError } from "../ui-state.js";
 import { fetchDynamicMedia } from "./api.js?v=2026080104";
-import { createMediaGallery } from "./gallery.js?v=2026080104";
+import { createMediaGallery } from "./gallery.js?v=2026080105";
 
 let activeMediaController = null;
 

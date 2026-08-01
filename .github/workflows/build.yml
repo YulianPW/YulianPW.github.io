@@ -37,11 +37,19 @@ jobs:
       - name: Validate dormant tweet media manifest
         run: node scripts/refresh-tweet-media.mjs --check
 
+      - name: Test local media source selection
+        run: node --test scripts/tests/*.test.mjs
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Compute data version
-        run: echo "DATA_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Compute runtime versions
+        run: |
+          DATA_VERSION=$(git rev-parse --short HEAD)
+          MEDIA_VERSION=$(git log -1 --format=%H -- assets/media/staff)
+          test -n "${MEDIA_VERSION}"
+          echo "DATA_VERSION=${DATA_VERSION}" >> "${GITHUB_ENV}"
+          echo "MEDIA_VERSION=${MEDIA_VERSION}" >> "${GITHUB_ENV}"
 
       - name: Prepare static files
         run: |
@@ -51,7 +59,8 @@ jobs:
       - name: Generate version manifest
         working-directory: public
         run: |
-          echo "{ \"dataVersion\": \"${DATA_VERSION}\" }" > version.json
+          printf '{ "dataVersion": "%s", "mediaVersion": "%s" }\n' \
+            "${DATA_VERSION}" "${MEDIA_VERSION}" > version.json
           cat version.json
 
       - name: Upload artifact

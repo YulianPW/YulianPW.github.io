@@ -1,8 +1,8 @@
 import {
   createMediaGallery,
   preloadMediaGalleryVideos,
-} from "./media/gallery.js?v=2026080104";
-import { fetchLocalMedia } from "./media/local.js?v=2026080102";
+} from "./media/gallery.js?v=2026080105";
+import { fetchLocalMedia } from "./media/local.js?v=2026080105";
 import { parseTweetUrl } from "./tweet-url.js";
 
 const MEDIA_REQUEST_TIMEOUT_MS = 15000;
