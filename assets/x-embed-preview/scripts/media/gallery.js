@@ -6,6 +6,9 @@ const VIDEO_PRELOAD_PRIORITY = Object.freeze({
   auto: 2,
 });
 
+/** @type {WeakMap<HTMLElement, ReturnType<typeof createMosaicVideoLoadController>>} */
+const galleryVideoLoadControllers = new WeakMap();
+
 /**
  * 解析媒体深链接在画廊中的初始位置。
  *
@@ -129,6 +132,100 @@ function attachMosaicVideoSource(video, preloadMode) {
 }
 
 /**
+ * 释放尚未形成可播放缓冲的推测下载。
+ *
+ * @description 只中止暂停、仍在联网且尚未达到 HAVE_FUTURE_DATA 的 auto 请求；
+ * 已经可播放的视频保留缓冲，避免为了抢占带宽反而浪费已经完成的下载。
+ *
+ * @param {HTMLVideoElement} video - 可能占用主加载槽的视频。
+ * @returns {void}
+ */
+function releaseUnreadySpeculativeLoad(video) {
+  const isUnreadyAutoLoad =
+    video.dataset.preloadMode === "auto" &&
+    video.paused &&
+    video.networkState === HTMLMediaElement.NETWORK_LOADING &&
+    video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
+  if (!isUnreadyAutoLoad) return;
+
+  video.removeAttribute("src");
+  video.preload = "none";
+  video.dataset.preloadMode = "none";
+
+  // 清空当前媒体选择会中止旧请求；poster 和 data-inline-src 仍用于稍后恢复。
+  try {
+    video.load();
+  } catch (_) {}
+}
+
+/**
+ * 为一个拼图画廊管理唯一的主动视频加载槽。
+ *
+ * @description metadata 仍可覆盖所有视频；auto 级内容预热只由当前槽位持有者
+ * 主导。软意图不会打扰正在播放的视频，pointerdown 和明确点击则允许目标抢占。
+ *
+ * @returns {{
+ *   register: (video: HTMLVideoElement) => void,
+ *   warmFirst: () => void,
+ *   warmForIntent: (video: HTMLVideoElement, takeover: boolean) => void,
+ *   activate: (video: HTMLVideoElement) => void,
+ *   deactivate: (video: HTMLVideoElement) => void
+ * }} 画廊视频加载控制器。
+ */
+function createMosaicVideoLoadController() {
+  /** @type {HTMLVideoElement[]} */
+  const videos = [];
+  /** @type {HTMLVideoElement | null} */
+  let warmVideo = null;
+  /** @type {HTMLVideoElement | null} */
+  let activeVideo = null;
+
+  /**
+   * 把主动内容加载槽交给指定视频。
+   *
+   * @param {HTMLVideoElement} video - 新的预热或播放目标。
+   * @param {boolean} takeover - 是否来自按下或点击等明确用户意图。
+   * @returns {void}
+   */
+  function claim(video, takeover) {
+    if (!videos.includes(video)) return;
+    if (!takeover && activeVideo && !activeVideo.paused) return;
+
+    const previousWarmVideo = warmVideo;
+    warmVideo = video;
+    if (
+      previousWarmVideo &&
+      previousWarmVideo !== video &&
+      previousWarmVideo !== activeVideo
+    ) {
+      releaseUnreadySpeculativeLoad(previousWarmVideo);
+    }
+    attachMosaicVideoSource(video, "auto");
+  }
+
+  return {
+    register(video) {
+      videos.push(video);
+    },
+    warmFirst() {
+      const firstVideo = videos[0];
+      if (firstVideo) claim(firstVideo, false);
+    },
+    warmForIntent(video, takeover) {
+      claim(video, takeover);
+    },
+    activate(video) {
+      activeVideo = video;
+      claim(video, true);
+    },
+    deactivate(video) {
+      if (activeVideo === video) activeVideo = null;
+      if (warmVideo !== video) releaseUnreadySpeculativeLoad(video);
+    },
+  };
+}
+
+/**
  * 创建点击后进入灯箱的拼图图片。
  *
  * @param {import("../types.js").MediaItem} item - 图片素材。
@@ -181,6 +278,8 @@ function createMosaicPhoto(item, index, openLightbox) {
  * @param {import("../types.js").MediaItem} item - 视频或动图素材。
  * @param {number} index - 素材索引。
  * @param {import("../types.js").DynamicMedia["author"]} author - 作者信息。
+ * @param {ReturnType<typeof createMosaicVideoLoadController>} videoLoadController -
+ * 当前画廊的主动加载槽控制器。
  * @param {(activeVideo: HTMLVideoElement) => void} pauseOtherVideos - 播放前暂停其他视频。
  * @param {(index: number, trigger: HTMLElement) => void} openLightbox - 灯箱入口。
  * @returns {{element: HTMLDivElement, video: HTMLVideoElement, reset: () => void}}
@@ -190,6 +289,7 @@ function createMosaicVideo(
   item,
   index,
   author,
+  videoLoadController,
   pauseOtherVideos,
   openLightbox,
 ) {
@@ -268,6 +368,7 @@ function createMosaicVideo(
    */
   function resetPlayback() {
     video.pause();
+    videoLoadController.deactivate(video);
     showPreviewControls();
   }
 
@@ -297,14 +398,19 @@ function createMosaicVideo(
     status.textContent = "点按播放 · 来源 X · 需开🪜";
   }
 
-  const warmForIntent = () => {
-    attachMosaicVideoSource(video, "auto");
-  };
-  playButton.addEventListener("pointerenter", warmForIntent);
-  playButton.addEventListener("pointerdown", warmForIntent, {
-    passive: true,
+  playButton.addEventListener("pointerenter", () => {
+    videoLoadController.warmForIntent(video, false);
   });
-  playButton.addEventListener("focus", warmForIntent);
+  playButton.addEventListener(
+    "pointerdown",
+    () => {
+      videoLoadController.warmForIntent(video, true);
+    },
+    { passive: true },
+  );
+  playButton.addEventListener("focus", () => {
+    videoLoadController.warmForIntent(video, false);
+  });
 
   playButton.addEventListener("click", () => {
     pauseOtherVideos(video);
@@ -314,7 +420,7 @@ function createMosaicVideo(
     status.textContent = "加载中 · 来源 X · 需开🪜";
     status.hidden = false;
 
-    attachMosaicVideoSource(video, "auto");
+    videoLoadController.activate(video);
 
     try {
       const playback = video.play();
@@ -331,11 +437,13 @@ function createMosaicVideo(
     expandButton.hidden = true;
   });
   video.addEventListener("pause", () => {
+    videoLoadController.deactivate(video);
     if (!video.hasAttribute("controls") && !video.ended) {
       showPreviewControls();
     }
   });
   video.addEventListener("ended", () => {
+    videoLoadController.deactivate(video);
     showPreviewControls();
     playButton.setAttribute(
       "aria-label",
@@ -347,6 +455,7 @@ function createMosaicVideo(
     if (video.paused) status.hidden = true;
   });
   video.addEventListener("error", () => {
+    videoLoadController.deactivate(video);
     video.pause();
     video.removeAttribute("controls");
     video.removeAttribute("src");
@@ -436,6 +545,8 @@ export function createMediaGallery(tweet, data) {
 
   const initialMedia = resolveInitialMedia(tweet, data);
   const mosaicVideoPlayers = [];
+  const videoLoadController = createMosaicVideoLoadController();
+  galleryVideoLoadControllers.set(gallery, videoLoadController);
   const pauseMosaicVideos = () => {
     mosaicVideoPlayers.forEach((player) => player.reset());
   };
@@ -457,6 +568,7 @@ export function createMediaGallery(tweet, data) {
         item,
         index,
         data.author,
+        videoLoadController,
         (activeVideo) => {
           mosaicVideoPlayers.forEach((player) => {
             if (player.video !== activeVideo) player.reset();
@@ -466,6 +578,7 @@ export function createMediaGallery(tweet, data) {
       );
       mosaicItem = videoResult.element;
       mosaicVideoPlayers.push(videoResult);
+      videoLoadController.register(videoResult.video);
     }
 
     if (initialMedia.matches && index === initialMedia.index) {
@@ -508,8 +621,13 @@ export function preloadMediaGalleryVideos(gallery, preloadMode) {
     gallery.querySelectorAll("video.gallery-mosaic-video"),
   );
   if (preloadMode === "auto") {
-    const firstVideo = videos[0];
-    if (firstVideo) attachMosaicVideoSource(firstVideo, "auto");
+    const controller = galleryVideoLoadControllers.get(gallery);
+    if (controller) {
+      controller.warmFirst();
+    } else {
+      const firstVideo = videos[0];
+      if (firstVideo) attachMosaicVideoSource(firstVideo, "auto");
+    }
     return;
   }
 
