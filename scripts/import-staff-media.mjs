@@ -28,10 +28,12 @@ const VIDEO_EXTENSIONS = new Set([".mov", ".mp4"]);
 const FOLDER_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
 const FULL_VIDEO_FILTER =
   "scale=w=if(gte(iw\\,ih)\\,-2\\,min(iw\\,720))" +
-  ":h=if(gte(iw\\,ih)\\,min(ih\\,720)\\,-2):flags=lanczos";
+  ":h=if(gte(iw\\,ih)\\,min(ih\\,720)\\,-2)" +
+  ":flags=lanczos:in_range=auto:out_range=tv";
 const INLINE_VIDEO_FILTER =
   "scale=w=if(gte(iw\\,ih)\\,-2\\,min(iw\\,360))" +
-  ":h=if(gte(iw\\,ih)\\,min(ih\\,360)\\,-2):flags=lanczos";
+  ":h=if(gte(iw\\,ih)\\,min(ih\\,360)\\,-2)" +
+  ":flags=lanczos:in_range=auto:out_range=tv";
 const POSTER_FILTER =
   "scale=w=if(gte(iw\\,ih)\\,min(iw\\,960)\\,-2)" +
   ":h=if(gte(iw\\,ih)\\,-2\\,min(ih\\,960)):flags=lanczos";
@@ -292,7 +294,8 @@ function encodeFullVideo(sourcePath, outputPath, crf) {
  *
  * @description 高清档最高 720p，并用 SSIM 0.95 作为质量门槛；列表档最高
  * 360p，专供接近视口时的低流量预热。两种 MP4 均使用 H.264/AAC、yuv420p
- * 和 faststart，以兼容主流移动浏览器并尽快出现可播放数据。
+ * 和 faststart，以兼容主流移动浏览器并尽快出现可播放数据。缩放时会将全范围
+ * 输入转为电视范围，避免 FFmpeg 将这类素材保留为 yuvj420p 而无法通过部署门禁。
  *
  * @param {string} sourcePath - 原视频路径。
  * @param {string} stageDir - 当前用户的临时输出目录。
