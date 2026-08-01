@@ -101,6 +101,7 @@ function normalizeMediaRecord(rawRecord) {
       {
         type,
         url,
+        preview: "",
         poster: parseAllowedMediaUrl(item.poster || item.thumbnail_url),
         variants,
         width: Number.isFinite(width) && width > 0 ? width : 16,
@@ -123,6 +124,7 @@ function normalizeMediaRecord(rawRecord) {
     "x";
   const handle = String(rawHandle).replace(/[^A-Za-z0-9_]/g, "") || "x";
   return {
+    source: "x",
     items,
     author: {
       name: String(rawRecord.author?.name || `@${handle}`),

@@ -1,4 +1,4 @@
-import { createMediaLightbox } from "./lightbox.js?v=2026073110";
+import { createMediaLightbox } from "./lightbox.js?v=2026080102";
 
 const VIDEO_PRELOAD_PRIORITY = Object.freeze({
   none: 0,
@@ -12,11 +12,12 @@ const galleryVideoLoadControllers = new WeakMap();
 /**
  * 解析媒体深链接在画廊中的初始位置。
  *
- * @param {import("../types.js").TweetReference} tweet - 当前推文链接信息。
+ * @param {import("../types.js").TweetReference | null} tweet - 可选的推文深链接信息。
  * @param {import("../types.js").DynamicMedia} data - 已校验媒体数据。
  * @returns {{index: number, matches: boolean}} 初始索引及深链接是否有效。
  */
 function resolveInitialMedia(tweet, data) {
+  if (!tweet) return { index: 0, matches: false };
   const requestedIndex = tweet.mediaIndex - 1;
   const requestedItem = data.items[requestedIndex];
   const matches =
@@ -74,6 +75,7 @@ function selectInlineVideoSource(item) {
  * @returns {string} 拼图使用的 X CDN 图片地址。
  */
 function selectInlinePhotoSource(item) {
+  if (item.preview) return item.preview;
   try {
     const source = new URL(item.url);
     if (
@@ -91,6 +93,16 @@ function selectInlinePhotoSource(item) {
   } catch (_) {
     return item.url;
   }
+}
+
+/**
+ * 返回拼图状态中使用的素材来源说明。
+ *
+ * @param {import("../types.js").DynamicMedia["source"]} source - 媒体来源。
+ * @returns {string} 本站或 X 的简短提示。
+ */
+function getMediaSourceNote(source) {
+  return source === "local" ? "本站素材" : "来源 X · 需开🪜";
 }
 
 /**
@@ -230,10 +242,11 @@ function createMosaicVideoLoadController() {
  *
  * @param {import("../types.js").MediaItem} item - 图片素材。
  * @param {number} index - 素材索引。
+ * @param {import("../types.js").DynamicMedia["source"]} source - 媒体来源。
  * @param {(index: number, trigger: HTMLElement) => void} openLightbox - 灯箱入口。
  * @returns {HTMLButtonElement} 拼图图片按钮。
  */
-function createMosaicPhoto(item, index, openLightbox) {
+function createMosaicPhoto(item, index, source, openLightbox) {
   const mosaicItem = document.createElement("button");
   mosaicItem.type = "button";
   mosaicItem.className =
@@ -252,7 +265,7 @@ function createMosaicPhoto(item, index, openLightbox) {
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = "加载中 · 来源 X · 需开🪜";
+  status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
   image.addEventListener("load", () => {
     image.classList.add("is-loaded");
     status.hidden = true;
@@ -261,7 +274,9 @@ function createMosaicPhoto(item, index, openLightbox) {
     image.hidden = true;
     status.hidden = false;
     status.dataset.state = "error";
-    status.textContent = "X 媒体未加载 · 请确认已开🪜";
+    status.textContent = source === "local"
+      ? "本站图片加载失败"
+      : "X 媒体未加载 · 请确认已开🪜";
   });
   image.src = selectInlinePhotoSource(item);
 
@@ -278,6 +293,7 @@ function createMosaicPhoto(item, index, openLightbox) {
  * @param {import("../types.js").MediaItem} item - 视频或动图素材。
  * @param {number} index - 素材索引。
  * @param {import("../types.js").DynamicMedia["author"]} author - 作者信息。
+ * @param {import("../types.js").DynamicMedia["source"]} source - 媒体来源。
  * @param {ReturnType<typeof createMosaicVideoLoadController>} videoLoadController -
  * 当前画廊的主动加载槽控制器。
  * @param {(activeVideo: HTMLVideoElement) => void} pauseOtherVideos - 播放前暂停其他视频。
@@ -289,6 +305,7 @@ function createMosaicVideo(
   item,
   index,
   author,
+  source,
   videoLoadController,
   pauseOtherVideos,
   openLightbox,
@@ -345,7 +362,7 @@ function createMosaicVideo(
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = "加载中 · 来源 X · 需开🪜";
+  status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
 
   let hasPreviewFrame = false;
 
@@ -389,13 +406,13 @@ function createMosaicVideo(
       "error",
       () => {
         if (video.paused && !video.hasAttribute("controls")) {
-          status.textContent = "点按播放 · 来源 X · 需开🪜";
+          status.textContent = `点按播放 · ${getMediaSourceNote(source)}`;
         }
       },
     );
     posterProbe.src = item.poster;
   } else {
-    status.textContent = "点按播放 · 来源 X · 需开🪜";
+    status.textContent = `点按播放 · ${getMediaSourceNote(source)}`;
   }
 
   playButton.addEventListener("pointerenter", () => {
@@ -417,7 +434,7 @@ function createMosaicVideo(
     playButton.hidden = true;
     expandButton.hidden = true;
     status.dataset.state = "loading";
-    status.textContent = "加载中 · 来源 X · 需开🪜";
+    status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
     status.hidden = false;
 
     videoLoadController.activate(video);
@@ -464,7 +481,9 @@ function createMosaicVideo(
     expandButton.hidden = false;
     status.hidden = false;
     status.dataset.state = "error";
-    status.textContent = "点按重试 · X 视频尚未连接";
+    status.textContent = source === "local"
+      ? "点按重试 · 本站视频加载失败"
+      : "点按重试 · X 视频尚未连接";
 
     // 清除失败的媒体选择，下一次明确点按时可以重新发起请求。
     try {
@@ -519,7 +538,7 @@ function createGallerySource(tweet, data, requestedTypeMatches) {
 /**
  * 创建可直接播放视频、并能进入页面级完整预览的多素材画廊。
  *
- * @param {import("../types.js").TweetReference} tweet - 当前推文及媒体深链接。
+ * @param {import("../types.js").TweetReference | null} tweet - X 素材的推文深链接；本站素材为 null。
  * @param {import("../types.js").DynamicMedia} data - 已校验的媒体数据。
  * @returns {HTMLElement} X 式拼图、站内视频播放和页面级媒体轮播。
  */
@@ -540,7 +559,7 @@ export function createMediaGallery(tweet, data) {
     "gallery-mosaic gallery-mosaic--" + mosaicItems.length;
   mosaic.setAttribute(
     "aria-label",
-    data.author.name + " 的 X 式多素材拼图",
+    data.author.name + " 的多素材拼图",
   );
 
   const initialMedia = resolveInitialMedia(tweet, data);
@@ -562,12 +581,18 @@ export function createMediaGallery(tweet, data) {
 
     let mosaicItem;
     if (item.type === "photo") {
-      mosaicItem = createMosaicPhoto(item, index, lightbox.open);
+      mosaicItem = createMosaicPhoto(
+        item,
+        index,
+        data.source,
+        lightbox.open,
+      );
     } else {
       const videoResult = createMosaicVideo(
         item,
         index,
         data.author,
+        data.source,
         videoLoadController,
         (activeVideo) => {
           mosaicVideoPlayers.forEach((player) => {
@@ -597,11 +622,13 @@ export function createMediaGallery(tweet, data) {
     mosaic.appendChild(mosaicItem);
   });
 
-  gallery.append(
-    mosaic,
-    createGallerySource(tweet, data, initialMedia.matches),
-    lightbox.element,
-  );
+  gallery.appendChild(mosaic);
+  if (tweet) {
+    gallery.appendChild(
+      createGallerySource(tweet, data, initialMedia.matches),
+    );
+  }
+  gallery.appendChild(lightbox.element);
   return gallery;
 }
 

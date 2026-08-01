@@ -3,7 +3,7 @@ import {
   createLocalCard,
   getLocalCardData,
 } from "./local-card.js?v=2026073110";
-import { renderDynamicMediaGallery } from "./media/preview.js?v=2026080101";
+import { renderDynamicMediaGallery } from "./media/preview.js?v=2026080102";
 import { findRepositoryTweet } from "./repository.js";
 import { parseTweetUrl } from "./tweet-url.js";
 import { setRailState } from "./ui-state.js";

@@ -34,16 +34,6 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
-    <link rel="dns-prefetch" href="//api.fxtwitter.com" />
-    <link rel="dns-prefetch" href="//pbs.twimg.com" />
-    <link rel="dns-prefetch" href="//video.twimg.com" />
-    <link
-      rel="preload"
-      href="assets/data/tweet-media.json?v=2026073110"
-      as="fetch"
-      type="application/json"
-      crossorigin="anonymous"
-    />
     <meta
       name="google-site-verification"
       content="gpN2O3lFrIKVgIDR7Fz0Th5Ebr5PVnZrCYNXdbWIf2s"
@@ -689,7 +679,7 @@
     />
     <link
       rel="stylesheet"
-      href="assets/x-embed-preview/styles/home-gallery.css?v=2026073105"
+      href="assets/x-embed-preview/styles/home-gallery.css?v=2026080102"
     />
   </head>
   <body>
@@ -847,13 +837,17 @@
       const INFO_CACHE_KEY_PREFIX = "info_content_cache:";
       const MOBILE_BG_CACHE_KEY = "rainlove_mobile_bg_v20260616";
       const MOBILE_BG_URL = "assets/images/rainlove-mobile-bg.webp?v=20260616";
-      const MEDIA_GALLERY_VERSION = "2026080101";
+      const MEDIA_GALLERY_VERSION = "2026080103";
+      // 首页 X 推文画廊当前停用；保留运行时代码供未来明确恢复。
+      const ENABLE_TWEET_MEDIA = false;
       const MEDIA_SOURCE_PROFILE_URL =
         "https://twitter.com/intent/user?screen_name=yl_YuTang";
       const HOME_MEDIA_ORIGINS = Object.freeze([
         "https://pbs.twimg.com",
         "https://video.twimg.com",
       ]);
+      const LOCAL_MEDIA_FOLDER_PATTERN =
+        /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
       const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
       const FEATURE_RULES = [
@@ -1210,7 +1204,7 @@
 
       function renderStaffRow(item) {
         const socialIcon = getSocialIcon(item.social);
-        const tweetShowcase = renderTweetShowcase(item);
+        const mediaShowcase = renderMediaShowcase(item);
         return `
                 <tr class="staff-item staff-row ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice || ""}">
                     <td>
@@ -1228,9 +1222,9 @@
                     </td>
                 </tr>
                 ${
-                  tweetShowcase
+                  mediaShowcase
                     ? `<tr class="staff-item staff-media-row" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}">
-                        <td colspan="3">${tweetShowcase}</td>
+                        <td colspan="3">${mediaShowcase}</td>
                       </tr>`
                     : ""
                 }
@@ -1256,7 +1250,7 @@
                     <p class="card-desc">${escapeHtml(item.desc)}</p>
                     <span class="desc-toggle-hint">展开</span>
                   </div>
-                  ${renderTweetShowcase(item)}
+                  ${renderMediaShowcase(item)}
                 </article>
             `;
       }
@@ -1274,30 +1268,68 @@
         }
       }
 
-      function getTweetMedia(item) {
-        const tweetUrl = getSafeUrl(item.tweet, ["x.com", "twitter.com"]);
-        if (!tweetUrl) return null;
-        return { tweetUrl, sourceUrl: MEDIA_SOURCE_PROFILE_URL };
+      /**
+       * 校验 data.json 中用于关联用户素材目录的稳定键。
+       *
+       * @param {unknown} value - 候选目录键。
+       * @returns {string} 可安全写入 data-* 属性的目录键；无效时为空字符串。
+       */
+      function getSafeMediaFolder(value) {
+        return typeof value === "string" &&
+          LOCAL_MEDIA_FOLDER_PATTERN.test(value)
+          ? value
+          : "";
       }
 
-      function renderTweetShowcase(item) {
-        const media = getTweetMedia(item);
+      /**
+       * 收敛一个用户可用的本站目录与可选 X 回退地址。
+       *
+       * @description `ENABLE_TWEET_MEDIA` 关闭时无条件忽略旧缓存或意外数据中的
+       * tweet，确保首页不会恢复 X 请求；未来明确启用后才重新校验其地址。
+       *
+       * @param {object} item - data.json 中的用户条目。
+       * @returns {{mediaFolder: string, tweetUrl: string, sourceUrl: string} | null}
+       * 首页画廊所需的可信来源配置。
+       */
+      function getStaffMedia(item) {
+        const mediaFolder = getSafeMediaFolder(item.mediaFolder);
+        const tweetUrl = ENABLE_TWEET_MEDIA
+          ? getSafeUrl(item.tweet, ["x.com", "twitter.com"])
+          : "";
+        if (!mediaFolder && !tweetUrl) return null;
+        return {
+          mediaFolder,
+          tweetUrl,
+          sourceUrl: MEDIA_SOURCE_PROFILE_URL,
+        };
+      }
+
+      /**
+       * 输出延迟加载的用户媒体占位区。
+       *
+       * @description 当前只输出 mediaFolder 对应的本站压缩成品。保留的 X 分支
+       * 受首页功能开关保护，未来恢复后才允许没有本地目录的 tweet 独立展示，
+       * 或在本站清单不可用时回退。
+       *
+       * @param {object} item - 已整理的用户条目。
+       * @returns {string} 首页表格或移动卡片中的媒体区 HTML。
+       */
+      function renderMediaShowcase(item) {
+        const media = getStaffMedia(item);
         if (!media) return "";
 
         const label = `${item.name} 的动态媒体画廊`;
-
-        return `
-          <section class="tweet-showcase" aria-label="${escapeHtml(label)}">
-            <div class="tweet-showcase-header">
-              <span class="tweet-showcase-hint">图片可放大 · 视频可播放</span>
-              <a
+        const initialSource = media.mediaFolder ? "local" : "x";
+        const sourceMarkup = media.mediaFolder
+          ? '<span class="tweet-source-label">本站素材</span>'
+          : `<a
                 class="tweet-source-link"
                 href="${escapeHtml(media.tweetUrl)}"
                 target="_blank"
                 rel="noreferrer"
-              >原推文 ↗</a>
-            </div>
-            <template class="tweet-connection-source-template">
+              >原推文 ↗</a>`;
+        const connectionTemplate = media.tweetUrl
+          ? `<template class="tweet-connection-source-template">
               <a
                 class="tweet-profile-link"
                 href="${escapeHtml(media.sourceUrl)}"
@@ -1309,10 +1341,23 @@
                 <span>twi</span>
               </a>
               <span class="tweet-network-note">需开🪜</span>
-            </template>
+            </template>`
+          : "";
+
+        return `
+          <section class="tweet-showcase" aria-label="${escapeHtml(label)}">
+            <div class="tweet-showcase-header">
+              <span class="tweet-showcase-hint">图片可放大 · 视频可播放</span>
+              <span class="tweet-source-slot">${sourceMarkup}</span>
+            </div>
+            ${connectionTemplate}
             <div
               class="tweet-gallery-host"
               data-tweet-url="${escapeHtml(media.tweetUrl)}"
+              data-media-folder="${escapeHtml(media.mediaFolder)}"
+              data-media-version="${escapeHtml(DATA_VERSION)}"
+              data-staff-name="${escapeHtml(item.name)}"
+              data-active-source="${initialSource}"
               data-state="waiting"
               role="status"
               aria-live="polite"
@@ -1617,7 +1662,7 @@
       }
 
       /**
-       * 在画廊模块延迟加载期间并行建立 X 媒体 CDN 连接。
+       * 在画廊模块延迟加载期间并行建立可选 X 回退源的 CDN 连接。
        *
        * @description 正文已经生成后才注入 preconnect，既不阻塞首轮内容渲染，
        * 又让图片、视频请求无需等到画廊模块执行时才开始握手。
@@ -1626,6 +1671,12 @@
        */
       function warmHomeMediaOrigins() {
         if (homeMediaOriginsWarmed) return;
+        const hasPrimaryXGallery = Array.from(
+          document.querySelectorAll(".tweet-gallery-host"),
+        ).some(
+          (mount) => !mount.dataset.mediaFolder && mount.dataset.tweetUrl,
+        );
+        if (!hasPrimaryXGallery) return;
         homeMediaOriginsWarmed = true;
 
         HOME_MEDIA_ORIGINS.forEach((origin) => {
@@ -1637,7 +1688,7 @@
       }
 
       /**
-       * 让正文至少完成一帧绘制后，再导入并扫描 X 媒体画廊。
+       * 让正文至少完成一帧绘制后，再导入并扫描用户媒体画廊。
        *
        * @description 生成号会取消快速排序或数据刷新留下的旧任务，避免扫描已经
        * 被替换的占位节点。
@@ -1684,7 +1735,7 @@
               .forEach((mount) => {
                 mount.dataset.state = "error";
                 const status = mount.querySelector(".tweet-gallery-status");
-                if (status) status.textContent = "连接 X 失败，请刷新重试";
+                if (status) status.textContent = "素材模块加载失败，请刷新重试";
               });
           });
       }

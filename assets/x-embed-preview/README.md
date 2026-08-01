@@ -25,6 +25,7 @@ x-embed-preview.html 只保留页面语义结构，样式与行为位于本目�
         ├── local-card.js       # 零组件卡片
         └── media/
             ├── api.js          # 静态清单、六小时缓存与 FxTwitter 回退
+            ├── local.js        # 本站用户素材清单校验与同源 URL 解析
             ├── preview.js      # 动态画廊异步状态
             ├── gallery.js      # 拼图与站内视频播放
             └── lightbox.js     # 完整比例媒体轮播
@@ -38,15 +39,25 @@ app.js 负责组合各模块；业务模块不反向引用入口。媒体调用�
 
 新增功能时优先放入最接近职责的模块。只有跨模块共享的固定配置放入 config.js，共享数据形态放入 types.js，避免重新把页面入口变成大文件。
 
-首页 `index.html` 复用 `media-gallery.css`、`home-gallery.css` 和 `home-gallery.js`。首页只负责输出带推文链接的占位区；适配模块负责接近视口时读取媒体，并复用同一套拼图、原生播放器与灯箱组件。
+首页 `index.html` 复用 `media-gallery.css`、`home-gallery.css` 和 `home-gallery.js`。当前首页只把 `data.json` 中的 `mediaFolder` 输出为占位区，并复用同一套拼图、原生播放器与灯箱组件。
 
-生产页优先读取 `assets/data/tweet-media.json` 中的 X CDN 元数据。清单没有目标推文或读取失败时，才请求 FxTwitter；成功结果会在浏览器缓存六小时。图片、视频封面和视频文件始终由访问者浏览器直接请求 X 官方 CDN，并由浏览器按 HTTP 缓存规则复用；仓库和 GitHub Pages 不保存推文预览图。
+首页 X 推文来源目前已停用：`data.json` 不含 `tweet` 字段，`ENABLE_TWEET_MEDIA` 为 `false`，`tweet-media.json` 是空清单，首页也不预取 X 清单或 CDN。解析模块、实验页、刷新脚本和 CI 校验仍保留；首页适配器只有未来明确恢复该功能时才按需导入 X 解析模块。
 
-首页的加载节奏按当前视口高度计算：提前约 1.5 屏生成画廊并请求 X 图片或封面，提前 0.75 屏连接全部视频并读取 metadata，提前 0.25 屏只把第一段视频提升为 `preload="auto"`。省流量、2G 和 3G 网络跳过最后一步；拼图图片在移动端请求 X `small`、桌面端请求 `medium`，列表视频在移动端选择最低码率、桌面端选择不高于 832kbps 的档位，灯箱按需读取高清文件。
+恢复后，生产页会优先读取 `assets/data/tweet-media.json` 中的 X CDN 元数据。清单没有目标推文或读取失败时，才请求 FxTwitter；成功结果会在浏览器缓存六小时。图片、视频封面和视频文件始终由访问者浏览器直接请求 X 官方 CDN，并由浏览器按 HTTP 缓存规则复用；仓库和 GitHub Pages 不保存推文预览图。
 
-## 更新媒体清单
+首页的加载节奏按当前视口高度计算：提前约 1.5 屏读取本站清单并请求列表图片/封面，提前 0.75 屏连接全部视频并读取 metadata，提前 0.25 屏只把第一段视频提升为 `preload="auto"`。省流量、2G 和 3G 网络跳过最后一步；列表视频使用低码率档位，灯箱只在用户打开当前素材后读取高清文件。保留的 X 分支恢复后沿用同一加载节奏。
 
-修改 `assets/data/data.json` 中的 `tweet` 字段后执行：
+## 导入本站用户素材
+
+原始素材不直接复制到仓库。使用 `scripts/import-staff-media.mjs` 从一个用户的
+来源目录生成 WebP、H.264/AAC MP4、封面和 `media.json`，再把相同目录键写入
+该用户的 `mediaFolder`。详细命令见 `assets/media/staff/README.md`；CI 会运行
+`node scripts/import-staff-media.mjs --check`，拒绝未关联目录、错误编码、非
+faststart 视频、单用户超过 30MB 或全站超过 850MB 的素材。
+
+## 恢复或更新 X 媒体清单
+
+只有明确决定恢复首页 X 功能后，才重新添加 `tweet` 字段、启用首页开关并执行：
 
     node scripts/refresh-tweet-media.mjs
 

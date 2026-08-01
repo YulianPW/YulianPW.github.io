@@ -5,7 +5,7 @@
  * @param {number} index - 当前媒体索引。
  * @param {import("../types.js").DynamicMedia} data - 完整媒体数据。
  * @param {number} initialIndex - 初次打开时的目标索引。
- * @param {import("../types.js").TweetReference} tweet - 原推文及媒体深链接。
+ * @param {import("../types.js").TweetReference | null} tweet - X 素材的原推文；本站素材为 null。
  * @returns {HTMLDivElement} 可放入灯箱舞台的媒体页。
  */
 function createLightboxSlide(item, index, data, initialIndex, tweet) {
@@ -42,13 +42,18 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
   mediaError.className = "gallery-lightbox-error";
   mediaError.hidden = true;
   const errorCopy = document.createElement("span");
-  errorCopy.textContent = "X 媒体未加载，请确认已开🪜。";
-  const sourceLink = document.createElement("a");
-  sourceLink.href = tweet.deepLink || tweet.url;
-  sourceLink.target = "_blank";
-  sourceLink.rel = "noreferrer";
-  sourceLink.textContent = "打开原推文 ↗";
-  mediaError.append(errorCopy, sourceLink);
+  errorCopy.textContent = data.source === "local"
+    ? "本站素材加载失败，请稍后重试。"
+    : "X 媒体未加载，请确认已开🪜。";
+  mediaError.appendChild(errorCopy);
+  if (tweet) {
+    const sourceLink = document.createElement("a");
+    sourceLink.href = tweet.deepLink || tweet.url;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noreferrer";
+    sourceLink.textContent = "打开原推文 ↗";
+    mediaError.appendChild(sourceLink);
+  }
   media.addEventListener("error", () => {
     media.hidden = true;
     mediaError.hidden = false;
@@ -68,7 +73,7 @@ function createLightboxSlide(item, index, data, initialIndex, tweet) {
  * @param {import("../types.js").DynamicMedia} data - 已校验的媒体数据。
  * @param {number} initialIndex - 深链接对应的初始素材索引。
  * @param {() => void} onBeforeOpen - 打开前用于暂停拼图视频的回调。
- * @param {import("../types.js").TweetReference} tweet - 原推文及媒体深链接。
+ * @param {import("../types.js").TweetReference | null} tweet - X 素材的原推文；本站素材为 null。
  * @returns {{element: HTMLDialogElement, open: (index: number, trigger: HTMLElement) => void}}
  * 灯箱节点及其打开方法。
  */
@@ -127,7 +132,7 @@ export function createMediaLightbox(data, initialIndex, onBeforeOpen, tweet) {
   let touchStartX = null;
 
   /**
-   * 首次显示某个灯箱页时才连接对应的 X 媒体地址。
+   * 首次显示某个灯箱页时才连接对应的高清媒体地址。
    *
    * @param {number} index - 要加载的素材索引。
    * @returns {void}

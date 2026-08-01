@@ -24,7 +24,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate tweet media manifest
+      - name: Install local media validation tools
+        run: |
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+
+      - name: Validate local staff media
+        run: node scripts/import-staff-media.mjs --check
+
+      - name: Validate dormant tweet media manifest
         run: node scripts/refresh-tweet-media.mjs --check
 
       - name: Configure Pages

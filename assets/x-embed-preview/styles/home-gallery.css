@@ -78,17 +78,36 @@
   color: #735700;
 }
 
-.tweet-source-link {
+.tweet-source-slot,
+.tweet-source-link,
+.tweet-source-label {
   display: inline-flex;
   min-height: 24px;
   align-items: center;
   flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.tweet-source-slot {
+  justify-content: flex-end;
+}
+
+.tweet-source-link {
   color: var(--x-blue);
   font-size: 10px;
   font-weight: 700;
   line-height: 1.35;
   text-decoration: none;
-  white-space: nowrap;
+}
+
+.tweet-source-label {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e9f8ee;
+  color: #237340;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .tweet-source-link:hover {

@@ -10,15 +10,16 @@
 
 /**
  * @typedef {Object} MediaVariant
- * @property {string} url - X 视频 CDN 上的 MP4 地址。
+ * @property {string} url - 列表播放器使用的 MP4 地址。
  * @property {number} bitrate - 每秒比特率，用于按展示尺寸选择清晰度。
  */
 
 /**
  * @typedef {Object} MediaItem
  * @property {"photo" | "video" | "gif"} type - 素材类型。
- * @property {string} url - 灯箱使用的 X 官方 CDN 高清媒体地址。
- * @property {string} poster - X CDN 上的视频或动图封面地址。
+ * @property {string} url - 灯箱使用的高清媒体地址。
+ * @property {string} preview - 可选的列表图片地址；为空时复用 url。
+ * @property {string} poster - 视频或动图封面地址。
  * @property {MediaVariant[]} variants - 可供列表播放器选择的 MP4 码率档位。
  * @property {number} width - 原始媒体宽度。
  * @property {number} height - 原始媒体高度。
@@ -27,6 +28,7 @@
 
 /**
  * @typedef {Object} DynamicMedia
+ * @property {"x" | "local"} source - 素材来自 X CDN 或本站用户目录。
  * @property {MediaItem[]} items - 保持推文原始顺序的媒体清单。
  * @property {{name: string, handle: string}} author - 推文作者展示信息。
  */

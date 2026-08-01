@@ -1,8 +1,8 @@
 import {
   createMediaGallery,
   preloadMediaGalleryVideos,
-} from "./media/gallery.js?v=2026080101";
-import { fetchDynamicMedia } from "./media/api.js?v=2026073110";
+} from "./media/gallery.js?v=2026080102";
+import { fetchLocalMedia } from "./media/local.js?v=2026080102";
 import { parseTweetUrl } from "./tweet-url.js";
 
 const MEDIA_REQUEST_TIMEOUT_MS = 15000;
@@ -36,7 +36,7 @@ function getObserverRootMargin(viewportMultiplier) {
 }
 
 /**
- * 移动端一次只连接一条推文，避免 X 请求与正文滚动争抢带宽。
+ * 移动端一次只加载一个画廊，避免媒体请求与正文滚动争抢带宽。
  *
  * @returns {number} 当前允许的最大并发连接数。
  */
@@ -150,7 +150,12 @@ function setMountState(mount, state, message) {
   if (!status) return;
 
   if (state === "queued" || state === "loading") {
-    renderConnectionStatus(mount, status, message);
+    if (mount.dataset.activeSource === "local") {
+      status.className = "tweet-gallery-status";
+      status.textContent = message;
+    } else {
+      renderConnectionStatus(mount, status, message);
+    }
     return;
   }
 
@@ -203,41 +208,119 @@ function renderLoadingState(mount) {
   mount.setAttribute("role", "status");
   mount.setAttribute("aria-live", "polite");
   mount.replaceChildren(loader, status);
-  renderConnectionStatus(mount, status, "正在连接");
+  delete mount.dataset.fallbackFromLocal;
+  mount.dataset.activeSource = mount.dataset.mediaFolder ? "local" : "x";
+  setMountState(
+    mount,
+    "loading",
+    mount.dataset.activeSource === "local"
+      ? "正在加载本站素材"
+      : "正在连接",
+  );
 }
 
 /**
- * 按推文 ID 复用媒体请求。
+ * 按稳定来源键复用一个带超时的媒体请求。
  *
- * @description 首页同时保留桌面表格和移动卡片 DOM，同一条推文可能出现两次；
- * 缓存 Promise 可避免响应返回前产生重复请求；单次请求最多等待 15 秒，失败时
- * 清除缓存以允许用户重试。
+ * @description 首页同时保留桌面表格和移动卡片 DOM，同一素材源可能出现两次；
+ * 缓存 Promise 可避免响应返回前产生重复请求。失败条目会被移除，以允许重试。
  *
- * @param {import("./types.js").TweetReference} tweet - 已校验的推文引用。
+ * @param {string} cacheKey - 带来源类型的唯一缓存键。
+ * @param {(signal: AbortSignal) => Promise<import("./types.js").DynamicMedia>} loader - 实际读取函数。
  * @returns {Promise<import("./types.js").DynamicMedia>} 可供多个挂载点复用的媒体数据。
  */
-function getCachedDynamicMedia(tweet) {
-  const cachedRequest = mediaRequestCache.get(tweet.id);
+function getCachedMediaRequest(cacheKey, loader) {
+  const cachedRequest = mediaRequestCache.get(cacheKey);
   if (cachedRequest) return cachedRequest;
 
   const requestController = new AbortController();
   const timeoutId = window.setTimeout(() => {
     requestController.abort();
   }, MEDIA_REQUEST_TIMEOUT_MS);
-  const request = fetchDynamicMedia(tweet, requestController.signal)
+  const request = loader(requestController.signal)
     .catch((error) => {
-      mediaRequestCache.delete(tweet.id);
+      mediaRequestCache.delete(cacheKey);
       throw error;
     })
     .finally(() => {
       window.clearTimeout(timeoutId);
     });
-  mediaRequestCache.set(tweet.id, request);
+  mediaRequestCache.set(cacheKey, request);
   return request;
 }
 
 /**
- * 渲染失败说明、重试入口和原推文链接。
+ * 读取并复用一条 X 推文媒体请求。
+ *
+ * @deprecated 首页 X 推文来源当前停用。这里保留按需导入入口，避免本站素材
+ * 画廊下载未使用的 X 解析模块，并支持未来经明确决策后恢复。
+ *
+ * @param {import("./types.js").TweetReference} tweet - 已校验的推文引用。
+ * @returns {Promise<import("./types.js").DynamicMedia>} X 媒体数据。
+ */
+function getCachedDynamicMedia(tweet) {
+  return getCachedMediaRequest(
+    `x:${tweet.id}`,
+    async (signal) => {
+      const { fetchDynamicMedia } = await import(
+        "./media/api.js?v=2026080102"
+      );
+      return fetchDynamicMedia(tweet, signal);
+    },
+  );
+}
+
+/**
+ * 读取并复用一个用户目录的本站媒体请求。
+ *
+ * @param {HTMLElement} mount - 带目录键、显示名和版本的画廊挂载点。
+ * @returns {Promise<import("./types.js").DynamicMedia>} 本站媒体数据。
+ */
+function getCachedLocalMedia(mount) {
+  const folder = mount.dataset.mediaFolder || "";
+  const version = mount.dataset.mediaVersion || "";
+  const displayName = mount.dataset.staffName || "";
+  return getCachedMediaRequest(
+    `local:${folder}:${version}`,
+    (signal) => fetchLocalMedia(folder, displayName, version, signal),
+  );
+}
+
+/**
+ * 同步画廊头部显示的实际素材来源。
+ *
+ * @param {HTMLElement} mount - 当前画廊挂载点。
+ * @param {"local" | "x"} source - 已成功加载的来源。
+ * @param {import("./types.js").TweetReference | null} tweet - 可选原推文。
+ * @returns {void}
+ */
+function updateShowcaseSource(mount, source, tweet) {
+  const slot = mount.closest(".tweet-showcase")?.querySelector(
+    ".tweet-source-slot",
+  );
+  if (!slot) return;
+
+  if (source === "local") {
+    const label = document.createElement("span");
+    label.className = "tweet-source-label";
+    label.textContent = "本站素材";
+    slot.replaceChildren(label);
+    return;
+  }
+
+  if (tweet) {
+    const sourceLink = document.createElement("a");
+    sourceLink.className = "tweet-source-link";
+    sourceLink.href = tweet.deepLink || tweet.url;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noreferrer";
+    sourceLink.textContent = "原推文 ↗";
+    slot.replaceChildren(sourceLink);
+  }
+}
+
+/**
+ * 渲染当前来源的失败说明、重试入口和可选原推文链接。
  *
  * @param {HTMLElement} mount - 加载失败的画廊挂载点。
  * @param {import("./types.js").TweetReference | null} tweet - 可选的规范推文引用。
@@ -249,7 +332,11 @@ function renderGalleryError(mount, tweet) {
 
   const copy = document.createElement("span");
   copy.className = "tweet-gallery-error-copy";
-  copy.textContent = "X 媒体未加载，请确认已开🪜后重试。";
+  copy.textContent = mount.dataset.fallbackFromLocal === "true"
+    ? "本站素材不可用，X 回退也未加载，请稍后重试。"
+    : mount.dataset.activeSource === "local"
+      ? "本站素材未加载，请稍后重试。"
+      : "X 媒体未加载，请确认已开🪜后重试。";
 
   const actions = document.createElement("span");
   actions.className = "tweet-gallery-error-actions";
@@ -260,7 +347,7 @@ function renderGalleryError(mount, tweet) {
   retry.textContent = "重新加载";
   retry.addEventListener("click", () => {
     renderLoadingState(mount);
-    setMountState(mount, "waiting", "正在重新连接 X…");
+    setMountState(mount, "waiting", "接近这里自动预载");
     queueMount(mount);
   });
   actions.appendChild(retry);
@@ -285,21 +372,42 @@ function renderGalleryError(mount, tweet) {
  */
 async function hydrateMount(mount) {
   const tweet = parseTweetUrl(mount.dataset.tweetUrl || "");
-  if (!tweet) {
+  const hasLocalMedia = Boolean(mount.dataset.mediaFolder);
+  if (!hasLocalMedia && !tweet) {
     renderGalleryError(mount, null);
     return;
   }
 
-  setMountState(mount, "loading", "正在连接");
   try {
-    const media = await getCachedDynamicMedia(tweet);
+    let media;
+    let galleryTweet = null;
+    if (hasLocalMedia) {
+      mount.dataset.activeSource = "local";
+      setMountState(mount, "loading", "正在加载本站素材");
+      try {
+        media = await getCachedLocalMedia(mount);
+      } catch (localError) {
+        if (!tweet) throw localError;
+        mount.dataset.fallbackFromLocal = "true";
+        mount.dataset.activeSource = "x";
+        setMountState(mount, "loading", "本站素材不可用，正在回退");
+        media = await getCachedDynamicMedia(tweet);
+        galleryTweet = tweet;
+      }
+    } else {
+      mount.dataset.activeSource = "x";
+      setMountState(mount, "loading", "正在连接");
+      media = await getCachedDynamicMedia(tweet);
+      galleryTweet = tweet;
+    }
     if (!mount.isConnected) return;
 
+    updateShowcaseSource(mount, media.source, tweet);
     mount.dataset.state = "ready";
     mount.removeAttribute("role");
     mount.removeAttribute("aria-live");
     mount.removeAttribute("aria-label");
-    const gallery = createMediaGallery(tweet, media);
+    const gallery = createMediaGallery(galleryTweet, media);
 
     // 首页已在紧凑头部提供原推文入口，移除共享组件的来源栏以避免重复信息。
     gallery.querySelector(".gallery-source")?.remove();
@@ -342,7 +450,12 @@ function drainQueue() {
  */
 function queueMount(mount) {
   if (!mount.isConnected || mount.dataset.state !== "waiting") return;
-  setMountState(mount, "queued", "即将连接");
+  mount.dataset.activeSource = mount.dataset.mediaFolder ? "local" : "x";
+  setMountState(
+    mount,
+    "queued",
+    mount.dataset.activeSource === "local" ? "即将加载本站素材" : "即将连接",
+  );
   pendingMounts.push(mount);
   drainQueue();
 }
