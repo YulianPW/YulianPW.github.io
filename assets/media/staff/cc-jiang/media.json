@@ -22,13 +22,18 @@
       "alt": ""
     },
     {
-      "type": "photo",
-      "url": "03-full.webp",
-      "preview": "03-inline.webp",
-      "poster": "",
-      "variants": [],
-      "width": 1440,
-      "height": 1114,
+      "type": "video",
+      "url": "03-full.mp4",
+      "preview": "",
+      "poster": "03-poster.webp",
+      "variants": [
+        {
+          "url": "03-inline.mp4",
+          "bitrate": 695890
+        }
+      ],
+      "width": 720,
+      "height": 540,
       "alt": ""
     }
   ]

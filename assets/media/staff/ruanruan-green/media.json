@@ -15,6 +15,36 @@
       "width": 1270,
       "height": 720,
       "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "02-full.webp",
+      "preview": "02-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1080,
+      "height": 1439,
+      "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "03-full.webp",
+      "preview": "03-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1080,
+      "height": 1620,
+      "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "04-full.webp",
+      "preview": "04-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1440,
+      "height": 1439,
+      "alt": ""
     }
   ]
 }

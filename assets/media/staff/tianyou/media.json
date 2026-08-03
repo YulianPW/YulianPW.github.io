@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "type": "video",
+      "url": "01-full.mp4",
+      "preview": "",
+      "poster": "01-poster.webp",
+      "variants": [
+        {
+          "url": "01-inline.mp4",
+          "bitrate": 84763
+        }
+      ],
+      "width": 1280,
+      "height": 720,
+      "alt": ""
+    }
+  ]
+}
