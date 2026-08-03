@@ -9,11 +9,21 @@
       "variants": [
         {
           "url": "01-inline.mp4",
-          "bitrate": 74887
+          "bitrate": 93876
         }
       ],
       "width": 1280,
       "height": 720,
+      "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "02-full.webp",
+      "preview": "02-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1080,
+      "height": 1474,
       "alt": ""
     }
   ]

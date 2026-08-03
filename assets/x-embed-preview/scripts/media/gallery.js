@@ -119,6 +119,18 @@ function getMediaSourceNote(source) {
 }
 
 /**
+ * 返回拼图加载状态使用的提示文案。
+ *
+ * @param {import("../types.js").DynamicMedia["source"]} source - 媒体来源。
+ * @returns {string} 包含加载状态和网络提示的文案。
+ */
+function getMediaLoadingText(source) {
+  return source === "local"
+    ? "加载中 · 国外站点 · 开🪜更快"
+    : `加载中 · ${getMediaSourceNote(source)}`;
+}
+
+/**
  * 将视频提升到指定预加载等级，且不重复重置已采用更高等级的缓冲。
  *
  * @param {HTMLVideoElement} video - 拼图内的视频节点。
@@ -280,7 +292,7 @@ function createMosaicPhoto(item, index, source, openLightbox) {
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
+  status.textContent = getMediaLoadingText(source);
   image.addEventListener("load", () => {
     image.classList.add("is-loaded");
     status.hidden = true;
@@ -398,7 +410,7 @@ function createMosaicVideo(
   const status = document.createElement("span");
   status.className = "gallery-mosaic-status";
   status.dataset.state = "loading";
-  status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
+  status.textContent = getMediaLoadingText(source);
 
   let hasPreviewFrame = false;
   let previewAction = "play";
@@ -580,7 +592,7 @@ function createMosaicVideo(
     playButton.hidden = true;
     expandButton.hidden = true;
     status.dataset.state = "loading";
-    status.textContent = `加载中 · ${getMediaSourceNote(source)}`;
+    status.textContent = getMediaLoadingText(source);
     status.hidden = false;
 
     videoLoadController.activate(video);
