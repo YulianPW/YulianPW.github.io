@@ -9,10 +9,10 @@
       "variants": [
         {
           "url": "01-inline.mp4",
-          "bitrate": 1001617
+          "bitrate": 426758
         }
       ],
-      "width": 1270,
+      "width": 960,
       "height": 720,
       "alt": ""
     },
@@ -22,8 +22,8 @@
       "preview": "02-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1080,
-      "height": 1439,
+      "width": 1320,
+      "height": 998,
       "alt": ""
     },
     {
@@ -32,8 +32,8 @@
       "preview": "03-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1080,
-      "height": 1620,
+      "width": 1280,
+      "height": 949,
       "alt": ""
     },
     {
@@ -42,8 +42,8 @@
       "preview": "04-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1440,
-      "height": 1439,
+      "width": 1170,
+      "height": 639,
       "alt": ""
     }
   ]
