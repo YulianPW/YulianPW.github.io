@@ -31,6 +31,9 @@ jobs:
             sudo apt-get install -y ffmpeg
           fi
 
+      - name: Validate staff data
+        run: node scripts/validate-staff-data.mjs
+
       - name: Validate local staff media
         run: node scripts/import-staff-media.mjs --check
 

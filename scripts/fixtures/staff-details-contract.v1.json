@@ -1,0 +1,50 @@
+{
+  "contractVersion": 1,
+  "snapshot": {
+    "schemaVersion": 1,
+    "snapshotVersion": "sha256:7567d94c43f37e4b9de38dd5eca12b802d15588e72c973c0e80e9b8249bf2d77",
+    "generatedAt": "2026-08-06T00:00:00Z",
+    "coverage": "full",
+    "profiles": [
+      {
+        "staffId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "updatedAt": "2026-08-06T00:00:00Z",
+        "details": {
+          "entry": "🚪200",
+          "intro": "emoji 🐱 与组合字符 é",
+          "services": [
+            {
+              "label": "TS语聊",
+              "detail": "99/30分"
+            },
+            {
+              "label": "KP",
+              "detail": "66/10分"
+            }
+          ],
+          "afterEntry": "结束说明"
+        }
+      }
+    ]
+  },
+  "localStaff": {
+    "staffId": "11111111-1111-4111-8111-111111111111",
+    "detailsRevision": 7,
+    "details": {
+      "entry": "🚪200",
+      "intro": "emoji 🐱 与组合字符 é",
+      "services": [
+        {
+          "label": "TS语聊",
+          "detail": "99/30分"
+        },
+        {
+          "label": "KP",
+          "detail": "66/10分"
+        }
+      ],
+      "afterEntry": "结束说明"
+    }
+  }
+}

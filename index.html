@@ -61,7 +61,9 @@
       }
 
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+          "Segoe UI", Arial, sans-serif;
         margin: 0;
         padding: 15px;
         color: var(--text);
@@ -107,7 +109,7 @@
 
       table {
         width: 100%;
-        max-width: 800px;
+        max-width: 1040px;
         margin: 25px auto 15px;
         border-collapse: collapse;
         background: white;
@@ -119,7 +121,7 @@
         padding: 10px 8px;
         border: 1px solid #e0e0e0;
         font-size: 13px;
-        line-height: 1.2;
+        line-height: 1.45;
       }
 
       th {
@@ -225,29 +227,31 @@
         display: none !important;
       }
 
+      .video {
+        --staff-accent: #f1c40f;
+        --staff-tint: #fff8d8;
+      }
+      .audio {
+        --staff-accent: #e74c3c;
+        --staff-tint: #fff0ee;
+      }
+      .green {
+        --staff-accent: #27ae60;
+        --staff-tint: #e9f8ef;
+      }
+      .unjoined {
+        --staff-accent: #aaa;
+        --staff-tint: #f1f1f1;
+      }
       .video .name-text,
-      .video .desc-text,
       .video .kp-text,
-      .video .card-desc {
-        color: #f1c40f;
-      }
       .audio .name-text,
-      .audio .desc-text,
       .audio .kp-text,
-      .audio .card-desc {
-        color: var(--secondary);
-      }
       .green .name-text,
-      .green .desc-text,
       .green .kp-text,
-      .green .card-desc {
-        color: #27ae60;
-      }
       .unjoined .name-text,
-      .unjoined .desc-text,
-      .unjoined .kp-text,
-      .unjoined .card-desc {
-        color: #aaa;
+      .unjoined .kp-text {
+        color: var(--staff-accent);
       }
       .info .video {
         color: #f1c40f;
@@ -268,8 +272,8 @@
 
       td:nth-child(3) {
         min-width: 50px;
-        text-align: center;
-        padding: 6px 4px;
+        text-align: left;
+        padding: 10px 12px;
       }
 
       .name-cell {
@@ -295,6 +299,7 @@
       .kp-text {
         font-size: 13px;
         font-weight: 500;
+        font-variant-numeric: tabular-nums;
       }
 
       .social-links {
@@ -456,6 +461,176 @@
         color: #777;
       }
 
+      .staff-details-shell {
+        min-width: 0;
+      }
+
+      .staff-row .staff-details-shell {
+        padding-left: 12px;
+        border-left: 3px solid var(--staff-accent, #aaa);
+      }
+
+      .staff-details-content {
+        min-width: 0;
+      }
+
+      .staff-entry,
+      .staff-after-entry {
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: var(--staff-tint, #f1f1f1);
+      }
+
+      .staff-entry-text,
+      .staff-intro,
+      .staff-service-row dd,
+      .staff-after-entry p {
+        color: var(--staff-accent, #aaa);
+        overflow-wrap: anywhere;
+      }
+
+      .staff-entry-text {
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.55;
+      }
+
+      .staff-intro-block {
+        margin-top: 9px;
+      }
+
+      .staff-intro {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.65;
+      }
+
+      .staff-details-shell.has-toggle:not(.expanded) .staff-intro {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+      }
+
+      .staff-detail-extra[hidden] {
+        display: none;
+      }
+
+      .staff-services-section {
+        margin-top: 12px;
+      }
+
+      .staff-services {
+        margin: 0;
+        border: 1px solid #e8ecef;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .staff-service-row {
+        display: grid;
+        grid-template-columns: minmax(72px, auto) minmax(0, 1fr);
+        gap: 10px;
+        padding: 7px 9px;
+      }
+
+      .staff-service-row + .staff-service-row {
+        border-top: 1px solid #edf0f2;
+      }
+
+      .staff-service-row dt,
+      .staff-service-row dd {
+        margin: 0;
+      }
+
+      .staff-service-row dt {
+        color: #52616d;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .staff-service-row dd {
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 1.5;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .staff-after-entry {
+        margin-top: 10px;
+      }
+
+      .staff-after-entry p {
+        margin: 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 1.55;
+      }
+
+      .staff-details-toggle {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+        width: max-content;
+        min-width: 112px;
+        max-width: 100%;
+        min-height: 34px;
+        margin: 8px auto 0;
+        padding: 5px 14px;
+        border: 1px solid var(--staff-accent, #aaa);
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+        color: #52616d;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.4;
+        transition:
+          background-color 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease;
+      }
+
+      .staff-details-toggle::after {
+        width: 5px;
+        height: 5px;
+        border-right: 1px solid var(--staff-accent, #aaa);
+        border-bottom: 1px solid var(--staff-accent, #aaa);
+        content: "";
+        transform: translateY(-1px) rotate(45deg);
+        transition: transform 160ms ease;
+      }
+
+      .staff-details-toggle:hover {
+        background: var(--staff-tint, #f1f1f1);
+        box-shadow: 0 2px 7px rgba(44, 62, 80, 0.09);
+        transform: translateY(-1px);
+      }
+
+      .staff-details-toggle:active {
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.08);
+        transform: translateY(0);
+      }
+
+      .staff-details-toggle[aria-expanded="true"] {
+        background: var(--staff-tint, #f1f1f1);
+      }
+
+      .staff-details-toggle[aria-expanded="true"]::after {
+        transform: translateY(1px) rotate(225deg);
+      }
+
+      .staff-details-toggle:focus-visible {
+        outline: 1px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      .staff-details-cell > .feature-chips {
+        margin-top: 8px;
+      }
+
       .card-list {
         display: none;
       }
@@ -560,17 +735,18 @@
 
         .card-list {
           display: grid;
-          gap: 10px;
+          gap: 12px;
           max-width: 800px;
           margin: 10px auto 18px;
         }
 
         .staff-card {
-          padding: 12px;
+          padding: 14px;
           border: 1px solid #e3e7ea;
-          border-radius: 8px;
+          border-left: 3px solid var(--staff-accent, #aaa);
+          border-radius: 12px;
           background: white;
-          box-shadow: 0 1px 2px rgba(44, 62, 80, 0.06);
+          box-shadow: 0 3px 10px rgba(44, 62, 80, 0.07);
         }
 
         .card-header {
@@ -610,6 +786,7 @@
           display: block;
           margin-top: 2px;
           font-size: 17px;
+          font-variant-numeric: tabular-nums;
         }
 
         .card-meta {
@@ -620,57 +797,38 @@
           margin: 9px 0 8px;
         }
 
-        .card-desc-toggle {
-          position: relative;
-          padding-bottom: 20px;
-          cursor: pointer;
+        .staff-card .staff-details-shell {
+          padding-left: 0;
+          border-left: 0;
         }
 
-        .card-desc-toggle::after {
-          content: "";
-          position: absolute;
-          right: 0;
-          bottom: 18px;
-          left: 0;
-          height: 28px;
-          background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
-          pointer-events: none;
+        .staff-card .staff-entry-text {
+          font-size: 14px;
         }
 
-        .card-desc {
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 4;
-          overflow: hidden;
-          margin: 0;
-          color: #3e4b55;
+        .staff-card .staff-intro {
           font-size: 13px;
-          line-height: 1.55;
+          line-height: 1.65;
         }
 
-        .staff-card.expanded .card-desc {
-          display: block;
-          -webkit-line-clamp: unset;
+        .staff-card .staff-service-row {
+          grid-template-columns: minmax(74px, auto) minmax(0, 1fr);
+          padding: 8px 9px;
         }
 
-        .staff-card.expanded .card-desc-toggle::after {
-          display: none;
+        .staff-card .staff-details-toggle {
+          min-height: 36px;
+          padding-right: 16px;
+          padding-left: 16px;
         }
 
-        .desc-toggle-hint {
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          z-index: 1;
-          padding: 3px 8px;
-          border-radius: 999px;
-          background: #eef3f7;
-          color: #52616d;
-          font-size: 11px;
-          line-height: 1.2;
-          box-shadow: 0 1px 2px rgba(27, 45, 59, 0.08);
-        }
+      }
 
+      @media (prefers-reduced-motion: reduce) {
+        .staff-details-toggle,
+        .staff-details-toggle::after {
+          transition: none;
+        }
       }
     </style>
     <link
@@ -835,7 +993,7 @@
 
     <script>
       const INFO_VERSION = "20251114";
-      let DATA_VERSION = "20251114";
+      let DATA_VERSION = "20260805";
       let MEDIA_VERSION = "";
       const DATA_CACHE_KEY_PREFIX = "staff_data_cache:";
       const DATA_CACHE_TIME_KEY_PREFIX = "staff_data_cache_time:";
@@ -939,22 +1097,89 @@
         return `${INFO_CACHE_KEY_PREFIX}${INFO_VERSION}`;
       }
 
-      // 提取 kp 价格
-      function extractKpPrice(desc) {
-        if (!desc) return null;
-        // 支持格式：kp66/10分、kp60/10分、kp88/10、k66/10分 等
-        const match = desc.match(/(?:^|[^a-zA-Z])k(?:p)?(\d+)\//);
-        return match ? parseInt(match[1], 10) : null;
+      /**
+       * 读取单条陪陪资料的结构化介绍。
+       *
+       * @description 新数据只使用 `details`；旧的七天本地缓存若仍包含 `desc`，
+       * 会临时作为单块简介展示，避免版本切换期间出现空卡片。
+       *
+       * @param {object} item - 原始 staff 记录。
+       * @returns {{entry: string, intro: string, services: {label: string, detail: string}[], afterEntry: string}}
+       */
+      function getStaffDetails(item) {
+        const source =
+          item.details &&
+          typeof item.details === "object" &&
+          !Array.isArray(item.details)
+            ? item.details
+            : { intro: typeof item.desc === "string" ? item.desc : "" };
+        const cleanText = (value) =>
+          typeof value === "string" ? value.trim() : "";
+        const services = Array.isArray(source.services)
+          ? source.services
+              .filter(
+                (service) =>
+                  service &&
+                  typeof service.label === "string" &&
+                  typeof service.detail === "string" &&
+                  service.label.trim() &&
+                  service.detail.trim(),
+              )
+              .map((service) => ({
+                label: service.label.trim(),
+                detail: service.detail.trim(),
+              }))
+          : [];
+
+        return {
+          entry: cleanText(source.entry),
+          intro: cleanText(source.intro),
+          services,
+          afterEntry: cleanText(source.afterEntry),
+        };
       }
 
-      function getKpPrice(item) {
+      /**
+       * 把结构化介绍拼成用于搜索和功能标签识别的纯文本。
+       *
+       * @param {{entry: string, intro: string, services: {label: string, detail: string}[], afterEntry: string}} details - 结构化介绍。
+       * @returns {string} 包含全部可搜索内容的文本。
+       */
+      function getStaffDetailsText(details) {
+        return [
+          details.entry,
+          details.intro,
+          ...details.services.flatMap((service) => [
+            service.label,
+            service.detail,
+          ]),
+          details.afterEntry,
+        ]
+          .filter(Boolean)
+          .join(" ");
+      }
+
+      /**
+       * 获取卡片和排序使用的 KP 单价。
+       *
+       * @description 顶层 `kp` 仍可作为明确覆盖值；否则只从标签为 KP 的服务项
+       * 读取首个数字，不会把门槛、语聊或胸腿 K 误当作基础 KP。
+       *
+       * @param {object} item - 原始 staff 记录。
+       * @param {{services: {label: string, detail: string}[]}} details - 结构化介绍。
+       * @returns {number|null} KP 单价，缺失时为 null。
+       */
+      function getKpPrice(item, details) {
         const fieldPrice = Number.parseInt(item.kp, 10);
         if (Number.isFinite(fieldPrice)) return fieldPrice;
-        return extractKpPrice(item.desc);
+        const kpService = details.services.find((service) =>
+          /^kp(?:$|[+＋/\s])/i.test(service.label),
+        );
+        const match = kpService?.detail.match(/\d+(?:\.\d+)?/);
+        return match ? Number.parseFloat(match[0]) : null;
       }
 
-      function getFeatureTags(desc, kpPrice) {
-        const text = desc || "";
+      function getFeatureTags(text, kpPrice) {
         const labels = FEATURE_RULES.filter((rule) => rule.pattern.test(text))
           .map((rule) => rule.label)
           .slice(0, 4);
@@ -963,18 +1188,22 @@
 
       function prepareStaffItems(data) {
         return (data.staff || []).map((item, index) => {
-          const kpPrice = getKpPrice(item);
-          const features = getFeatureTags(item.desc, kpPrice);
+          const details = getStaffDetails(item);
+          const detailsText = getStaffDetailsText(details);
+          const kpPrice = getKpPrice(item, details);
+          const features = getFeatureTags(detailsText, kpPrice);
           return {
             ...item,
+            details,
+            detailsText,
             index,
             kpPrice,
-            kpDisplay: kpPrice ? String(kpPrice) : "-",
+            kpDisplay: kpPrice !== null ? String(kpPrice) : "-",
             features,
             searchText: [
               item.name,
               item.tags,
-              item.desc,
+              detailsText,
               kpPrice || "",
               features.join(" "),
             ].join(" "),
@@ -984,7 +1213,7 @@
 
       function init() {
         document.getElementById("tagSelect").value = "all";
-        bindCardListActions();
+        bindStaffDetailsActions();
         applyUrlState();
         syncSortControls();
         warmVisualCache();
@@ -1233,11 +1462,102 @@
         return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
       }
 
+      /**
+       * 渲染项目与价格列表。
+       *
+       * @param {{label: string, detail: string}[]} services - 结构化服务项目。
+       * @returns {string} 服务列表 HTML；无项目时返回空字符串。
+       */
+      function renderStaffServices(services) {
+        if (!services.length) return "";
+        return `
+          <div class="staff-services-section">
+            <dl class="staff-services">
+              ${services
+                .map(
+                  (service) => `
+                    <div class="staff-service-row">
+                      <dt>${escapeHtml(service.label)}</dt>
+                      <dd>${escapeHtml(service.detail)}</dd>
+                    </div>
+                  `,
+                )
+                .join("")}
+            </dl>
+          </div>
+        `;
+      }
+
+      /**
+       * 渲染一条陪陪资料的门槛、简介、服务和入门后说明。
+       *
+       * @description 移动卡片与桌面表格复用同一信息结构，但直接展示内容，
+       * 不输出区块标题；服务和入门后内容默认折叠，长简介也可通过同一按钮
+       * 展开。媒体画廊始终位于该区块之外。
+       *
+       * @param {object} item - prepareStaffItems 生成的展示记录。
+       * @param {"mobile"|"desktop"} surface - 用于生成唯一 DOM id 的渲染表面。
+       * @returns {string} 结构化介绍 HTML。
+       */
+      function renderStaffDetails(item, surface) {
+        const { entry, intro, services, afterEntry } = item.details;
+        const contentId = `${surface}-staff-details-${item.index}`;
+        const hasExtra = services.length > 0 || Boolean(afterEntry);
+        const hasToggle = hasExtra || intro.length > 80;
+        const collapsedLabel = "查看详情";
+
+        return `
+          <div class="staff-details-shell${hasToggle ? " has-toggle" : ""}">
+            <div id="${contentId}" class="staff-details-content">
+              ${
+                entry
+                  ? `<div class="staff-entry">
+                      <span class="staff-entry-text">${escapeHtml(entry)}</span>
+                    </div>`
+                  : ""
+              }
+              ${
+                intro
+                  ? `<div class="staff-intro-block">
+                      <p class="staff-intro">${escapeHtml(intro)}</p>
+                    </div>`
+                  : ""
+              }
+              ${
+                hasExtra
+                  ? `<div class="staff-detail-extra" hidden>
+                      ${renderStaffServices(services)}
+                      ${
+                        afterEntry
+                          ? `<div class="staff-after-entry">
+                              <p>${escapeHtml(afterEntry)}</p>
+                            </div>`
+                          : ""
+                      }
+                    </div>`
+                  : ""
+              }
+            </div>
+            ${
+              hasToggle
+                ? `<button
+                    type="button"
+                    class="staff-details-toggle"
+                    aria-expanded="false"
+                    aria-controls="${contentId}"
+                    data-collapsed-label="${collapsedLabel}"
+                  >${collapsedLabel}</button>`
+                : ""
+            }
+          </div>
+        `;
+      }
+
       function renderStaffRow(item) {
         const socialIcon = getSocialIcon(item.social);
         const mediaShowcase = renderMediaShowcase(item);
         return `
-                <tr class="staff-item staff-row ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice || ""}">
+                <tr class="staff-item staff-row ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice ?? ""}">
                     <td>
                         <div class="name-cell">
                             <div class="name-text">${escapeHtml(item.name)}</div>
@@ -1247,8 +1567,8 @@
                         </div>
                     </td>
                     <td class="kp-cell"><span class="kp-text">${item.kpDisplay}</span></td>
-                    <td>
-                      <span class="desc-text">${escapeHtml(item.desc)}</span>
+                    <td class="staff-details-cell">
+                      ${renderStaffDetails(item, "desktop")}
                       ${renderFeatureChips(item.features)}
                     </td>
                 </tr>
@@ -1265,7 +1585,7 @@
       function renderStaffCard(item) {
         const socialIcon = getSocialIcon(item.social);
         return `
-                <article id="staff-${item.index}" class="staff-item staff-card ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice || ""}">
+                <article id="staff-${item.index}" class="staff-item staff-card ${getTagClass(item.tags)}" data-tags="${escapeHtml(item.tags)}" data-search="${escapeHtml(item.searchText)}" data-kp="${item.kpPrice ?? ""}">
                   <div class="card-header">
                     <div class="card-title">
                       <h2 class="card-name">${escapeHtml(item.name)}</h2>
@@ -1277,10 +1597,7 @@
                   <div class="card-meta">
                     ${renderFeatureChips(item.features)}
                   </div>
-                  <div class="card-desc-toggle" role="button" tabindex="0" aria-expanded="false" aria-label="展开完整介绍">
-                    <p class="card-desc">${escapeHtml(item.desc)}</p>
-                    <span class="desc-toggle-hint">展开</span>
-                  </div>
+                  ${renderStaffDetails(item, "mobile")}
                   ${renderMediaShowcase(item)}
                 </article>
             `;
@@ -1686,10 +2003,18 @@
         init();
       }
 
-      function bindCardListActions() {
-        const cardList = document.getElementById("cardList");
-        cardList.addEventListener("click", handleCardDescClick);
-        cardList.addEventListener("keydown", handleCardDescKeydown);
+      /**
+       * 为移动卡片和桌面表格绑定结构化介绍的展开事件。
+       *
+       * @returns {void}
+       */
+      function bindStaffDetailsActions() {
+        document
+          .getElementById("cardList")
+          .addEventListener("click", handleStaffDetailsClick);
+        document
+          .getElementById("myTable")
+          .addEventListener("click", handleStaffDetailsClick);
       }
 
       /**
@@ -1791,33 +2116,29 @@
           });
       }
 
-      function handleCardDescClick(event) {
-        const target = event.target.closest(".card-desc-toggle");
+      function handleStaffDetailsClick(event) {
+        const target = event.target.closest(".staff-details-toggle");
         if (!target || !event.currentTarget.contains(target)) return;
-        toggleCardDesc(target);
+        toggleStaffDetails(target);
       }
 
-      function handleCardDescKeydown(event) {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        const target = event.target.closest(".card-desc-toggle");
-        if (!target || !event.currentTarget.contains(target)) return;
-        event.preventDefault();
-        toggleCardDesc(target);
-      }
-
-      function toggleCardDesc(target) {
-        const card = target.closest(".staff-card");
-        if (!card) return;
-        const isExpanded = card.classList.toggle("expanded");
+      /**
+       * 切换一条陪陪资料的完整简介、项目和入门后内容。
+       *
+       * @param {HTMLButtonElement} target - 用户点击的原生展开按钮。
+       * @returns {void}
+       */
+      function toggleStaffDetails(target) {
+        const shell = target.closest(".staff-details-shell");
+        if (!shell) return;
+        const isExpanded = target.getAttribute("aria-expanded") !== "true";
+        const extra = shell.querySelector(".staff-detail-extra");
+        shell.classList.toggle("expanded", isExpanded);
+        if (extra) extra.hidden = !isExpanded;
         target.setAttribute("aria-expanded", String(isExpanded));
-        target.setAttribute(
-          "aria-label",
-          isExpanded ? "收起完整介绍" : "展开完整介绍"
-        );
-        const hint = target.querySelector(".desc-toggle-hint");
-        if (hint) {
-          hint.textContent = isExpanded ? "收起" : "展开";
-        }
+        target.textContent = isExpanded
+          ? "收起详情"
+          : target.dataset.collapsedLabel;
       }
 
       function copyPageUrl() {
