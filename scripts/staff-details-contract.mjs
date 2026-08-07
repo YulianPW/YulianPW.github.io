@@ -13,8 +13,10 @@ const MAX_DETAILS_BYTES = 32 * 1024;
 const MAX_SERVICE_COUNT = 30;
 const MAX_SERVICE_LABEL_LENGTH = 64;
 const MAX_SERVICE_DETAIL_LENGTH = 512;
+const MAX_SERVICE_ADD_ON_COUNT = 30;
+const MAX_SERVICE_ADD_ON_ITEM_LENGTH = 128;
 const DETAIL_KEYS = new Set(["entry", "intro", "services", "afterEntry"]);
-const SERVICE_KEYS = new Set(["label", "detail"]);
+const SERVICE_KEYS = new Set(["label", "detail", "addOns"]);
 const UUID_V4_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
@@ -24,7 +26,7 @@ const UUID_V4_PATTERN =
  * @param {unknown} value - 外部 JSON 中的 details 候选值。
  * @param {string} [fieldPath="details"] - 用于错误信息的字段路径。
  * @returns {Record<string, unknown>} 省略空区块且保持服务顺序的规范对象。
- * @throws {Error} 字段未知、为空、超限或含控制字符时抛出。
+ * @throws {Error} 字段未知、为空、超限或含不允许的控制字符时抛出。
  */
 export function normalizeStaffDetails(value, fieldPath = "details") {
   if (!isPlainObject(value)) {
@@ -39,6 +41,7 @@ export function normalizeStaffDetails(value, fieldPath = "details") {
       value[field],
       `${fieldPath}.${field}`,
       DETAIL_LIMITS[field],
+      true,
     );
   }
 
@@ -55,7 +58,7 @@ export function normalizeStaffDetails(value, fieldPath = "details") {
         throw new Error(`${servicePath} 必须是对象`);
       }
       assertExactKeys(service, SERVICE_KEYS, servicePath);
-      return {
+      const normalizedService = {
         label: normalizeText(
           service.label,
           `${servicePath}.label`,
@@ -67,6 +70,13 @@ export function normalizeStaffDetails(value, fieldPath = "details") {
           MAX_SERVICE_DETAIL_LENGTH,
         ),
       };
+      if (Object.hasOwn(service, "addOns")) {
+        normalizedService.addOns = normalizeAddOns(
+          service.addOns,
+          `${servicePath}.addOns`,
+        );
+      }
+      return normalizedService;
     });
   }
 
@@ -138,28 +148,69 @@ export function equalStaffDetails(left, right) {
   return canonicalJson(left) === canonicalJson(right);
 }
 
-function normalizeText(value, fieldPath, maximum) {
+/**
+ * 规范单个公开文本字段，并只为多行正文保留 LF。
+ *
+ * @param {unknown} value - 文本候选值。
+ * @param {string} fieldPath - 错误字段路径。
+ * @param {number} maximum - Unicode code point 上限。
+ * @param {boolean} [allowLineFeed=false] - 是否规范并允许多行 LF。
+ * @returns {string} 已规范的文本。
+ */
+function normalizeText(
+  value,
+  fieldPath,
+  maximum,
+  allowLineFeed = false,
+) {
   if (typeof value !== "string") {
     throw new Error(`${fieldPath} 必须是字符串`);
   }
-  const normalized = value.trim();
+  const normalizedSource = (
+    allowLineFeed ? value.replace(/\r\n?/g, "\n") : value
+  );
+  for (const character of normalizedSource) {
+    const codePoint = character.codePointAt(0);
+    const forbiddenControl =
+      codePoint <= 0x1f ||
+      (codePoint >= 0x7f && codePoint <= 0x9f) ||
+      (codePoint >= 0xd800 && codePoint <= 0xdfff);
+    if (forbiddenControl && !(allowLineFeed && codePoint === 0x0a)) {
+      throw new Error(`${fieldPath} 包含控制字符`);
+    }
+  }
+  const normalized = normalizedSource.trim();
   if (!normalized) {
     throw new Error(`${fieldPath} 不能为空字符串`);
   }
   if (Array.from(normalized).length > maximum) {
     throw new Error(`${fieldPath} 超过 ${maximum} 字`);
   }
-  for (const character of normalized) {
-    const codePoint = character.codePointAt(0);
-    if (
-      codePoint <= 0x1f ||
-      (codePoint >= 0x7f && codePoint <= 0x9f) ||
-      (codePoint >= 0xd800 && codePoint <= 0xdfff)
-    ) {
-      throw new Error(`${fieldPath} 包含控制字符`);
-    }
-  }
   return normalized;
+}
+
+/**
+ * 校验并规范单项服务下的有序附加项目。
+ *
+ * @param {unknown} value - `addOns` 数组候选值。
+ * @param {string} fieldPath - 用于错误信息的字段路径。
+ * @returns {string[]} 保持输入顺序、逐项 trim 后的单行文本。
+ * @throws {Error} 数组为空、项目超限，或单项为空、超长、含 Cc/Cs 字符时抛出。
+ */
+function normalizeAddOns(value, fieldPath) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${fieldPath} 必须是非空数组；无项目时请省略字段`);
+  }
+  if (value.length > MAX_SERVICE_ADD_ON_COUNT) {
+    throw new Error(`${fieldPath} 最多 ${MAX_SERVICE_ADD_ON_COUNT} 项`);
+  }
+  return value.map((item, index) =>
+    normalizeText(
+      item,
+      `${fieldPath}[${index}]`,
+      MAX_SERVICE_ADD_ON_ITEM_LENGTH,
+    ),
+  );
 }
 
 function assertExactKeys(value, allowedKeys, fieldPath) {

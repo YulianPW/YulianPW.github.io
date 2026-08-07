@@ -489,6 +489,12 @@
         overflow-wrap: anywhere;
       }
 
+      .staff-entry-text,
+      .staff-intro,
+      .staff-after-entry p {
+        white-space: pre-wrap;
+      }
+
       .staff-entry-text {
         font-size: 13px;
         font-weight: 500;
@@ -555,6 +561,150 @@
         font-weight: 600;
         line-height: 1.5;
         font-variant-numeric: tabular-nums;
+      }
+
+      .staff-service-add-ons-cell {
+        grid-column: 1 / -1;
+        min-width: 0;
+      }
+
+      .staff-service-add-ons {
+        overflow: hidden;
+        max-width: 100%;
+        margin-top: 2px;
+        border: 1px solid #edf0f2;
+        border-radius: 7px;
+        background: linear-gradient(
+          90deg,
+          var(--staff-tint, #f1f1f1) 0 3px,
+          #fbfcfd 3px
+        );
+      }
+
+      .staff-service-add-ons summary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 8px;
+        align-items: center;
+        min-height: 34px;
+        padding: 6px 9px 6px 12px;
+        color: #65727d;
+        font-size: 11.5px;
+        font-weight: 700;
+        line-height: 1.4;
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .staff-service-add-ons-teaser {
+        min-width: 0;
+        overflow: hidden;
+        color: #6f7b84;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0.68;
+        filter: blur(0.45px);
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          #000 0%,
+          #000 58%,
+          transparent 100%
+        );
+        mask-image: linear-gradient(
+          90deg,
+          #000 0%,
+          #000 58%,
+          transparent 100%
+        );
+      }
+
+      .staff-service-add-ons-action {
+        color: var(--staff-accent, #aaa);
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .staff-service-add-ons-action::before {
+        content: "展开更多";
+      }
+
+      .staff-service-add-ons[open] .staff-service-add-ons-teaser {
+        display: none;
+      }
+
+      .staff-service-add-ons[open] summary {
+        grid-template-columns: auto auto;
+        justify-content: end;
+        min-height: 28px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+      }
+
+      .staff-service-add-ons[open] .staff-service-add-ons-action {
+        grid-column: auto;
+      }
+
+      .staff-service-add-ons[open] .staff-service-add-ons-action::before {
+        content: "收起";
+      }
+
+      .staff-service-add-ons summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .staff-service-add-ons summary::after {
+        width: 5px;
+        height: 5px;
+        border-right: 1px solid var(--staff-accent, #aaa);
+        border-bottom: 1px solid var(--staff-accent, #aaa);
+        content: "";
+        transform: translateY(-1px) rotate(45deg);
+        transition: transform 160ms ease;
+      }
+
+      .staff-service-add-ons[open] summary::after {
+        transform: translateY(1px) rotate(225deg);
+      }
+
+      .staff-service-add-ons summary:focus-visible {
+        outline: 1px solid var(--staff-accent, #aaa);
+        outline-offset: -2px;
+      }
+
+      .staff-service-add-ons-list {
+        margin: 0;
+        padding: 8px 10px 9px 12px;
+        border-top: 1px solid #edf0f2;
+        list-style: none;
+      }
+
+      .staff-service-add-ons-item {
+        display: grid;
+        grid-template-columns: 6px minmax(0, 1fr);
+        gap: 8px;
+        align-items: start;
+        min-width: 0;
+        margin-inline-start: calc(var(--add-ons-step, 0) * 5px);
+        color: #52616d;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+      }
+
+      .staff-service-add-ons-item + .staff-service-add-ons-item {
+        margin-top: 5px;
+      }
+
+      .staff-service-add-ons-item::before {
+        width: 5px;
+        height: 5px;
+        margin-top: 0.65em;
+        border-radius: 50%;
+        background: var(--staff-accent, #aaa);
+        box-shadow: 0 0 0 3px var(--staff-tint, #f1f1f1);
+        content: "";
       }
 
       .staff-after-entry {
@@ -816,6 +966,14 @@
           padding: 8px 9px;
         }
 
+        .staff-card .staff-service-add-ons summary {
+          min-height: 36px;
+        }
+
+        .staff-card .staff-service-add-ons[open] summary {
+          min-height: 32px;
+        }
+
         .staff-card .staff-details-toggle {
           min-height: 36px;
           padding-right: 16px;
@@ -826,7 +984,8 @@
 
       @media (prefers-reduced-motion: reduce) {
         .staff-details-toggle,
-        .staff-details-toggle::after {
+        .staff-details-toggle::after,
+        .staff-service-add-ons summary::after {
           transition: none;
         }
       }
@@ -1104,7 +1263,7 @@
        * 会临时作为单块简介展示，避免版本切换期间出现空卡片。
        *
        * @param {object} item - 原始 staff 记录。
-       * @returns {{entry: string, intro: string, services: {label: string, detail: string}[], afterEntry: string}}
+       * @returns {{entry: string, intro: string, services: {label: string, detail: string, addOns: string[]}[], afterEntry: string}}
        */
       function getStaffDetails(item) {
         const source =
@@ -1115,6 +1274,12 @@
             : { intro: typeof item.desc === "string" ? item.desc : "" };
         const cleanText = (value) =>
           typeof value === "string" ? value.trim() : "";
+        const cleanAddOns = (value) =>
+          Array.isArray(value)
+            ? value
+                .filter((item) => typeof item === "string" && item.trim())
+                .map((item) => item.trim())
+            : [];
         const services = Array.isArray(source.services)
           ? source.services
               .filter(
@@ -1128,6 +1293,7 @@
               .map((service) => ({
                 label: service.label.trim(),
                 detail: service.detail.trim(),
+                addOns: cleanAddOns(service.addOns),
               }))
           : [];
 
@@ -1142,7 +1308,7 @@
       /**
        * 把结构化介绍拼成用于搜索和功能标签识别的纯文本。
        *
-       * @param {{entry: string, intro: string, services: {label: string, detail: string}[], afterEntry: string}} details - 结构化介绍。
+       * @param {{entry: string, intro: string, services: {label: string, detail: string, addOns: string[]}[], afterEntry: string}} details - 结构化介绍。
        * @returns {string} 包含全部可搜索内容的文本。
        */
       function getStaffDetailsText(details) {
@@ -1152,6 +1318,7 @@
           ...details.services.flatMap((service) => [
             service.label,
             service.detail,
+            ...service.addOns,
           ]),
           details.afterEntry,
         ]
@@ -1166,7 +1333,7 @@
        * 读取首个数字，不会把门槛、语聊或胸腿 K 误当作基础 KP。
        *
        * @param {object} item - 原始 staff 记录。
-       * @param {{services: {label: string, detail: string}[]}} details - 结构化介绍。
+       * @param {{services: {label: string, detail: string, addOns: string[]}[]}} details - 结构化介绍。
        * @returns {number|null} KP 单价，缺失时为 null。
        */
       function getKpPrice(item, details) {
@@ -1463,9 +1630,23 @@
       }
 
       /**
+       * 生成收起态的内容线索，只展示前几项并保留“还有更多”的视觉暗示。
+       *
+       * @param {string[]} addOns - 保持业务顺序的附加项目。
+       * @returns {string} 供模糊渐隐展示的短文本。
+       */
+      function getServiceAddOnsTeaser(addOns) {
+        const visibleItems = addOns.slice(0, 4).join("、");
+        return addOns.length > 4 ? `${visibleItems}…` : visibleItems;
+      }
+
+      /**
        * 渲染项目与价格列表。
        *
-       * @param {{label: string, detail: string}[]} services - 结构化服务项目。
+       * @description 收起时拼接前几项生成模糊渐隐的点击线索，不显示字段名；
+       * 展开后保持数组顺序，以轻量阶梯列表逐项展示完整文案。
+       *
+       * @param {{label: string, detail: string, addOns: string[]}[]} services - 结构化服务项目。
        * @returns {string} 服务列表 HTML；无项目时返回空字符串。
        */
       function renderStaffServices(services) {
@@ -1479,6 +1660,25 @@
                     <div class="staff-service-row">
                       <dt>${escapeHtml(service.label)}</dt>
                       <dd>${escapeHtml(service.detail)}</dd>
+                      ${
+                        service.addOns.length
+                          ? `<dd class="staff-service-add-ons-cell">
+                              <details class="staff-service-add-ons">
+                                <summary aria-label="展开或收起更多内容">
+                                  <span class="staff-service-add-ons-teaser" aria-hidden="true">${escapeHtml(getServiceAddOnsTeaser(service.addOns))}</span>
+                                  <span class="staff-service-add-ons-action" aria-hidden="true"></span>
+                                </summary>
+                                <ol class="staff-service-add-ons-list">
+                                  ${service.addOns
+                                    .map(
+                                      (addOnItem, index) => `<li class="staff-service-add-ons-item" style="--add-ons-step: ${Math.min(index, 5)}"><span>${escapeHtml(addOnItem)}</span></li>`,
+                                    )
+                                    .join("")}
+                                </ol>
+                              </details>
+                            </dd>`
+                          : ""
+                      }
                     </div>
                   `,
                 )

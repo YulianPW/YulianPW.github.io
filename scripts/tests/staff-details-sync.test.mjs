@@ -20,6 +20,7 @@ import test from "node:test";
 import {
   canonicalSha256,
   MAX_SNAPSHOT_BYTES,
+  normalizeStaffDetails,
 } from "../staff-details-contract.mjs";
 import {
   mergeStaffDetails,
@@ -35,6 +36,19 @@ const CONTRACT_FIXTURE = resolve(
 );
 const STAFF_ID = "11111111-1111-4111-8111-111111111111";
 const SECOND_STAFF_ID = "22222222-2222-4222-8222-222222222222";
+const XIAOMA_KP_ADD_ONS = Object.freeze([
+  "自嗨单卡",
+  "剧情",
+  "打屁股",
+  "水声",
+  "调教",
+  "寸止",
+  "看lu",
+  "绿帽",
+  "狗叫",
+  "旁听",
+  "远程玩具+20",
+]);
 
 test("完整快照通过内容哈希校验并保持服务顺序", () => {
   const snapshot = buildSnapshot([
@@ -42,7 +56,11 @@ test("完整快照通过内容哈希校验并保持服务顺序", () => {
       details: {
         intro: "emoji 🐱 与组合字符 e\u0301",
         services: [
-          { label: "KP", detail: "66/10分" },
+          {
+            label: "KP",
+            detail: "58/10",
+            addOns: [...XIAOMA_KP_ADD_ONS],
+          },
           { label: "TS", detail: "99/30分" },
         ],
       },
@@ -53,9 +71,136 @@ test("完整快照通过内容哈希校验并保持服务顺序", () => {
 
   assert.equal(normalized.snapshotVersion, snapshot.snapshotVersion);
   assert.deepEqual(normalized.profiles[0].details.services, [
-    { label: "KP", detail: "66/10分" },
+    {
+      label: "KP",
+      detail: "58/10",
+      addOns: [...XIAOMA_KP_ADD_ONS],
+    },
     { label: "TS", detail: "99/30分" },
   ]);
+});
+
+test("多行正文规范跨平台换行且附加项目保持数组顺序", () => {
+  assert.deepEqual(
+    normalizeStaffDetails({
+      entry: "第一行\r\n第二行",
+      intro: "介绍一\r介绍二",
+      afterEntry: "说明一\n说明二",
+      services: [
+        {
+          label: "KP",
+          detail: "66/10分",
+          addOns: [" 水声 +20 ", "远程玩具+30"],
+        },
+      ],
+    }),
+    {
+      entry: "第一行\n第二行",
+      intro: "介绍一\n介绍二",
+      afterEntry: "说明一\n说明二",
+      services: [
+        {
+          label: "KP",
+          detail: "66/10分",
+          addOns: ["水声 +20", "远程玩具+30"],
+        },
+      ],
+    },
+  );
+  assert.throws(
+    () => normalizeStaffDetails({ intro: "介绍一\t介绍二" }),
+    /控制字符/,
+  );
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [{ label: "KP\nTS", detail: "99/30分" }],
+      }),
+    /控制字符/,
+  );
+  assert.throws(
+    () => normalizeStaffDetails({ intro: "介绍一\n介绍二\t" }),
+    /控制字符/,
+  );
+});
+
+test("addOns 严格校验数量、单行文本、Unicode 长度和旧字段", () => {
+  for (const item of [
+    "水声\n+20",
+    "水声\r\n+20",
+    "水声\t+20",
+    "\u0000",
+    "\u0085",
+    "\ud800",
+  ]) {
+    assert.throws(
+      () =>
+        normalizeStaffDetails({
+          services: [{ label: "KP", detail: "99/30分", addOns: [item] }],
+        }),
+      /控制字符/,
+    );
+  }
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [{ label: "KP", detail: "99/30分", addOns: [] }],
+      }),
+    /必须是非空数组/,
+  );
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [{ label: "KP", detail: "99/30分", addOns: ["  "] }],
+      }),
+    /不能为空字符串/,
+  );
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [{ label: "KP", detail: "99/30分", addOns: [20] }],
+      }),
+    /必须是字符串/,
+  );
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [
+          { label: "KP", detail: "99/30分", addOns: Array(31).fill("项目") },
+        ],
+      }),
+    /最多 30 项/,
+  );
+  const maximumItem = "🧩".repeat(128);
+  const normalized = normalizeStaffDetails({
+    services: [
+      {
+        label: "KP",
+        detail: "99/30分",
+        addOns: Array.from({ length: 30 }, (_, index) =>
+          index === 29 ? maximumItem : `项目 ${index + 1}`,
+        ),
+      },
+    ],
+  });
+  assert.equal(normalized.services[0].addOns.length, 30);
+  assert.equal(Array.from(normalized.services[0].addOns[29]).length, 128);
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [
+          { label: "KP", detail: "99/30分", addOns: ["🧩".repeat(129)] },
+        ],
+      }),
+    /超过 128 字/,
+  );
+  assert.throws(
+    () =>
+      normalizeStaffDetails({
+        services: [{ label: "KP", detail: "99/30分", addOn: "水声 +20" }],
+      }),
+    /未知字段：addOn/,
+  );
 });
 
 test("Node 快照与 Python 共用合同 fixture 完全一致", async () => {

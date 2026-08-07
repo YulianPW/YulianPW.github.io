@@ -2,7 +2,7 @@
   "contractVersion": 1,
   "snapshot": {
     "schemaVersion": 1,
-    "snapshotVersion": "sha256:7567d94c43f37e4b9de38dd5eca12b802d15588e72c973c0e80e9b8249bf2d77",
+    "snapshotVersion": "sha256:3e508ef82f6750f16efe9db2a0f2dfb8c79158670c290346bcfa1707f01ba600",
     "generatedAt": "2026-08-06T00:00:00Z",
     "coverage": "full",
     "profiles": [
@@ -12,7 +12,7 @@
         "updatedAt": "2026-08-06T00:00:00Z",
         "details": {
           "entry": "🚪200",
-          "intro": "emoji 🐱 与组合字符 é",
+          "intro": "emoji 🐱 与组合字符 é\n第二行",
           "services": [
             {
               "label": "TS语聊",
@@ -20,7 +20,20 @@
             },
             {
               "label": "KP",
-              "detail": "66/10分"
+              "detail": "58/10",
+              "addOns": [
+                "自嗨单卡",
+                "剧情",
+                "打屁股",
+                "水声",
+                "调教",
+                "寸止",
+                "看lu",
+                "绿帽",
+                "狗叫",
+                "旁听",
+                "远程玩具+20"
+              ]
             }
           ],
           "afterEntry": "结束说明"
@@ -33,7 +46,7 @@
     "detailsRevision": 7,
     "details": {
       "entry": "🚪200",
-      "intro": "emoji 🐱 与组合字符 é",
+      "intro": "emoji 🐱 与组合字符 é\n第二行",
       "services": [
         {
           "label": "TS语聊",
@@ -41,7 +54,20 @@
         },
         {
           "label": "KP",
-          "detail": "66/10分"
+          "detail": "58/10",
+          "addOns": [
+            "自嗨单卡",
+            "剧情",
+            "打屁股",
+            "水声",
+            "调教",
+            "寸止",
+            "看lu",
+            "绿帽",
+            "狗叫",
+            "旁听",
+            "远程玩具+20"
+          ]
         }
       ],
       "afterEntry": "结束说明"

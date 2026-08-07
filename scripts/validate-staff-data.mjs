@@ -29,8 +29,8 @@ function assertNonEmptyString(value, fieldPath) {
 /**
  * 校验单条陪陪资料的结构化介绍。
  *
- * @description 可选区块不允许用空字符串占位；服务项目保持为轻量的
- * `{label, detail}`，以兼容不同计价单位和附加说明。
+ * @description 可选区块不允许用空字符串占位；服务项目使用必填的
+ * `{label, detail}` 与可选有序 `addOns` 字符串数组，不解析金额或计价单位。
  *
  * @param {Record<string, unknown>} item - 单条 staff 记录。
  * @param {number} index - 记录在 staff 数组中的索引。
