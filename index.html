@@ -1216,6 +1216,21 @@
         return new URL(path, getSiteBaseUrl()).toString();
       }
 
+      /**
+       * 判断页面是否运行在本机回环开发地址。
+       *
+       * @description 本地开发没有 CI 生成的 `version.json`，若继续使用生产环境的
+       * 七天资料缓存，同步后的 `data.json` 会在第一次刷新时只更新缓存、第二次刷新
+       * 才重绘。回环地址因此始终直接读取当前工作文件。
+       *
+       * @returns {boolean} 当前是否为本地开发页面。
+       */
+      function isLocalDevelopment() {
+        return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(
+          window.location.hostname,
+        );
+      }
+
       function readLocalCache(key) {
         try {
           return localStorage.getItem(key);
@@ -1384,7 +1399,8 @@
         applyUrlState();
         syncSortControls();
         warmVisualCache();
-        const hasCachedContent = renderLatestCachedTableData();
+        const hasCachedContent =
+          !isLocalDevelopment() && renderLatestCachedTableData();
         if (!hasCachedContent) {
           document.getElementById("loading").style.display = "block";
         }
@@ -1962,12 +1978,13 @@
         if (!hasRenderedContent) {
           document.getElementById("loading").style.display = "block";
         }
+        const shouldUseCache = !isLocalDevelopment();
         const { dataKey, timeKey } = getDataCacheKeys();
         const cached = readLocalCache(dataKey);
         const cachedTime = Number(readLocalCache(timeKey) || 0);
         const now = Date.now();
 
-        if (cached && now - cachedTime < DATA_CACHE_TTL) {
+        if (shouldUseCache && cached && now - cachedTime < DATA_CACHE_TTL) {
           try {
             const cachedData = JSON.parse(cached);
             if (cached !== lastRenderedDataJson) {
@@ -2001,8 +2018,9 @@
       }
 
       function fetchTableData(dataKey, timeKey, shouldRender) {
+        const localDevelopment = isLocalDevelopment();
         return fetch(buildRuntimeUrl(`assets/data/data.json?v=${DATA_VERSION}`), {
-          cache: "default",
+          cache: localDevelopment ? "no-store" : "default",
         })
           .then((response) => {
             if (!response.ok) throw new Error("网络响应异常");
@@ -2010,8 +2028,10 @@
           })
           .then((data) => {
             const serializedData = JSON.stringify(data);
-            writeLocalCache(dataKey, serializedData);
-            writeLocalCache(timeKey, String(Date.now()));
+            if (!localDevelopment) {
+              writeLocalCache(dataKey, serializedData);
+              writeLocalCache(timeKey, String(Date.now()));
+            }
             if (shouldRender) {
               if (serializedData !== lastRenderedDataJson) {
                 lastRenderedDataJson = serializedData;
