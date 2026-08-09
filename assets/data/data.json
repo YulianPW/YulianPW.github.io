@@ -30,7 +30,7 @@
     {
       "tags": "视频陪",
       "staffId": "968cc1e0-57b9-4c1a-8796-579992a94ab0",
-      "detailsRevision": 3,
+      "detailsRevision": 4,
       "name": "𝙔𝙡.怕冷",
       "social": "twitter://user?screen_name=bdkbdksbksnsvsv",
       "mediaFolder": "paling-green",
@@ -45,11 +45,20 @@
           },
           {
             "label": "TS手游",
-            "detail": "（王者、金铲铲）128/30分"
+            "detail": "（王者、金铲铲）128/30分",
+            "addOns": [
+              "玩具+88",
+              "剧情+66",
+              "调教+88",
+              "自嗨+52"
+            ]
           },
           {
             "label": "TS端游",
-            "detail": "（lol、云顶，瓦，steam小游戏）128/30分"
+            "detail": "（lol、云顶，瓦，steam小游戏）128/30分",
+            "addOns": [
+              "同上 都一样的"
+            ]
           },
           {
             "label": "语聊",
@@ -480,6 +489,7 @@
       "detailsRevision": 4,
       "name": "𝙔𝙡.死宅",
       "social": "twitter://user?screen_name=Yl_ll0503",
+      "mediaFolder": "sizhai",
       "details": {
         "entry": "🚪148（送k十分钟）",
         "intro": "少女",
@@ -1067,16 +1077,22 @@
     {
       "tags": "女喘陪",
       "staffId": "468f94b1-022b-4f73-b51d-f4bff4be22e4",
-      "detailsRevision": 2,
+      "detailsRevision": 3,
       "name": "𝙔𝙡.觉觉",
       "social": "twitter://user?screen_name=trxthhxrts",
+      "mediaFolder": "juejue",
       "details": {
         "entry": "🚪142（送Kp10分钟）",
         "intro": "少女音，少御音",
         "services": [
           {
             "label": "KP",
-            "detail": "58/10分（项目附加+20）"
+            "detail": "58/10分（项目附加+20）",
+            "addOns": [
+              "调教+20 剧情+20  SM+20 玩具+20 看撸+20 ntr+20  水声+20 🐶叫+20 自嗨+20",
+              "远程👿+30",
+              "单卡/78"
+            ]
           },
           {
             "label": "TS语聊",
@@ -1089,6 +1105,10 @@
           {
             "label": "语聊",
             "detail": "35/30分"
+          },
+          {
+            "label": "ts哄睡",
+            "detail": "108/30分"
           }
         ]
       }
@@ -1160,7 +1180,7 @@
     {
       "tags": "视频陪",
       "staffId": "ae5a9292-375b-485f-8f51-470ab35a85d1",
-      "detailsRevision": 2,
+      "detailsRevision": 4,
       "name": "𝙔𝙡.小姨子",
       "social": "twitter://user?screen_name=princesalolafan",
       "details": {
@@ -1177,7 +1197,8 @@
               "打耳光50",
               "调教+20",
               "寸止+20",
-              "玩具30"
+              "玩具+30",
+              "远程+40"
             ]
           },
           {
@@ -1191,6 +1212,22 @@
           {
             "label": "语聊",
             "detail": "52/30分"
+          },
+          {
+            "label": "视频",
+            "detail": "130/10",
+            "addOns": [
+              "高跟鞋/丝袜+20（撕丝袜+60）",
+              "打屁股/打🐻/乳夹/手铐/口球+30",
+              "衣服/调教/跳蛋+40",
+              "假🐔/震动棒/肛塞尾巴/秒潮+50",
+              "风油精/远程小恶魔+60",
+              "喷水/蜡烛/水果+80",
+              "口含内裤/湿身诱惑/洗澡/爆菊/cos+100（双插额外收100）",
+              "高跟鞋插/长肛塞/灌肠/灌尿道/塞丝袜/扩阴器/双龙头/炮机+200",
+              "拳交+500",
+              "bt项目500起（除黄金穿刺都可以接）"
+            ]
           }
         ]
       }
@@ -1421,26 +1458,30 @@
     {
       "tags": "女喘陪",
       "staffId": "3f21a851-e6a1-4a71-bbe5-88c445c3ef7c",
-      "detailsRevision": 2,
+      "detailsRevision": 4,
       "name": "𝙔𝙡.小呆",
       "social": "twitter://user?screen_name=Hana_Rorii",
       "mediaFolder": "xiaodai",
       "details": {
         "entry": "🚪148（送kp10分钟）",
-        "intro": "少萝音，甜美可爱",
-        "afterEntry": "定制音频、擦边照片、掉落语音条",
+        "intro": "很粘人爱哭脾气小很想陪陪你 就这样一直呆呆的说很多话好不好",
+        "afterEntry": "不定期掉落照片、Sp语音条，平时也可以聊天",
         "services": [
           {
             "label": "KP",
             "detail": "66/10分",
             "addOns": [
-              "单卡/剧情/➕50  远程➕20 称呼➕10",
-              "旁听/60"
+              "自嗨/远程 / 剧情 / 调教 / ➕52",
+              "狗叫/扇耳光/看🦌/➕20"
             ]
           },
           {
-            "label": "TS手游",
-            "detail": "王者、金铲铲，66/30分"
+            "label": "TS游戏",
+            "detail": "手游➕ 88 端游➕120"
+          },
+          {
+            "label": "ts语聊",
+            "detail": "99/30"
           }
         ]
       }
@@ -1620,27 +1661,40 @@
     {
       "tags": "女喘陪",
       "staffId": "418f749e-f3fa-4ae7-84e6-2f56a58c8f2b",
-      "detailsRevision": 1,
+      "detailsRevision": 2,
       "name": "𝙔𝙡.右右",
       "social": "twitter://user?screen_name=qgyfhtzmrtgufu",
+      "mediaFolder": "youyou",
       "details": {
         "entry": "🚪142（送kp10分钟）",
-        "intro": "清纯萝莉音，青涩女大学生辅导",
+        "intro": "萝莉/御姐，青涩女大学生",
         "services": [
           {
             "label": "KP",
-            "detail": "58/10分；自嗨单卡、剧情、打屁股、水声、调教、寸止、看lu、绿帽、狗叫、旁听、远程玩具+20"
+            "detail": "58/10分钟",
+            "addOns": [
+              "自嗨单卡/剧情/打屁股/水声/调教/寸止/看lu/绿帽/狗叫/旁听/远程玩具+20)"
+            ]
           },
           {
             "label": "TS语聊",
-            "detail": "60/30分"
+            "detail": "88/30分"
           },
           {
             "label": "TS游戏",
-            "detail": "王者、lol、瓦，60/30分；端游+10，外服+20"
+            "detail": "98半 手游88",
+            "addOns": [
+              "外服+20 三角洲机密+20"
+            ]
+          },
+          {
+            "label": "绿色游戏",
+            "detail": "手游60h 端游70h",
+            "addOns": [
+              "外服+20 三角洲机密+20"
+            ]
           }
-        ],
-        "afterEntry": "音频、擦边照、日常生活照"
+        ]
       }
     },
     {
@@ -1854,35 +1908,57 @@
     {
       "tags": "女喘陪",
       "staffId": "f68f9c17-2067-4df3-ae4c-ae47b05dcc3f",
-      "detailsRevision": 1,
+      "detailsRevision": 3,
       "name": "𝙔𝙡.mio",
       "social": "twitter://user?screen_name=komikveespirili",
+      "mediaFolder": "mio",
       "details": {
         "entry": "🚪142（送kp10分钟）",
         "intro": "少女少萝/御姐音，乖巧听话、大雷、反差",
+        "afterEntry": "点单优惠、日常文字聊天、擦边照、朋友圈等",
         "services": [
           {
             "label": "KP",
-            "detail": "58/10分；玩具远程、水声、剧情+15"
+            "detail": "58/10分",
+            "addOns": [
+              "水声＋20",
+              "调教＋20",
+              "剧情＋20",
+              "玩具＋20",
+              "看撸＋10"
+            ]
           },
           {
             "label": "TS语聊",
-            "detail": "52/30分"
+            "detail": "52/30分",
+            "addOns": [
+              "水声＋20",
+              "玩具＋20"
+            ]
           },
           {
             "label": "TS手游",
-            "detail": "50/30分"
+            "detail": "50/30分",
+            "addOns": [
+              "水声＋20",
+              "调教＋20",
+              "玩具＋20"
+            ]
           },
           {
             "label": "TS端游",
-            "detail": "无畏契约、三角洲，88/30分"
+            "detail": "无畏契约、三角洲，88/30分",
+            "addOns": [
+              "水声＋20",
+              "调教＋20",
+              "玩具＋20"
+            ]
           },
           {
             "label": "语聊",
             "detail": "30/30分"
           }
-        ],
-        "afterEntry": "点单优惠、日常文字聊天、擦边照、朋友圈等"
+        ]
       }
     },
     {
@@ -2388,6 +2464,40 @@
       "social": "twitter://user?screen_name=",
       "details": {
         "intro": "未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍"
+      }
+    },
+    {
+      "tags": "女喘陪",
+      "staffId": "e5f143f1-a58f-4d9b-a7cf-efab6d7dc5f7",
+      "detailsRevision": 1,
+      "name": "𝙔𝙡.小玩具",
+      "social": "twitter://user?screen_name=Vega_Xxx",
+      "details": {
+        "entry": "🚪142（送k10）",
+        "intro": "少女音 少御；switch 🉑m 🉑反差s",
+        "services": [
+          {
+            "label": "KP",
+            "detail": "58/10分",
+            "addOns": [
+              "调教附加项目20",
+              "远程30"
+            ]
+          },
+          {
+            "label": "TS语聊",
+            "detail": "88/30分"
+          },
+          {
+            "label": "TS手游",
+            "detail": "王者，66/30分"
+          },
+          {
+            "label": "TS端游",
+            "detail": "无畏契约 88/30分；深海 128/30分"
+          }
+        ],
+        "afterEntry": "入门解锁剧情音频、小玩具"
       }
     }
   ]
