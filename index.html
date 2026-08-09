@@ -685,7 +685,6 @@
         gap: 8px;
         align-items: start;
         min-width: 0;
-        margin-inline-start: calc(var(--add-ons-step, 0) * 5px);
         color: #52616d;
         font-size: 12px;
         font-weight: 500;
@@ -1660,7 +1659,7 @@
        * 渲染项目与价格列表。
        *
        * @description 收起时拼接前几项生成模糊渐隐的点击线索，不显示字段名；
-       * 展开后保持数组顺序，以轻量阶梯列表逐项展示完整文案。
+       * 展开后保持数组顺序，以同级对齐列表逐项展示完整文案。
        *
        * @param {{label: string, detail: string, addOns: string[]}[]} services - 结构化服务项目。
        * @returns {string} 服务列表 HTML；无项目时返回空字符串。
@@ -1687,7 +1686,7 @@
                                 <ol class="staff-service-add-ons-list">
                                   ${service.addOns
                                     .map(
-                                      (addOnItem, index) => `<li class="staff-service-add-ons-item" style="--add-ons-step: ${Math.min(index, 5)}"><span>${escapeHtml(addOnItem)}</span></li>`,
+                                      (addOnItem) => `<li class="staff-service-add-ons-item"><span>${escapeHtml(addOnItem)}</span></li>`,
                                     )
                                     .join("")}
                                 </ol>
