@@ -4,6 +4,9 @@ export const DETAILS_SCHEMA_VERSION = 1;
 export const SNAPSHOT_SCHEMA_VERSION = 1;
 export const MAX_SNAPSHOT_BYTES = 5 * 1024 * 1024;
 
+/** 标记只由站点本地维护、永不接受云端快照覆盖的资料修订号。 */
+export const LOCAL_DETAILS_REVISION = 0;
+
 const DETAIL_LIMITS = Object.freeze({
   entry: 128,
   intro: 1000,
@@ -105,6 +108,8 @@ export function requireStaffId(value, fieldPath) {
 
 /**
  * 校验同步 revision 是否为非负安全整数。
+ *
+ * @description 修订号 0 保留给固定本地资料；云端资料从 1 开始。
  *
  * @param {unknown} value - revision 候选值。
  * @param {string} fieldPath - 错误字段路径。

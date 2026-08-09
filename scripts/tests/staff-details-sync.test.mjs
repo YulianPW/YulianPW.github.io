@@ -267,10 +267,50 @@ test("合并只更新 details 与 detailsRevision 并保持数组顺序", () => 
   verifyMergedStaffDetails(result.data, snapshot);
 });
 
+test("修订号 0 的固定本地资料不进入云端集合且保持原样", () => {
+  const localOnly = buildStaff({
+    staffId: SECOND_STAFF_ID,
+    revision: 0,
+    name: "固定本地资料",
+    details: { intro: "不接受云端覆盖" },
+  });
+  const original = buildLocalData([
+    buildStaff({ staffId: STAFF_ID, name: "云端资料" }),
+    localOnly,
+  ]);
+  const snapshot = normalizeStaffDetailsSnapshot(
+    buildSnapshot([
+      buildProfile({
+        staffId: STAFF_ID,
+        revision: 2,
+        details: { intro: "云端新介绍" },
+      }),
+    ]),
+  );
+
+  const result = mergeStaffDetails(original, snapshot);
+
+  assert.deepEqual(result.changedStaffIds, [STAFF_ID]);
+  assert.deepEqual(result.data.staff.map((item) => item.name), [
+    "云端资料",
+    "固定本地资料",
+  ]);
+  assert.strictEqual(result.data.staff[1], localOnly);
+  verifyMergedStaffDetails(result.data, snapshot);
+});
+
 test("拒绝集合差异、revision 回退和同 revision 异文", () => {
   const local = buildLocalData([buildStaff()]);
   const missing = normalizeStaffDetailsSnapshot(buildSnapshot([]));
   assert.throws(() => mergeStaffDetails(local, missing), /集合不一致/);
+
+  const extra = normalizeStaffDetailsSnapshot(
+    buildSnapshot([
+      buildProfile(),
+      buildProfile({ staffId: SECOND_STAFF_ID }),
+    ]),
+  );
+  assert.throws(() => mergeStaffDetails(local, extra), /集合不一致/);
 
   const older = normalizeStaffDetailsSnapshot(
     buildSnapshot([buildProfile({ revision: 1 })]),

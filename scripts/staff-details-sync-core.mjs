@@ -1,4 +1,5 @@
 import {
+  LOCAL_DETAILS_REVISION,
   SNAPSHOT_SCHEMA_VERSION,
   canonicalJson,
   canonicalSha256,
@@ -111,6 +112,9 @@ export function normalizeStaffDetailsSnapshot(value) {
 /**
  * 把已验证云端快照合并到站点读模型，只替换受托管字段。
  *
+ * @description `detailsRevision: 0` 的固定本地资料不属于云端完整集合，
+ * 合并时保持其位置和全部字段原样；其余资料仍执行严格全量集合校验。
+ *
  * @param {unknown} localData - 本地 `data.json` 解析结果。
  * @param {ReturnType<typeof normalizeStaffDetailsSnapshot>} snapshot - 已验证完整快照。
  * @returns {{data: Record<string, unknown>, changedStaffIds: string[]}} 合并结果与变化 ID。
@@ -122,6 +126,7 @@ export function mergeStaffDetails(localData, snapshot) {
   }
 
   const localById = new Map();
+  const cloudManagedLocalById = new Map();
   localData.staff.forEach((staff, index) => {
     const path = `staff[${index}]`;
     if (!isPlainObject(staff)) {
@@ -136,14 +141,22 @@ export function mergeStaffDetails(localData, snapshot) {
       `${path}.detailsRevision`,
     );
     const details = normalizeStaffDetails(staff.details, `${path}.details`);
-    localById.set(staffId, { staff, detailsRevision, details });
+    const local = { staff, detailsRevision, details };
+    localById.set(staffId, local);
+    if (detailsRevision !== LOCAL_DETAILS_REVISION) {
+      cloudManagedLocalById.set(staffId, local);
+    }
   });
 
   const remoteById = new Map(
     snapshot.profiles.map((profile) => [profile.staffId, profile]),
   );
-  const missingIds = [...localById.keys()].filter((id) => !remoteById.has(id));
-  const extraIds = [...remoteById.keys()].filter((id) => !localById.has(id));
+  const missingIds = [...cloudManagedLocalById.keys()].filter(
+    (id) => !remoteById.has(id),
+  );
+  const extraIds = [...remoteById.keys()].filter(
+    (id) => !cloudManagedLocalById.has(id),
+  );
   if (missingIds.length || extraIds.length) {
     throw new Error(
       `staffId 集合不一致；远端缺失=${formatIds(missingIds)}；远端额外=${formatIds(extraIds)}`,
@@ -153,6 +166,9 @@ export function mergeStaffDetails(localData, snapshot) {
   const changedStaffIds = [];
   const mergedStaff = localData.staff.map((staff) => {
     const local = localById.get(staff.staffId);
+    if (local.detailsRevision === LOCAL_DETAILS_REVISION) {
+      return staff;
+    }
     const remote = remoteById.get(staff.staffId);
     if (remote.revision < local.detailsRevision) {
       throw new Error(
