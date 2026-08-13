@@ -412,6 +412,14 @@
         height: 12px;
       }
 
+      .icon-crown {
+        width: 12px;
+        height: 12px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+      }
+
       .feature-chips {
         display: flex;
         flex-wrap: wrap;
@@ -420,7 +428,8 @@
       }
 
       .feature-chip,
-      .tag-badge {
+      .tag-badge,
+      .headliner-badge {
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
@@ -459,6 +468,42 @@
       .tag-badge.unjoined-badge {
         background: #f1f1f1;
         color: #777;
+      }
+
+      .headliner-badge {
+        --headliner-border: #7e8992;
+        --headliner-background: #46515c;
+        --headliner-color: #eff3f6;
+        flex: none;
+        gap: 2px;
+        padding: 4px;
+        border: 1px solid var(--headliner-border);
+        background: var(--headliner-background);
+        color: var(--headliner-color);
+        font-size: 11px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .headliner-badge.rank-1 {
+        --headliner-border: #d5a32b;
+        --headliner-background: #5a4214;
+        --headliner-color: #ffe08a;
+      }
+
+      .headliner-badge.rank-2 {
+        --headliner-border: #99a8b4;
+        --headliner-background: #f1f4f6;
+        --headliner-color: #2f3d48;
+        box-shadow:
+          inset 0 1px 0 #fff,
+          0 1px 2px rgba(44, 62, 80, 0.14);
+      }
+
+      .headliner-badge.rank-3 {
+        --headliner-border: #81695a;
+        --headliner-background: #59483e;
+        --headliner-color: #d5c0b2;
       }
 
       .staff-details-shell {
@@ -1113,6 +1158,10 @@
           d="M672 128h128c10 92 75 156 160 160v160c-66 2-127-23-160-64v352c0 141-115 256-256 256S288 877 288 736s115-256 256-256c18 0 35 2 52 6V640c-16-5-33-8-52-8-71 0-128 57-128 128s57 128 128 128 128-57 128-128V128z"
         />
       </symbol>
+      <symbol id="icon-crown" viewBox="0 0 24 24">
+        <path d="M3 6l4.5 5L12 4l4.5 7L21 6l-2 11H5L3 6z" />
+        <path d="M6 20h12" />
+      </symbol>
     </svg>
 
     <div class="search-container">
@@ -1174,6 +1223,7 @@
         /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
       const VISUAL_CACHE_ASSETS = ["assets/images/quan.png"];
       const VALID_TAGS = ["绿色陪", "女喘陪", "视频陪", "未进店"];
+      const HEADLINER_LIMITS = { 视频陪: 3, 女喘陪: 5 };
       const FEATURE_RULES = [
         {
           label: "音频定制",
@@ -1367,17 +1417,34 @@
         return kpPrice !== null ? ["KP", ...labels] : labels;
       }
 
+      /**
+       * 为原始陪陪记录补齐首页展示字段。
+       *
+       * @description 头牌按 data.json 的原始分类顺序计算，并在用户执行 KP
+       * 排序之前固定，避免筛选或排序改变头牌身份。
+       *
+       * @param {{staff?: object[]}} data - 首页陪陪数据。
+       * @returns {object[]} 可直接渲染和筛选的陪陪记录。
+       */
       function prepareStaffItems(data) {
+        const categoryRanks = {};
         return (data.staff || []).map((item, index) => {
           const details = getStaffDetails(item);
           const detailsText = getStaffDetailsText(details);
           const kpPrice = getKpPrice(item, details);
           const features = getFeatureTags(detailsText, kpPrice);
+          const categoryRank = (categoryRanks[item.tags] || 0) + 1;
+          categoryRanks[item.tags] = categoryRank;
+          const headlinerRank =
+            categoryRank <= (HEADLINER_LIMITS[item.tags] || 0)
+              ? categoryRank
+              : 0;
           return {
             ...item,
             details,
             detailsText,
             index,
+            headlinerRank,
             kpPrice,
             kpDisplay: kpPrice !== null ? String(kpPrice) : "-",
             features,
@@ -1387,6 +1454,7 @@
               detailsText,
               kpPrice || "",
               features.join(" "),
+              headlinerRank ? "头牌" : "",
             ].join(" "),
           };
         });
@@ -1779,6 +1847,7 @@
                             <div class="social-links compact">
                                 ${socialIcon}
                             </div>
+                            ${renderHeadlinerBadge(item.headlinerRank)}
                         </div>
                     </td>
                     <td class="kp-cell"><span class="kp-text">${item.kpDisplay}</span></td>
@@ -1806,6 +1875,7 @@
                       <h2 class="card-name">${escapeHtml(item.name)}</h2>
                       ${socialIcon}
                       ${renderTagBadge(item.tags)}
+                      ${renderHeadlinerBadge(item.headlinerRank)}
                     </div>
                     <div class="card-price">KP<strong>${item.kpDisplay}</strong></div>
                   </div>
@@ -1942,6 +2012,11 @@
 
       function renderTagBadge(tags) {
         return `<span class="tag-badge ${getTagClass(tags)}-badge">${escapeHtml(tags)}</span>`;
+      }
+
+      function renderHeadlinerBadge(rank) {
+        if (!rank) return "";
+        return `<span class="headliner-badge rank-${rank}" aria-label="分类内第${rank}名头牌">${getSvgIcon("crown")}<span>${rank}</span><span>头牌</span></span>`;
       }
 
       // 排序函数
@@ -2199,6 +2274,13 @@
                     <span class="icon icon-douyin" aria-hidden="true">
                         <svg viewBox="0 0 1024 1024">
                             <use href="#icon-douyin" />
+                        </svg>
+                    </span>
+                `,
+          crown: `
+                    <span class="icon icon-crown" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <use href="#icon-crown" />
                         </svg>
                     </span>
                 `,
