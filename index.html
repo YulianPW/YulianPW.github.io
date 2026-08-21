@@ -262,8 +262,88 @@
         margin: 10px auto;
       }
 
-      .info {
+      .info-toggle,
+      .info-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        margin: 10px auto;
+        padding: 8px 18px;
+        border: 1px solid #526f8a;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #2c3e50, #36546e);
+        box-shadow: 0 5px 13px rgba(44, 62, 80, 0.16);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .info-toggle::after {
+        width: 6px;
+        height: 6px;
+        margin-left: 9px;
+        border-right: 1px solid currentColor;
+        border-bottom: 1px solid currentColor;
+        content: "";
+        transform: translateY(-2px) rotate(45deg);
+        transition: transform 160ms ease;
+      }
+
+      .info-toggle[aria-expanded="true"]::after {
+        transform: translateY(2px) rotate(225deg);
+      }
+
+      .info-toggle:disabled {
+        cursor: wait;
+        opacity: 0.72;
+      }
+
+      .info-close {
+        border-color: #b9c9d8;
+        background: white;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+        color: #52616d;
+      }
+
+      .info-toggle:hover:not(:disabled) {
+        background: linear-gradient(135deg, #344d65, #42627f);
+      }
+
+      .info-close:hover {
+        background: #f2f6f9;
+      }
+
+      .info-toggle:focus-visible,
+      .info-close:focus-visible {
+        outline: 2px solid #6f94b7;
+        outline-offset: 2px;
+      }
+
+      .info-status {
+        width: max-content;
+        max-width: calc(100% - 20px);
+        margin: 6px auto 0;
+        color: #667783;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .info-status.error {
+        padding: 7px 11px;
+        border: 1px solid #f0b8b2;
+        border-radius: 8px;
+        background: #fff3f2;
+        color: #b84135;
+      }
+
+      .info-status:empty {
         display: none;
+      }
+
+      .info {
+        display: block;
         background: white;
         padding: 15px;
         margin: 15px 0;
@@ -1247,8 +1327,31 @@
       </p>
     </div>
 
-    <button onclick="loadInfoContent()">项目介绍（点击展开）</button>
-    <div id="info-container"></div>
+    <button
+      id="info-toggle"
+      class="info-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="info-container"
+    >
+      <span class="info-toggle-label">展开项目介绍</span>
+    </button>
+    <div
+      id="info-container"
+      role="region"
+      aria-labelledby="info-toggle"
+      hidden
+    ></div>
+    <button
+      id="info-close"
+      class="info-close"
+      type="button"
+      aria-controls="info-container"
+      hidden
+    >
+      ↑ 收起项目介绍
+    </button>
+    <p id="info-status" class="info-status" role="status" aria-live="polite"></p>
 
     <div
       id="loading"
@@ -1362,6 +1465,7 @@
       let homeGalleryModulePromise = null;
       let homeGalleryRefreshGeneration = 0;
       let homeMediaOriginsWarmed = false;
+      let infoContentPromise = null;
 
       function getSiteBaseUrl() {
         const { origin, pathname } = window.location;
@@ -1575,6 +1679,7 @@
 
       function init() {
         document.getElementById("tagSelect").value = "all";
+        bindInfoActions();
         bindStaffDetailsActions();
         applyUrlState();
         syncSortControls();
@@ -1741,11 +1846,50 @@
         }
       }
 
-      // 动态加载说明内容
-      function loadInfoContent() {
+      /**
+       * 绑定项目介绍的展开和底部收起入口。
+       *
+       * @returns {void}
+       */
+      function bindInfoActions() {
+        const toggleButton = document.getElementById("info-toggle");
+        const closeButton = document.getElementById("info-close");
+        toggleButton.addEventListener("click", handleInfoToggle);
+        closeButton.addEventListener("click", () => {
+          setInfoExpanded(false);
+          toggleButton.focus();
+        });
+      }
+
+      /**
+       * 根据当前公开状态展开或收起项目介绍。
+       *
+       * @returns {void}
+       */
+      function handleInfoToggle() {
+        const isExpanded =
+          document.getElementById("info-toggle").getAttribute("aria-expanded") ===
+          "true";
+        if (isExpanded) {
+          setInfoExpanded(false);
+          return;
+        }
+        void loadInfoContent();
+      }
+
+      /**
+       * 从已渲染内容、本地缓存或同源片段加载项目介绍并展开。
+       *
+       * @description 首次网络请求以单一 Promise 去重；缓存命中时立即展开，
+       * 再在空闲阶段刷新缓存，因此不会给首页增加额外首屏请求。
+       *
+       * @returns {Promise<void>} 加载、渲染和状态反馈完成后结束。
+       */
+      async function loadInfoContent() {
         const container = document.getElementById("info-container");
-        if (container.innerHTML) {
-          toggleInfo();
+        if (container.children.length) {
+          setInfoStatus("");
+          setInfoExpanded(true);
           return;
         }
 
@@ -1753,21 +1897,42 @@
         const cachedHtml = readLocalCache(cacheKey);
         if (cachedHtml) {
           container.innerHTML = cachedHtml;
-          toggleInfo();
+          setInfoStatus("");
+          setInfoExpanded(true);
           runWhenIdle(() =>
             fetchInfoContent(container, cacheKey, false).catch(() => {})
           );
           return;
         }
 
-        document.getElementById("loading").style.display = "block";
-        fetchInfoContent(container, cacheKey, true)
-          .catch((err) => console.error(err))
-          .finally(
-            () => (document.getElementById("loading").style.display = "none"),
-          );
+        if (infoContentPromise) return infoContentPromise;
+
+        setInfoLoading(true);
+        setInfoStatus("正在加载项目介绍…");
+        infoContentPromise = fetchInfoContent(container, cacheKey, true)
+          .then(() => {
+            setInfoStatus("");
+            setInfoExpanded(true);
+          })
+          .catch((error) => {
+            console.error(error);
+            setInfoStatus("项目介绍加载失败，请重试", true);
+          })
+          .finally(() => {
+            infoContentPromise = null;
+            setInfoLoading(false);
+          });
+        return infoContentPromise;
       }
 
+      /**
+       * 请求同源项目介绍片段，并按需更新当前容器。
+       *
+       * @param {HTMLElement} container - 项目介绍容器。
+       * @param {string} cacheKey - 当前 INFO_VERSION 对应的缓存键。
+       * @param {boolean} shouldRender - 是否立即写入当前页面。
+       * @returns {Promise<void>} 片段完成校验、缓存和可选渲染后结束。
+       */
       function fetchInfoContent(container, cacheKey, shouldRender) {
         return fetch(
           buildRuntimeUrl(`assets/fragments/info-content.html?v=${INFO_VERSION}`),
@@ -1779,11 +1944,57 @@
           })
           .then((html) => {
             writeLocalCache(cacheKey, html);
-            if (shouldRender) {
-              container.innerHTML = html;
-              toggleInfo();
-            }
+            if (shouldRender) container.innerHTML = html;
           });
+      }
+
+      /**
+       * 同步项目介绍的可见性、按钮文案和无障碍状态。
+       *
+       * @param {boolean} expanded - 是否展示项目介绍。
+       * @returns {void}
+       */
+      function setInfoExpanded(expanded) {
+        const toggleButton = document.getElementById("info-toggle");
+        const closeButton = document.getElementById("info-close");
+        const container = document.getElementById("info-container");
+        toggleButton.setAttribute("aria-expanded", String(expanded));
+        toggleButton.querySelector(".info-toggle-label").textContent = expanded
+          ? "收起项目介绍"
+          : "展开项目介绍";
+        container.hidden = !expanded;
+        closeButton.hidden = !expanded;
+      }
+
+      /**
+       * 切换项目介绍的进行中状态并锁定重复点击。
+       *
+       * @param {boolean} loading - 是否正在等待首次网络片段。
+       * @returns {void}
+       */
+      function setInfoLoading(loading) {
+        const button = document.getElementById("info-toggle");
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+        button.disabled = loading;
+        button.setAttribute("aria-busy", String(loading));
+        button.querySelector(".info-toggle-label").textContent = loading
+          ? "正在加载项目介绍…"
+          : isExpanded
+            ? "收起项目介绍"
+            : "展开项目介绍";
+      }
+
+      /**
+       * 更新项目介绍专属状态信息。
+       *
+       * @param {string} message - 展示给用户的状态文案；空字符串清除状态。
+       * @param {boolean} [isError=false] - 是否应用错误样式。
+       * @returns {void}
+       */
+      function setInfoStatus(message, isError = false) {
+        const status = document.getElementById("info-status");
+        status.textContent = message;
+        status.classList.toggle("error", isError);
       }
 
       // 数据加载函数
@@ -2399,15 +2610,6 @@
                 `,
         };
         return icons[name] || "";
-      }
-
-      // 修改后的切换函数
-      function toggleInfo() {
-        const info = document.querySelector(".info");
-        if (info) {
-          info.style.display =
-            info.style.display === "block" ? "none" : "block";
-        }
       }
 
       // DOM 就绪即开始正文加载，不等待图片等非关键资源完成。
