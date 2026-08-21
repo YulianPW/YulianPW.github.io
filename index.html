@@ -5,7 +5,7 @@
 
     <meta
       property="og:image"
-      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg?v=2026081902"
+      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg?v=2026082101"
     />
     <meta property="og:image:width" content="1672" />
     <meta property="og:image:height" content="941" />
@@ -21,7 +21,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:image"
-      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg?v=2026081902"
+      content="https://yulianpw.github.io/assets/images/rainlove-social-cover.jpg?v=2026082101"
     />
     <meta name="twitter:image:alt" content="雨恋女陪殿" />
     <meta name="twitter:title" content="雨恋女陪殿" />
@@ -80,6 +80,71 @@
         text-align: center;
       }
 
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0 0;
+      }
+
+      .hero-actions button {
+        margin: 0;
+      }
+
+      .hero-copy-button,
+      .recruit-entry-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        min-height: 36px;
+        padding: 0 13px;
+        border-radius: 999px;
+        box-shadow: 0 2px 7px rgba(71, 99, 137, 0.08);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .hero-copy-button {
+        gap: 5px;
+        border: 1px solid #b8cce2;
+        background: #eef5fd;
+        color: #34546f;
+        font-family: inherit;
+      }
+
+      .hero-copy-button::before {
+        content: "⧉";
+        font-size: 13px;
+      }
+
+      .hero-copy-button:hover {
+        background: #e2eefb;
+      }
+
+      .hero-copy-button:focus-visible {
+        outline: 2px solid #789bbf;
+        outline-offset: 2px;
+      }
+
+      .recruit-entry-link {
+        border: 1px solid #efafc8;
+        background: #fff3f8;
+        color: #b94f79;
+      }
+
+      .recruit-entry-link:hover {
+        background: #ffe7f1;
+      }
+
+      .recruit-entry-link:focus-visible {
+        outline: 2px solid #d96e99;
+        outline-offset: 2px;
+      }
+
       .alert-box {
         background: #fff3f3;
         padding: 12px;
@@ -96,6 +161,25 @@
         margin: 15px auto;
         border: 2px solid var(--primary);
         border-radius: 8px;
+      }
+
+      .qrcode-caption {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        margin: -7px 0 15px;
+        color: #5c7188;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-align: center;
+      }
+
+      .qrcode-caption-arrow {
+        color: #789bbf;
+        font-size: 18px;
+        line-height: 1;
       }
 
       .info-block {
@@ -890,6 +974,24 @@
           box-shadow: 0 8px 18px rgba(36, 56, 75, 0.22);
         }
 
+        .hero-panel .hero-actions {
+          margin: 12px auto;
+        }
+
+        .hero-panel .hero-copy-button {
+          margin: 0;
+          min-height: 40px;
+          border: 1px solid #b8cce2;
+          border-radius: 999px;
+          background: #eef5fd;
+          box-shadow: 0 2px 7px rgba(71, 99, 137, 0.1);
+          color: #34546f;
+        }
+
+        .recruit-entry-link {
+          min-height: 40px;
+        }
+
         .hero-panel .qrcode {
           width: 188px;
           height: 188px;
@@ -897,6 +999,10 @@
           border-color: #24384b;
           background: white;
           box-shadow: 0 12px 28px rgba(36, 56, 75, 0.18);
+        }
+
+        .qrcode-caption {
+          margin: 7px 0 0;
         }
 
         .info-block {
@@ -1056,7 +1162,10 @@
         </p>
       </div>
 
-      <button onclick="copyPageUrl()">复制网页链接</button>
+      <div class="hero-actions">
+        <button class="hero-copy-button" onclick="copyPageUrl()">复制网页链接</button>
+        <a class="recruit-entry-link" href="recruit.html">♡ 女宝宝应聘</a>
+      </div>
 
       <img
         class="qrcode"
@@ -1067,6 +1176,10 @@
         decoding="async"
         loading="lazy"
       />
+      <p class="qrcode-caption">
+        <span class="qrcode-caption-arrow" aria-hidden="true">↑</span>
+        <span>微信扫码点单</span>
+      </p>
     </section>
 
     <div class="info-block">
