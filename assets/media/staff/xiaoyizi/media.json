@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "type": "photo",
+      "url": "01-full.webp",
+      "preview": "01-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1080,
+      "height": 2200,
+      "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "02-full.webp",
+      "preview": "02-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 887,
+      "height": 1920,
+      "alt": ""
+    },
+    {
+      "type": "video",
+      "url": "03-full.mp4",
+      "preview": "",
+      "poster": "03-poster.webp",
+      "variants": [
+        {
+          "url": "03-inline.mp4",
+          "bitrate": 522632
+        }
+      ],
+      "width": 592,
+      "height": 1280,
+      "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "04-full.webp",
+      "preview": "04-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1239,
+      "height": 2200,
+      "alt": ""
+    }
+  ]
+}
