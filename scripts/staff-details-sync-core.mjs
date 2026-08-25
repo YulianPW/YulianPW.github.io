@@ -112,13 +112,14 @@ export function normalizeStaffDetailsSnapshot(value) {
 /**
  * 把已验证云端快照合并到站点读模型，只替换受托管字段。
  *
- * @description `detailsRevision: 0` 的固定本地资料不属于云端完整集合，
- * 合并时保持其位置和全部字段原样；其余资料仍执行严格全量集合校验。
+ * @description `detailsRevision: 0` 的固定本地资料始终保持原样；其余资料
+ * 只按 `staffId` 同步本地与云端的交集。云端独有记录不会新增到本地，
+ * 本地独有记录也不会被删除或改写。
  *
  * @param {unknown} localData - 本地 `data.json` 解析结果。
  * @param {ReturnType<typeof normalizeStaffDetailsSnapshot>} snapshot - 已验证完整快照。
  * @returns {{data: Record<string, unknown>, changedStaffIds: string[]}} 合并结果与变化 ID。
- * @throws {Error} ID 集不一致、revision 回退或同 revision 异文时抛出。
+ * @throws {Error} 交集记录 revision 回退或同 revision 异文时抛出。
  */
 export function mergeStaffDetails(localData, snapshot) {
   if (!isPlainObject(localData) || !Array.isArray(localData.staff)) {
@@ -126,7 +127,6 @@ export function mergeStaffDetails(localData, snapshot) {
   }
 
   const localById = new Map();
-  const cloudManagedLocalById = new Map();
   localData.staff.forEach((staff, index) => {
     const path = `staff[${index}]`;
     if (!isPlainObject(staff)) {
@@ -143,26 +143,11 @@ export function mergeStaffDetails(localData, snapshot) {
     const details = normalizeStaffDetails(staff.details, `${path}.details`);
     const local = { staff, detailsRevision, details };
     localById.set(staffId, local);
-    if (detailsRevision !== LOCAL_DETAILS_REVISION) {
-      cloudManagedLocalById.set(staffId, local);
-    }
   });
 
   const remoteById = new Map(
     snapshot.profiles.map((profile) => [profile.staffId, profile]),
   );
-  const missingIds = [...cloudManagedLocalById.keys()].filter(
-    (id) => !remoteById.has(id),
-  );
-  const extraIds = [...remoteById.keys()].filter(
-    (id) => !cloudManagedLocalById.has(id),
-  );
-  if (missingIds.length || extraIds.length) {
-    throw new Error(
-      `staffId 集合不一致；远端缺失=${formatIds(missingIds)}；远端额外=${formatIds(extraIds)}`,
-    );
-  }
-
   const changedStaffIds = [];
   const mergedStaff = localData.staff.map((staff) => {
     const local = localById.get(staff.staffId);
@@ -170,6 +155,9 @@ export function mergeStaffDetails(localData, snapshot) {
       return staff;
     }
     const remote = remoteById.get(staff.staffId);
+    if (!remote) {
+      return staff;
+    }
     if (remote.revision < local.detailsRevision) {
       throw new Error(
         `${staff.staffId} 远端 revision ${remote.revision} 早于本地 ${local.detailsRevision}`,
@@ -199,12 +187,12 @@ export function mergeStaffDetails(localData, snapshot) {
 }
 
 /**
- * 核对已合并站点数据与远端完整快照的 revision 和正文。
+ * 核对已合并站点数据与远端快照交集的 revision 和正文。
  *
  * @param {unknown} data - 合并后的站点数据。
  * @param {ReturnType<typeof normalizeStaffDetailsSnapshot>} snapshot - 已验证快照。
  * @returns {void}
- * @throws {Error} 任一受托管字段没有精确收敛时抛出。
+ * @throws {Error} 任一交集记录的受托管字段没有精确收敛时抛出。
  */
 export function verifyMergedStaffDetails(data, snapshot) {
   const result = mergeStaffDetails(data, snapshot);

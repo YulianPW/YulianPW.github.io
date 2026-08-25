@@ -36,6 +36,7 @@ const CONTRACT_FIXTURE = resolve(
 );
 const STAFF_ID = "11111111-1111-4111-8111-111111111111";
 const SECOND_STAFF_ID = "22222222-2222-4222-8222-222222222222";
+const THIRD_STAFF_ID = "33333333-3333-4333-8333-333333333333";
 const XIAOMA_KP_ADD_ONS = Object.freeze([
   "自嗨单卡",
   "剧情",
@@ -299,19 +300,49 @@ test("修订号 0 的固定本地资料不进入云端集合且保持原样", ()
   verifyMergedStaffDetails(result.data, snapshot);
 });
 
-test("拒绝集合差异、revision 回退和同 revision 异文", () => {
-  const local = buildLocalData([buildStaff()]);
-  const missing = normalizeStaffDetailsSnapshot(buildSnapshot([]));
-  assert.throws(() => mergeStaffDetails(local, missing), /集合不一致/);
-
-  const extra = normalizeStaffDetailsSnapshot(
+test("只同步双方交集并保留本地或云端的单边记录", () => {
+  const localOnly = buildStaff({
+    staffId: SECOND_STAFF_ID,
+    name: "仅本地资料",
+    details: { intro: "本地保留" },
+  });
+  const original = buildLocalData([
+    buildStaff({ staffId: STAFF_ID, name: "双方共有" }),
+    localOnly,
+  ]);
+  const snapshot = normalizeStaffDetailsSnapshot(
     buildSnapshot([
-      buildProfile(),
-      buildProfile({ staffId: SECOND_STAFF_ID }),
+      buildProfile({
+        staffId: STAFF_ID,
+        revision: 2,
+        details: { intro: "云端新介绍" },
+      }),
+      buildProfile({
+        staffId: THIRD_STAFF_ID,
+        details: { intro: "仅云端资料" },
+      }),
     ]),
   );
-  assert.throws(() => mergeStaffDetails(local, extra), /集合不一致/);
 
+  const result = mergeStaffDetails(original, snapshot);
+
+  assert.deepEqual(result.changedStaffIds, [STAFF_ID]);
+  assert.deepEqual(result.data.staff.map((item) => item.name), [
+    "双方共有",
+    "仅本地资料",
+  ]);
+  assert.equal(result.data.staff[0].detailsRevision, 2);
+  assert.deepEqual(result.data.staff[0].details, { intro: "云端新介绍" });
+  assert.strictEqual(result.data.staff[1], localOnly);
+  assert.equal(
+    result.data.staff.some((item) => item.staffId === THIRD_STAFF_ID),
+    false,
+  );
+  verifyMergedStaffDetails(result.data, snapshot);
+});
+
+test("交集记录仍拒绝 revision 回退和同 revision 异文", () => {
+  const local = buildLocalData([buildStaff()]);
   const older = normalizeStaffDetailsSnapshot(
     buildSnapshot([buildProfile({ revision: 1 })]),
   );

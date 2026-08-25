@@ -1619,12 +1619,14 @@
     {
       "tags": "女喘陪",
       "staffId": "66f3eb59-7b2f-4783-8c81-9e1c21a774b0",
-      "detailsRevision": 1,
+      "detailsRevision": 2,
       "name": "𝙔𝙡.晦涩",
       "social": "twitter://user?screen_name=yl_huise1",
+      "mediaFolder": "huise",
       "details": {
         "entry": "🚪142（送kp10分钟）",
         "intro": "少御音",
+        "afterEntry": "朋友圈生活照和日常文字聊天",
         "services": [
           {
             "label": "KP",
@@ -1636,15 +1638,15 @@
           },
           {
             "label": "TS语聊",
-            "detail": "66/30分"
+            "detail": "99/30分"
           },
           {
             "label": "TS手游",
-            "detail": "王者、金铲铲，66/30分"
+            "detail": "王者、金铲铲，99/30分"
           },
           {
             "label": "TS端游",
-            "detail": "无畏契约、云顶，88/30分"
+            "detail": "无畏契约、云顶，118/30分"
           },
           {
             "label": "绿色项目",
@@ -1658,8 +1660,7 @@
             "label": "绿色哄睡/端游",
             "detail": "45/30分"
           }
-        ],
-        "afterEntry": "朋友圈生活照和日常文字聊天"
+        ]
       }
     },
     {
@@ -1766,6 +1767,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.小郁",
       "social": "",
+      "mediaFolder": "xiaoyu",
       "details": {
         "entry": "🚪148（送kp10分钟）",
         "intro": "极品御姐音 温柔撩人",
@@ -1943,6 +1945,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.小玩具",
       "social": "",
+      "mediaFolder": "xiaowanju",
       "details": {
         "entry": "🚪142（送k10）",
         "intro": "少女音 少御；switch 🉑m 🉑反差s",
@@ -1999,6 +2002,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.微雨",
       "social": "twitter://user?screen_name=yl_weiyu",
+      "mediaFolder": "weiyu",
       "details": {
         "entry": "🚪198（送视频单10分）",
         "intro": "少女音，160/80",
@@ -2059,6 +2063,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.苏蜜",
       "social": "twitter://user?screen_name=nlaanm",
+      "mediaFolder": "sumi",
       "details": {
         "entry": "🚪148（送kp10分钟）",
         "intro": "少御、少女音，双属性",
@@ -2077,6 +2082,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.宝宝亲",
       "social": "twitter://user?screen_name=PaPer644rc",
+      "mediaFolder": "baobaoqin",
       "details": {
         "entry": "🚪188送电报群（很多色情照片视频音频➕等很多长录屏）",
         "intro": "情绪价值满满的电子女友，线上项目都可接",
@@ -2143,6 +2149,7 @@
       "detailsRevision": 4,
       "name": "𝙔𝙡.咩咩",
       "social": "twitter://user?screen_name=Mie_Sno",
+      "mediaFolder": "miemie",
       "details": {
         "entry": "🚪218（送视频单10分）",
         "intro": "极品少女音，肤白貌美、童颜巨乳、超绝撕漫身材",
@@ -2239,6 +2246,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.小艾",
       "social": "",
+      "mediaFolder": "xiaoai",
       "details": {
         "entry": "🚪200（送视频单十分）",
         "intro": "极品少女音，36C，御萝双修，身材天花板",
@@ -2295,44 +2303,11 @@
     },
     {
       "tags": "女喘陪",
-      "staffId": "cecdba81-ea29-4863-9f85-c74cc19a0a6d",
-      "detailsRevision": 1,
-      "name": "𝙔𝙡.妮妮",
-      "social": "twitter://user?screen_name=",
-      "details": {
-        "entry": "🚪148（送kp10分钟/定制简单照片/音频福利，三选一）",
-        "intro": "少御音，女s",
-        "services": [
-          {
-            "label": "KP",
-            "detail": "60/10分"
-          },
-          {
-            "label": "项目附加",
-            "detail": "打屁股/水声+15/1分，远程+20/10分钟"
-          },
-          {
-            "label": "音频定制",
-            "detail": "10/1分"
-          },
-          {
-            "label": "文爱",
-            "detail": "52/30分"
-          },
-          {
-            "label": "文语",
-            "detail": "70/30分"
-          }
-        ],
-        "afterEntry": "下单优惠很多，可接asmr音频录制、语音条、照片等"
-      }
-    },
-    {
-      "tags": "女喘陪",
       "staffId": "995246fc-1b24-4312-abc0-257aa084f018",
       "detailsRevision": 1,
       "name": "𝙔𝙡.猫颜",
       "social": "twitter://user?screen_name=maoyan_yl",
+      "mediaFolder": "maoyan",
       "details": {
         "entry": "🚪142（送kp10分钟）",
         "intro": "少女少萝",
@@ -2532,6 +2507,7 @@
       "detailsRevision": 1,
       "name": "𝙔𝙡.娇嗔",
       "social": "",
+      "mediaFolder": "jiachen",
       "details": {
         "entry": "🚪148（送kp10分钟）",
         "intro": "少御音",
