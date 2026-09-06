@@ -1684,7 +1684,7 @@
     {
       "tags": "女喘陪",
       "staffId": "66f3eb59-7b2f-4783-8c81-9e1c21a774b0",
-      "detailsRevision": 2,
+      "detailsRevision": 3,
       "name": "𝙔𝙡.晦涩",
       "social": "twitter://user?screen_name=yl_huise1",
       "mediaFolder": "huise",
@@ -1714,16 +1714,8 @@
             "detail": "无畏契约、云顶，118/30分"
           },
           {
-            "label": "绿色项目",
-            "detail": "语聊；手游30/30分"
-          },
-          {
             "label": "TS哄睡",
-            "detail": "66/30分"
-          },
-          {
-            "label": "绿色哄睡/端游",
-            "detail": "45/30分"
+            "detail": "88/15分"
           }
         ]
       }
@@ -1733,7 +1725,7 @@
       "staffId": "a52f3fcd-547a-4c79-9286-6a2e6f8b4e3d",
       "detailsRevision": 1,
       "name": "𝙔𝙡.小郁",
-      "social": "",
+      "social": "twitter://user?screen_name=MettrePetit",
       "mediaFolder": "xiaoyu",
       "details": {
         "entry": "🚪148（送kp10分钟）",
