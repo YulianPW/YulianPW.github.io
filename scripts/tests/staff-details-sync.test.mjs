@@ -23,6 +23,7 @@ import {
   normalizeStaffDetails,
 } from "../staff-details-contract.mjs";
 import {
+  appendStaffFromSnapshot,
   mergeStaffDetails,
   normalizeStaffDetailsSnapshot,
   verifyMergedStaffDetails,
@@ -30,6 +31,10 @@ import {
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const SYNC_SCRIPT = resolve(TEST_DIR, "../sync-staff-details.mjs");
+const EXPORT_SCRIPT = resolve(
+  TEST_DIR,
+  "../export-staff-details-bootstrap.mjs",
+);
 const CONTRACT_FIXTURE = resolve(
   TEST_DIR,
   "../fixtures/staff-details-contract.v1.json",
@@ -265,6 +270,8 @@ test("合并只更新 details 与 detailsRevision 并保持数组顺序", () => 
   assert.equal(result.data.staff[0].detailsRevision, 2);
   assert.deepEqual(result.data.staff[0].details, { intro: "新介绍" });
   assert.equal(result.data.staff[0].social, original.staff[0].social);
+  assert.deepEqual(result.remoteOnlyStaffIds, []);
+  assert.deepEqual(result.localMissingRemoteStaffIds, []);
   verifyMergedStaffDetails(result.data, snapshot);
 });
 
@@ -286,6 +293,11 @@ test("修订号 0 的固定本地资料不进入云端集合且保持原样", ()
         revision: 2,
         details: { intro: "云端新介绍" },
       }),
+      buildProfile({
+        staffId: SECOND_STAFF_ID,
+        revision: 2,
+        details: { intro: "不得覆盖固定本地资料" },
+      }),
     ]),
   );
 
@@ -296,6 +308,8 @@ test("修订号 0 的固定本地资料不进入云端集合且保持原样", ()
     "云端资料",
     "固定本地资料",
   ]);
+  assert.deepEqual(result.remoteOnlyStaffIds, []);
+  assert.deepEqual(result.localMissingRemoteStaffIds, []);
   assert.strictEqual(result.data.staff[1], localOnly);
   verifyMergedStaffDetails(result.data, snapshot);
 });
@@ -338,7 +352,62 @@ test("只同步双方交集并保留本地或云端的单边记录", () => {
     result.data.staff.some((item) => item.staffId === THIRD_STAFF_ID),
     false,
   );
+  assert.deepEqual(result.remoteOnlyStaffIds, [THIRD_STAFF_ID]);
+  assert.deepEqual(result.localMissingRemoteStaffIds, [SECOND_STAFF_ID]);
   verifyMergedStaffDetails(result.data, snapshot);
+});
+
+test("首次接入只追加指定快照资料并拒绝覆盖既有 staffId", () => {
+  const existing = buildStaff({ staffId: STAFF_ID, name: "既有人", mediaFolder: undefined });
+  const original = buildLocalData([existing]);
+  const snapshot = normalizeStaffDetailsSnapshot(
+    buildSnapshot([
+      buildProfile({ staffId: STAFF_ID }),
+      buildProfile({
+        staffId: SECOND_STAFF_ID,
+        revision: 3,
+        details: { services: [{ label: "KP", detail: "88/10分" }] },
+      }),
+    ]),
+  );
+
+  const result = appendStaffFromSnapshot(original, snapshot, {
+    staffId: SECOND_STAFF_ID,
+    name: "新陪陪",
+    tags: "视频陪",
+    social: "",
+  });
+
+  assert.deepEqual(result.addedStaffIds, [SECOND_STAFF_ID]);
+  assert.strictEqual(result.data.staff[0], existing);
+  assert.deepEqual(result.data.staff[1], {
+    tags: "视频陪",
+    staffId: SECOND_STAFF_ID,
+    detailsRevision: 3,
+    name: "新陪陪",
+    social: "",
+    details: { services: [{ label: "KP", detail: "88/10分" }] },
+  });
+  assert.throws(
+    () =>
+      appendStaffFromSnapshot(result.data, snapshot, {
+        staffId: SECOND_STAFF_ID,
+        name: "不能覆盖",
+        tags: "视频陪",
+        social: "",
+      }),
+    /staffId 已存在，拒绝覆盖/,
+  );
+  assert.throws(
+    () =>
+      appendStaffFromSnapshot(original, snapshot, {
+        staffId: THIRD_STAFF_ID,
+        name: "错误 ID",
+        tags: "视频陪",
+        social: "",
+      }),
+    /云端快照中不存在 staffId/,
+  );
 });
 
 test("交集记录仍拒绝 revision 回退和同 revision 异文", () => {
@@ -374,6 +443,171 @@ test("check 模式报告变化但不写文件", async () => {
   assert.match(result.stdout, /检测到变化：1 人/);
   assert.equal(await readFile(fixture.dataPath, "utf8"), before);
   assert.equal((await stat(fixture.dataPath)).mtimeMs, beforeMtime);
+});
+
+test("json check 输出稳定差异摘要且不把单边资料当错误", async () => {
+  const fixture = await createFixture({
+    localData: buildLocalData([
+      buildStaff({ staffId: STAFF_ID }),
+      buildStaff({
+        staffId: SECOND_STAFF_ID,
+        name: "本地待核对",
+        mediaFolder: "local-only",
+      }),
+    ]),
+    snapshotProfiles: [
+      buildProfile({ staffId: STAFF_ID, revision: 2, details: { intro: "远端介绍" } }),
+      buildProfile({ staffId: THIRD_STAFF_ID, details: { intro: "待接入" } }),
+    ],
+  });
+  const before = await readFile(fixture.dataPath, "utf8");
+
+  const result = await runSync([
+    "--check",
+    "--json",
+    "--source",
+    pathToFileURL(fixture.snapshotPath).href,
+    "--data",
+    fixture.dataPath,
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), {
+    schemaVersion: 1,
+    mode: "check",
+    result: "changes",
+    differencesEvaluated: true,
+    snapshotVersion: JSON.parse(await readFile(fixture.snapshotPath, "utf8"))
+      .snapshotVersion,
+    profileCount: 2,
+    changedStaffIds: [STAFF_ID],
+    addedStaffIds: [],
+    remoteOnlyStaffIds: [THIRD_STAFF_ID],
+    localMissingRemoteStaffIds: [SECOND_STAFF_ID],
+  });
+  assert.equal(await readFile(fixture.dataPath, "utf8"), before);
+});
+
+test("apply 可在同一次快照拉取中更新既有正文并追加新 staff", async () => {
+  const existing = buildStaff({ staffId: STAFF_ID, name: "既有人" });
+  const fixture = await createFixture({
+    initializeGit: true,
+    localData: buildLocalData([existing]),
+    snapshotProfiles: [
+      buildProfile({ staffId: STAFF_ID, revision: 2, details: { intro: "既有人更新" } }),
+      buildProfile({
+        staffId: SECOND_STAFF_ID,
+        revision: 4,
+        details: { services: [{ label: "KP", detail: "99/10分" }] },
+      }),
+      buildProfile({ staffId: THIRD_STAFF_ID, details: { intro: "仍待接入" } }),
+    ],
+  });
+
+  const result = await runSync([
+    "--apply",
+    "--json",
+    "--source",
+    pathToFileURL(fixture.snapshotPath).href,
+    "--data",
+    fixture.dataPath,
+    "--add-staff",
+    SECOND_STAFF_ID,
+    "--name",
+    "新陪陪",
+    "--tags",
+    "女喘陪",
+    "--social",
+    "",
+    "--media-folder",
+    "new-staff",
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  const summary = JSON.parse(result.stdout);
+  assert.equal(summary.result, "applied");
+  assert.deepEqual(summary.changedStaffIds, [STAFF_ID]);
+  assert.deepEqual(summary.addedStaffIds, [SECOND_STAFF_ID]);
+  assert.deepEqual(summary.remoteOnlyStaffIds, [THIRD_STAFF_ID]);
+  assert.deepEqual(summary.localMissingRemoteStaffIds, []);
+  const updated = JSON.parse(await readFile(fixture.dataPath, "utf8"));
+  assert.deepEqual(updated.staff[0], {
+    ...existing,
+    detailsRevision: 2,
+    details: { intro: "既有人更新" },
+  });
+  assert.deepEqual(updated.staff[1], {
+    tags: "女喘陪",
+    staffId: SECOND_STAFF_ID,
+    detailsRevision: 4,
+    name: "新陪陪",
+    social: "",
+    mediaFolder: "new-staff",
+    details: { services: [{ label: "KP", detail: "99/10分" }] },
+  });
+
+  const duplicate = await runSync([
+    "--check",
+    "--source",
+    pathToFileURL(fixture.snapshotPath).href,
+    "--data",
+    fixture.dataPath,
+    "--add-staff",
+    SECOND_STAFF_ID,
+    "--name",
+    "不能覆盖",
+    "--tags",
+    "视频陪",
+    "--social",
+    "",
+  ]);
+  assert.equal(duplicate.code, 1);
+  assert.match(duplicate.stderr, /staffId 已存在，拒绝覆盖/);
+});
+
+test("catalog 导出只读官网名录并保留固定本地 revision", async () => {
+  const localData = buildLocalData([
+    buildStaff({ staffId: STAFF_ID, name: "云端托管", mediaFolder: undefined }),
+    buildStaff({
+      staffId: SECOND_STAFF_ID,
+      revision: 0,
+      name: "固定本地",
+      details: { intro: "固定介绍" },
+      mediaFolder: "fixed-local",
+    }),
+  ]);
+  const fixture = await createFixture({ remoteRevision: 1, localData });
+
+  const result = await runNodeScript(EXPORT_SCRIPT, [
+    "--catalog",
+    "--data",
+    fixture.dataPath,
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), {
+    profiles: [
+      {
+        name: "云端托管",
+        staffId: STAFF_ID,
+        detailsRevision: 1,
+        details: { intro: "本地介绍" },
+      },
+      {
+        name: "固定本地",
+        staffId: SECOND_STAFF_ID,
+        detailsRevision: 0,
+        details: { intro: "固定介绍" },
+      },
+    ],
+  });
+
+  const bootstrap = await runNodeScript(EXPORT_SCRIPT, ["--data", fixture.dataPath]);
+  assert.equal(bootstrap.code, 0, bootstrap.stderr);
+  assert.deepEqual(JSON.parse(bootstrap.stdout), {
+    profiles: [{ staffId: STAFF_ID, details: { intro: "本地介绍" } }],
+    confirm: false,
+  });
 });
 
 test("apply 对干净 Git 目标原子更新，重复拉取为 no-op", async () => {
@@ -557,6 +791,7 @@ async function createFixture({
   remoteRevision,
   initializeGit = false,
   localData = buildLocalData([buildStaff()]),
+  snapshotProfiles = null,
 }) {
   const root = await mkdtemp(join(tmpdir(), "yulian-staff-details-"));
   const dataPath = join(root, "assets/data/data.json");
@@ -567,7 +802,9 @@ async function createFixture({
     snapshotPath,
     `${JSON.stringify(
       buildSnapshot([
-        buildProfile({ revision: remoteRevision, details: { intro: "远端介绍" } }),
+        ...(snapshotProfiles ?? [
+          buildProfile({ revision: remoteRevision, details: { intro: "远端介绍" } }),
+        ]),
       ]),
       null,
       2,
@@ -599,8 +836,12 @@ function commitTarget(root) {
 }
 
 function runSync(argumentsList) {
+  return runNodeScript(SYNC_SCRIPT, argumentsList);
+}
+
+function runNodeScript(script, argumentsList) {
   return new Promise((resolvePromise, rejectPromise) => {
-    const child = spawn(process.execPath, [SYNC_SCRIPT, ...argumentsList], {
+    const child = spawn(process.execPath, [script, ...argumentsList], {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
@@ -652,6 +893,7 @@ function buildStaff({
   name = "测试陪陪",
   tags = "视频陪",
   details = { intro: "本地介绍" },
+  mediaFolder = "test-staff",
 } = {}) {
   return {
     staffId,
@@ -659,7 +901,7 @@ function buildStaff({
     tags,
     name,
     social: "twitter://user?screen_name=test",
-    mediaFolder: "test-staff",
+    ...(mediaFolder === undefined ? {} : { mediaFolder }),
     details,
   };
 }

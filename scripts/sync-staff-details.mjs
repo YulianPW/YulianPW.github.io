@@ -13,6 +13,7 @@ import { spawn } from "node:child_process";
 
 import { MAX_SNAPSHOT_BYTES } from "./staff-details-contract.mjs";
 import {
+  appendStaffFromSnapshot,
   mergeStaffDetails,
   normalizeStaffDetailsSnapshot,
   verifyMergedStaffDetails,
@@ -24,6 +25,7 @@ const DEFAULT_DATA_PATH = resolve(PROJECT_ROOT, "assets/data/data.json");
 const VALIDATOR_PATH = resolve(SCRIPT_DIR, "validate-staff-data.mjs");
 const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_REDIRECTS = 3;
+const SUMMARY_SCHEMA_VERSION = 1;
 
 /**
  * 拉取云端完整快照，严格合并并按 check/apply 模式处理站点读模型。
@@ -34,7 +36,7 @@ async function main() {
   const options = parseArguments(process.argv.slice(2));
   const fetchResult = await fetchSnapshot(options.source, options.ifNoneMatch);
   if (fetchResult.notModified) {
-    console.log(`云端快照未变化（304）：${options.ifNoneMatch}`);
+    printNotModifiedSummary(options);
     return;
   }
 
@@ -42,22 +44,57 @@ async function main() {
   const originalText = await readFile(options.dataPath, "utf8");
   const originalData = JSON.parse(originalText);
   const mergeResult = mergeStaffDetails(originalData, snapshot);
-  printSummary(snapshot, mergeResult.changedStaffIds, options.mode);
+  let mergedData = mergeResult.data;
+  let addedStaffIds = [];
+  let remoteOnlyStaffIds = mergeResult.remoteOnlyStaffIds;
+  if (options.newStaff) {
+    const appendResult = appendStaffFromSnapshot(
+      mergedData,
+      snapshot,
+      options.newStaff,
+    );
+    mergedData = appendResult.data;
+    addedStaffIds = appendResult.addedStaffIds;
+    remoteOnlyStaffIds = remoteOnlyStaffIds.filter(
+      (staffId) => !addedStaffIds.includes(staffId),
+    );
+  }
+  const hasChanges =
+    mergeResult.changedStaffIds.length > 0 || addedStaffIds.length > 0;
+  const result = !hasChanges
+    ? "no-op"
+    : options.mode === "check"
+      ? "changes"
+      : "applied";
+  const summary = buildSummary({
+    snapshot,
+    mode: options.mode,
+    result,
+    changedStaffIds: mergeResult.changedStaffIds,
+    addedStaffIds,
+    remoteOnlyStaffIds,
+    localMissingRemoteStaffIds: mergeResult.localMissingRemoteStaffIds,
+  });
   if (options.mode === "check") {
+    printSummary(summary, options.json);
     return;
   }
 
   await requireCleanTarget(options.dataPath);
-  if (mergeResult.changedStaffIds.length === 0) {
+  if (!hasChanges) {
+    printSummary(summary, options.json);
     return;
   }
   await replaceDataAtomically({
     dataPath: options.dataPath,
     originalText,
-    mergedData: mergeResult.data,
+    mergedData,
     snapshot,
   });
-  console.log("已原子更新 assets/data/data.json；未执行 commit、push 或部署");
+  printSummary(summary, options.json);
+  if (!options.json) {
+    console.log("已原子更新 assets/data/data.json；未执行 commit、push 或部署");
+  }
 }
 
 function parseArguments(argumentsList) {
@@ -69,27 +106,64 @@ function parseArguments(argumentsList) {
   const source = requireOption(argumentsList, "--source");
   const dataValue = optionalOption(argumentsList, "--data");
   const ifNoneMatch = optionalOption(argumentsList, "--if-none-match");
+  const addStaffId = optionalOption(argumentsList, "--add-staff");
   const knownFlags = new Set([
     "--check",
     "--apply",
+    "--json",
     "--source",
     "--data",
     "--if-none-match",
+    "--add-staff",
+    "--name",
+    "--tags",
+    "--social",
+    "--media-folder",
   ]);
   for (let index = 0; index < argumentsList.length; index += 1) {
     const argument = argumentsList[index];
     if (!knownFlags.has(argument)) {
       throw new Error(`未知参数：${argument}`);
     }
-    if (["--source", "--data", "--if-none-match"].includes(argument)) {
+    if (
+      [
+        "--source",
+        "--data",
+        "--if-none-match",
+        "--add-staff",
+        "--name",
+        "--tags",
+        "--social",
+        "--media-folder",
+      ].includes(argument)
+    ) {
       index += 1;
     }
   }
+  const newStaffFlags = ["--name", "--tags", "--social", "--media-folder"];
+  if (!addStaffId && newStaffFlags.some((flag) => argumentsList.includes(flag))) {
+    throw new Error("--name/--tags/--social/--media-folder 只能与 --add-staff 同时使用");
+  }
+  if (addStaffId && ifNoneMatch) {
+    throw new Error("--add-staff 必须读取完整快照，不能与 --if-none-match 同时使用");
+  }
   return {
     mode: hasApply ? "apply" : "check",
+    json: argumentsList.includes("--json"),
     source,
     dataPath: dataValue ? resolve(dataValue) : DEFAULT_DATA_PATH,
     ifNoneMatch,
+    newStaff: addStaffId
+      ? {
+          staffId: addStaffId,
+          name: requireOption(argumentsList, "--name"),
+          tags: requireOption(argumentsList, "--tags"),
+          social: requireOption(argumentsList, "--social"),
+          ...(argumentsList.includes("--media-folder")
+            ? { mediaFolder: requireOption(argumentsList, "--media-folder") }
+            : {}),
+        }
+      : null,
   };
 }
 
@@ -316,20 +390,80 @@ function runCommand(command, argumentsList) {
   });
 }
 
-function printSummary(snapshot, changedStaffIds, mode) {
-  console.log(`快照版本：${snapshot.snapshotVersion}`);
-  console.log(`完整资料数：${snapshot.profiles.length}`);
-  console.log(`${mode === "apply" ? "将更新" : "检测到变化"}：${changedStaffIds.length} 人`);
-  if (changedStaffIds.length) {
-    console.log(`staffId：${changedStaffIds.join(",")}`);
-  } else {
+function buildSummary({
+  snapshot,
+  mode,
+  result,
+  changedStaffIds,
+  addedStaffIds,
+  remoteOnlyStaffIds,
+  localMissingRemoteStaffIds,
+}) {
+  return {
+    schemaVersion: SUMMARY_SCHEMA_VERSION,
+    mode,
+    result,
+    differencesEvaluated: true,
+    snapshotVersion: snapshot.snapshotVersion,
+    profileCount: snapshot.profiles.length,
+    changedStaffIds,
+    addedStaffIds,
+    remoteOnlyStaffIds,
+    localMissingRemoteStaffIds,
+  };
+}
+
+function printNotModifiedSummary(options) {
+  if (!options.json) {
+    console.log(`云端快照未变化（304）：${options.ifNoneMatch}`);
+    return;
+  }
+  process.stdout.write(
+    `${JSON.stringify({
+      schemaVersion: SUMMARY_SCHEMA_VERSION,
+      mode: options.mode,
+      result: "not-modified",
+      differencesEvaluated: false,
+      snapshotVersion: null,
+      profileCount: null,
+      changedStaffIds: [],
+      addedStaffIds: [],
+      remoteOnlyStaffIds: [],
+      localMissingRemoteStaffIds: [],
+    })}\n`,
+  );
+}
+
+function printSummary(summary, json) {
+  if (json) {
+    process.stdout.write(`${JSON.stringify(summary)}\n`);
+    return;
+  }
+  console.log(`快照版本：${summary.snapshotVersion}`);
+  console.log(`完整资料数：${summary.profileCount}`);
+  console.log(
+    `${summary.mode === "apply" ? "已更新" : "检测到变化"}：${summary.changedStaffIds.length} 人`,
+  );
+  if (summary.changedStaffIds.length) {
+    console.log(`正文更新 staffId：${summary.changedStaffIds.join(",")}`);
+  }
+  if (summary.addedStaffIds.length) {
+    console.log(`首次接入 staffId：${summary.addedStaffIds.join(",")}`);
+  }
+  if (summary.remoteOnlyStaffIds.length) {
+    console.log(`云端待首次接入：${summary.remoteOnlyStaffIds.join(",")}`);
+  }
+  if (summary.localMissingRemoteStaffIds.length) {
+    console.log(`本地缺少云端资料：${summary.localMissingRemoteStaffIds.join(",")}`);
+  }
+  if (summary.result === "no-op") {
     console.log("结果：no-op");
   }
 }
 
 function requireOption(argumentsList, flag) {
   const value = optionalOption(argumentsList, flag);
-  if (!value) throw new Error(`缺少 ${flag}`);
+  if (value === null) throw new Error(`缺少 ${flag}`);
   return value;
 }
 
@@ -337,7 +471,7 @@ function optionalOption(argumentsList, flag) {
   const index = argumentsList.indexOf(flag);
   if (index < 0) return null;
   const value = argumentsList[index + 1];
-  if (!value || value.startsWith("--")) {
+  if (value === undefined || value.startsWith("--")) {
     throw new Error(`${flag} 缺少值`);
   }
   return value;

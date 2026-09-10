@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -8,31 +8,25 @@ import {
   requireDetailsRevision,
   requireStaffId,
 } from "./staff-details-contract.mjs";
+import { validateStaffData } from "./validate-staff-data.mjs";
 
 const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const DATA_PATH = join(PROJECT_ROOT, "assets/data/data.json");
+const DEFAULT_DATA_PATH = join(PROJECT_ROOT, "assets/data/data.json");
 
 /**
- * 从站点读模型导出管理员 bootstrap 请求，不猜测任何云端 owner 映射。
+ * 从站点读模型导出管理员 bootstrap 请求或只读 staff 名录。
  *
  * @description 修订号 0 的固定本地资料会被校验但不会导入云端。
  *
  * @returns {Promise<void>}
  */
 async function main() {
-  const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
-  if (!Array.isArray(data.staff)) {
-    throw new Error("data.json.staff 必须是数组");
-  }
-  const seen = new Set();
-  const profiles = [];
-  data.staff.forEach((staff, index) => {
+  const options = parseArguments(process.argv.slice(2));
+  const data = JSON.parse(await readFile(options.dataPath, "utf8"));
+  validateStaffData(data);
+  const catalogProfiles = data.staff.map((staff, index) => {
     const staffId = requireStaffId(staff.staffId, `staff[${index}].staffId`);
-    if (seen.has(staffId)) {
-      throw new Error(`staff[${index}].staffId 重复：${staffId}`);
-    }
-    seen.add(staffId);
-    const revision = requireDetailsRevision(
+    const detailsRevision = requireDetailsRevision(
       staff.detailsRevision,
       `staff[${index}].detailsRevision`,
     );
@@ -40,18 +34,53 @@ async function main() {
       staff.details,
       `staff[${index}].details`,
     );
-    if (revision === LOCAL_DETAILS_REVISION) {
-      return;
-    }
-    if (revision !== 1) {
+    return {
+      name: staff.name,
+      staffId,
+      detailsRevision,
+      details,
+    };
+  });
+  if (options.catalog) {
+    process.stdout.write(
+      `${JSON.stringify({ profiles: catalogProfiles }, null, 2)}\n`,
+    );
+    return;
+  }
+
+  const profiles = catalogProfiles.flatMap((profile, index) => {
+    if (profile.detailsRevision === LOCAL_DETAILS_REVISION) return [];
+    if (profile.detailsRevision !== 1) {
       throw new Error(`staff[${index}].detailsRevision bootstrap 时必须为 1`);
     }
-    profiles.push({
-      staffId,
-      details,
-    });
+    return [{ staffId: profile.staffId, details: profile.details }];
   });
   process.stdout.write(`${JSON.stringify({ profiles, confirm: false }, null, 2)}\n`);
+}
+
+function parseArguments(argumentsList) {
+  const knownFlags = new Set(["--catalog", "--data"]);
+  for (let index = 0; index < argumentsList.length; index += 1) {
+    const argument = argumentsList[index];
+    if (!knownFlags.has(argument)) {
+      throw new Error(`未知参数：${argument}`);
+    }
+    if (argument === "--data") index += 1;
+  }
+  const dataIndex = argumentsList.indexOf("--data");
+  if (dataIndex >= 0) {
+    const value = argumentsList[dataIndex + 1];
+    if (!value || value.startsWith("--")) {
+      throw new Error("--data 缺少值");
+    }
+  }
+  return {
+    catalog: argumentsList.includes("--catalog"),
+    dataPath:
+      dataIndex >= 0
+        ? resolve(argumentsList[dataIndex + 1])
+        : DEFAULT_DATA_PATH,
+  };
 }
 
 await main().catch((error) => {

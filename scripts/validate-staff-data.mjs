@@ -11,6 +11,7 @@ import {
 const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_DATA_PATH = join(PROJECT_ROOT, "assets/data/data.json");
 const VALID_TAGS = new Set(["绿色陪", "女喘陪", "视频陪", "未进店"]);
+const MEDIA_FOLDER_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
 
 /**
  * 校验值是否为去除首尾空白后的非空字符串。
@@ -52,7 +53,7 @@ function validateDetails(item, index) {
  * @returns {{staffCount: number, serviceCount: number}} 校验通过后的统计信息。
  * @throws {Error} 顶层结构、标签、姓名、KP 或详情契约无效时抛出。
  */
-function validateStaffData(data) {
+export function validateStaffData(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("data.json 顶层必须是对象");
   }
@@ -62,6 +63,7 @@ function validateStaffData(data) {
 
   const names = new Set();
   const staffIds = new Set();
+  const mediaFolders = new Set();
   let serviceCount = 0;
   data.staff.forEach((item, index) => {
     const itemPath = `staff[${index}]`;
@@ -86,6 +88,18 @@ function validateStaffData(data) {
 
     if (typeof item.social !== "string") {
       throw new Error(`${itemPath}.social 必须是字符串`);
+    }
+    if (Object.hasOwn(item, "mediaFolder")) {
+      if (
+        typeof item.mediaFolder !== "string" ||
+        !MEDIA_FOLDER_PATTERN.test(item.mediaFolder)
+      ) {
+        throw new Error(`${itemPath}.mediaFolder 必须是小写 ASCII 稳定键`);
+      }
+      if (mediaFolders.has(item.mediaFolder)) {
+        throw new Error(`${itemPath}.mediaFolder 重复：${item.mediaFolder}`);
+      }
+      mediaFolders.add(item.mediaFolder);
     }
     if (
       Object.hasOwn(item, "kp") &&
@@ -119,4 +133,9 @@ async function main() {
   );
 }
 
-await main();
+if (
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  await main();
+}

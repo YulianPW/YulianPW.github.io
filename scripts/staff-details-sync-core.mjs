@@ -8,6 +8,7 @@ import {
   requireDetailsRevision,
   requireStaffId,
 } from "./staff-details-contract.mjs";
+import { validateStaffData } from "./validate-staff-data.mjs";
 
 const SNAPSHOT_KEYS = new Set([
   "schemaVersion",
@@ -118,7 +119,7 @@ export function normalizeStaffDetailsSnapshot(value) {
  *
  * @param {unknown} localData - 本地 `data.json` 解析结果。
  * @param {ReturnType<typeof normalizeStaffDetailsSnapshot>} snapshot - 已验证完整快照。
- * @returns {{data: Record<string, unknown>, changedStaffIds: string[]}} 合并结果与变化 ID。
+ * @returns {{data: Record<string, unknown>, changedStaffIds: string[], remoteOnlyStaffIds: string[], localMissingRemoteStaffIds: string[]}} 合并结果与差异 ID。
  * @throws {Error} 交集记录 revision 回退或同 revision 异文时抛出。
  */
 export function mergeStaffDetails(localData, snapshot) {
@@ -148,6 +149,16 @@ export function mergeStaffDetails(localData, snapshot) {
   const remoteById = new Map(
     snapshot.profiles.map((profile) => [profile.staffId, profile]),
   );
+  const remoteOnlyStaffIds = snapshot.profiles
+    .filter((profile) => !localById.has(profile.staffId))
+    .map((profile) => profile.staffId);
+  const localMissingRemoteStaffIds = [...localById.entries()]
+    .filter(
+      ([staffId, local]) =>
+        local.detailsRevision !== LOCAL_DETAILS_REVISION && !remoteById.has(staffId),
+    )
+    .map(([staffId]) => staffId)
+    .sort();
   const changedStaffIds = [];
   const mergedStaff = localData.staff.map((staff) => {
     const local = localById.get(staff.staffId);
@@ -182,8 +193,48 @@ export function mergeStaffDetails(localData, snapshot) {
 
   return {
     data: { ...localData, staff: mergedStaff },
-    changedStaffIds,
+    changedStaffIds: changedStaffIds.sort(),
+    remoteOnlyStaffIds,
+    localMissingRemoteStaffIds,
   };
+}
+
+/**
+ * 使用同一份已验证快照，把指定云端资料首次接入站点数组末尾。
+ *
+ * @param {unknown} localData - 已完成常规合并的站点数据。
+ * @param {ReturnType<typeof normalizeStaffDetailsSnapshot>} snapshot - 已验证完整快照。
+ * @param {{staffId: string, name: string, tags: string, social: string, mediaFolder?: string}} input - 站点本地展示字段。
+ * @returns {{data: Record<string, unknown>, addedStaffIds: string[]}} 追加后的站点数据。
+ * @throws {Error} staffId 已存在、快照中不存在，或站点字段不符合现有 schema 时抛出。
+ */
+export function appendStaffFromSnapshot(localData, snapshot, input) {
+  if (!isPlainObject(localData) || !Array.isArray(localData.staff)) {
+    throw new Error("本地 data.json.staff 必须是数组");
+  }
+  const staffId = requireStaffId(input.staffId, "--add-staff");
+  if (localData.staff.some((staff) => staff.staffId === staffId)) {
+    throw new Error(`staffId 已存在，拒绝覆盖：${staffId}`);
+  }
+  const profile = snapshot.profiles.find((item) => item.staffId === staffId);
+  if (!profile) {
+    throw new Error(`云端快照中不存在 staffId：${staffId}`);
+  }
+
+  const newStaff = {
+    tags: input.tags,
+    staffId,
+    detailsRevision: profile.revision,
+    name: input.name,
+    social: input.social,
+    ...(input.mediaFolder === undefined
+      ? {}
+      : { mediaFolder: input.mediaFolder }),
+    details: profile.details,
+  };
+  const data = { ...localData, staff: [...localData.staff, newStaff] };
+  validateStaffData(data);
+  return { data, addedStaffIds: [staffId] };
 }
 
 /**
