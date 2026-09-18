@@ -294,14 +294,14 @@
     {
       "tags": "视频陪",
       "staffId": "539a2e51-ee0a-4cde-ba34-c2818c31c241",
-      "detailsRevision": 5,
+      "detailsRevision": 6,
       "name": "𝙔𝙡.小困",
       "social": "twitter://user?screen_name=LeonardXio33330",
       "mediaFolder": "xiaokun-green",
       "details": {
         "entry": "🚪198（送视频10分钟）",
         "intro": "少女音，有多种衣服丝袜可选，包括情趣、jk、lolita、cos",
-        "afterEntry": "定制视频、照片和音频",
+        "afterEntry": "入🚪解锁定制视频/照片",
         "services": [
           {
             "label": "门后",
@@ -421,7 +421,7 @@
       "staffId": "e4138e0b-2c20-4d22-ab1c-12542ed0b252",
       "detailsRevision": 1,
       "name": "𝙔𝙡.小情天",
-      "social": "",
+      "social": "twitter://user?screen_name=AlanCook54321",
       "mediaFolder": "xiaoqingtian",
       "details": {
         "entry": "🚪198（送视频单十分）",
@@ -621,7 +621,7 @@
       "staffId": "ae5a9292-375b-485f-8f51-470ab35a85d1",
       "detailsRevision": 5,
       "name": "𝙔𝙡.小姨子",
-      "social": "twitter://user?screen_name=Moe_Lolita0",
+      "social": "twitter://user?screen_name=ylSkyBun",
       "mediaFolder": "xiaoyizi",
       "details": {
         "entry": "🚪198（送视频单10分）",
@@ -2201,23 +2201,44 @@
     {
       "tags": "女喘陪",
       "staffId": "545ce8c6-4e97-4a15-889a-4a347e97ff6a",
-      "detailsRevision": 1,
+      "detailsRevision": 4,
       "name": "𝙔𝙡.甜优",
       "social": "twitter://user?screen_name=TianYou_yl",
       "mediaFolder": "tianyou",
       "details": {
         "entry": "🚪142（送kp10分钟）",
+        "intro": "极品少女音，其他音色也会，双属性，brat，擅长剧情绿帽哭腔等…",
+        "afterEntry": "音频定制、跳蛋阅读、连休、绿聊、叫醒、舔耳以及各种套餐",
         "services": [
           {
             "label": "KP",
-            "detail": "58/10分；自嗨+10/10，剧情、SM、打屁股、水声、狗叫等+30/10，远控+50/10"
+            "detail": "58/10分",
+            "addOns": [
+              "自嗨/特殊称呼+20/10",
+              "剧情/绿帽/SM调教/铃铛/打屁股/狗叫/旁听/看撸+30/10",
+              "水声/寸止/四爱/重口/远控+50/10"
+            ]
+          },
+          {
+            "label": "TS聊天",
+            "detail": "99/30分"
+          },
+          {
+            "label": "TS哄睡",
+            "detail": "109/30分"
+          },
+          {
+            "label": "文爱",
+            "detail": "99/30分",
+            "addOns": [
+              "剧情/SM+52半"
+            ]
           },
           {
             "label": "成品音频",
             "detail": "7.7/1分钟"
           }
-        ],
-        "afterEntry": "音频定制、跳蛋阅读、连休、绿聊、叫醒、舔耳等各种套餐"
+        ]
       }
     },
     {
@@ -2647,6 +2668,71 @@
       "social": "twitter://user?screen_name=",
       "details": {
         "intro": "未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍未进店测试陪陪介绍"
+      }
+    },
+    {
+      "tags": "女喘陪",
+      "staffId": "04f83c87-826f-4630-88ed-31d3a0c3e8dd",
+      "detailsRevision": 1,
+      "name": "𝙔𝙡.小怡",
+      "social": "",
+      "mediaFolder": "xiaoyi",
+      "details": {
+        "entry": "142（送kp10分）",
+        "intro": "少御音反差brat",
+        "afterEntry": "游戏高手 定制照片 入门解锁朋友圈",
+        "services": [
+          {
+            "label": "kp",
+            "detail": "60/10分",
+            "addOns": [
+              "单k/远程遥控/剧情/水声+20"
+            ]
+          },
+          {
+            "label": "ts语聊",
+            "detail": "80/30分"
+          },
+          {
+            "label": "手游（王者、和平）",
+            "detail": "60/30分"
+          },
+          {
+            "label": "语聊",
+            "detail": "50/30分"
+          }
+        ]
+      }
+    },
+    {
+      "tags": "女喘陪",
+      "staffId": "3587a780-72d6-4c11-a2cd-5618ee354a9c",
+      "detailsRevision": 8,
+      "name": "𝙔𝙡.兔美美",
+      "social": "twitter://user?screen_name=yl_tumm",
+      "mediaFolder": "tumeimei",
+      "details": {
+        "entry": "🚪142（送Kp10分钟）",
+        "intro": "少萝音    温柔可爱善良，温柔能理解包容人，非常听话哦，非常喜欢发骚的一条小母狗~会喘会发骚，会叫，水多",
+        "services": [
+          {
+            "label": "kp",
+            "detail": "58/10分",
+            "addOns": [
+              "特殊称呼+10",
+              "水声/打屁股/用晾衣架惩罚/扇耳光/狗叫/绿帽/自嗨/剧情/+20",
+              "高爆/玩小游戏/控制/+15"
+            ]
+          },
+          {
+            "label": "ts游戏",
+            "detail": "手游88/半"
+          },
+          {
+            "label": "ts语音聊天",
+            "detail": "88/半"
+          }
+        ]
       }
     }
   ]

@@ -16,10 +16,14 @@ node scripts/import-staff-media.mjs \
 ```
 
 脚本会删除元数据并生成列表图、灯箱图、视频封面、低码率列表视频和最高 720p
-高清 MP4。需要有意替换现有目录时追加 `--replace`。提交前执行：
+高清 MP4。超过 45 秒的视频会在导入时截断，音轨同步截断；本站 MP4 成品
+最长为 45 秒。需要有意替换现有目录时追加 `--replace`。提交前执行：
 
 ```sh
 node scripts/import-staff-media.mjs --check
 ```
+
+已有成品超出 45 秒时，可执行 `node scripts/import-staff-media.mjs --trim-existing`，
+脚本会保留编码并截断高清和列表两个档位，再校验全部素材。
 
 不要手工改动子目录内的 `media.json` 或派生文件；原始下载目录不复制进仓库。

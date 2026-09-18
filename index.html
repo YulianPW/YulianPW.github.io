@@ -1616,7 +1616,7 @@
        * 获取卡片和排序使用的 KP 单价。
        *
        * @description 顶层 `kp` 仍可作为明确覆盖值；否则只从标签为 KP 的服务项
-       * 读取首个数字，不会把门槛、语聊或胸腿 K 误当作基础 KP。
+       * 读取文案开头的基础价格，不把附加费、门槛或其他服务误当作 KP 单价。
        *
        * @param {object} item - 原始 staff 记录。
        * @param {{services: {label: string, detail: string, addOns: string[]}[]}} details - 结构化介绍。
@@ -1628,8 +1628,8 @@
         const kpService = details.services.find((service) =>
           /^kp(?:$|[+＋/\s])/i.test(service.label),
         );
-        const match = kpService?.detail.match(/\d+(?:\.\d+)?/);
-        return match ? Number.parseFloat(match[0]) : null;
+        const match = kpService?.detail.match(/^\s*(\d+(?:\.\d+)?)/);
+        return match ? Number.parseFloat(match[1]) : null;
       }
 
       function getFeatureTags(text, kpPrice) {

@@ -3,6 +3,7 @@
 import { spawnSync } from "node:child_process";
 import {
   access,
+  copyFile,
   mkdir,
   mkdtemp,
   readFile,
@@ -23,6 +24,9 @@ const MEDIA_MANIFEST_NAME = "media.json";
 const MAX_ITEMS_PER_FOLDER = 4;
 const MAX_FOLDER_BYTES = 30 * 1024 * 1024;
 const MAX_SITE_MEDIA_BYTES = 850 * 1024 * 1024;
+const MAX_VIDEO_DURATION_SECONDS = 45;
+// 给末帧和 AAC 音频包留出余量，确保容器时长不超过 45 秒。
+const TRIM_VIDEO_DURATION_SECONDS = 44.8;
 const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const VIDEO_EXTENSIONS = new Set([".mov", ".mp4"]);
 const FOLDER_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
@@ -140,11 +144,13 @@ function measureImageSsim(referencePath, outputPath) {
  *
  * @param {string} sourcePath - 原视频。
  * @param {string} outputPath - 高清 MP4 成品。
+ * @param {number | null} trimDuration - 超长视频的截断时长。
  * @returns {number} 综合 SSIM 分数。
  */
-function measureVideoSsim(sourcePath, outputPath) {
+function measureVideoSsim(sourcePath, outputPath, trimDuration) {
   const result = runCommand("ffmpeg", [
     "-hide_banner",
+    ...(trimDuration === null ? [] : ["-t", String(trimDuration)]),
     "-i",
     sourcePath,
     "-i",
@@ -249,9 +255,10 @@ async function importPhoto(sourcePath, stageDir, ordinal) {
  * @param {string} sourcePath - 原视频路径。
  * @param {string} outputPath - MP4 输出路径。
  * @param {number} crf - libx264 恒定质量参数。
+ * @param {number | null} trimDuration - 超长视频的截断时长。
  * @returns {void}
  */
-function encodeFullVideo(sourcePath, outputPath, crf) {
+function encodeFullVideo(sourcePath, outputPath, crf, trimDuration) {
   runCommand("ffmpeg", [
     "-hide_banner",
     "-loglevel",
@@ -259,6 +266,7 @@ function encodeFullVideo(sourcePath, outputPath, crf) {
     "-y",
     "-i",
     sourcePath,
+    ...(trimDuration === null ? [] : ["-t", String(trimDuration)]),
     "-map",
     "0:v:0",
     "-map",
@@ -314,14 +322,18 @@ async function importVideo(sourcePath, stageDir, ordinal) {
 
   const sourceProbe = probeMedia(sourcePath);
   const duration = Number(sourceProbe.format?.duration);
+  // 接近上限的源片也留出封装余量，避免末帧或音频包使成品超过 45 秒。
+  const trimDuration = duration > TRIM_VIDEO_DURATION_SECONDS
+    ? TRIM_VIDEO_DURATION_SECONDS
+    : null;
   if (!sourceProbe.streams?.some((stream) => stream.codec_type === "video")) {
     throw new Error(`${basename(sourcePath)} 不包含视频轨道`);
   }
 
   let qualityScore = 0;
   for (const crf of [21, 19, 18]) {
-    encodeFullVideo(sourcePath, fullPath, crf);
-    qualityScore = measureVideoSsim(sourcePath, fullPath);
+    encodeFullVideo(sourcePath, fullPath, crf, trimDuration);
+    qualityScore = measureVideoSsim(sourcePath, fullPath, trimDuration);
     if (qualityScore >= 0.95) break;
   }
   if (qualityScore < 0.95) {
@@ -335,6 +347,7 @@ async function importVideo(sourcePath, stageDir, ordinal) {
     "-y",
     "-i",
     sourcePath,
+    ...(trimDuration === null ? [] : ["-t", String(trimDuration)]),
     "-map",
     "0:v:0",
     "-map",
@@ -413,15 +426,17 @@ async function importVideo(sourcePath, stageDir, ordinal) {
  * 解析命令行参数。
  *
  * @param {string[]} argv - `process.argv` 中脚本名之后的参数。
- * @returns {{check: boolean, replace: boolean, source: string, folder: string}}
+ * @returns {{check: boolean, trimExisting: boolean, replace: boolean, source: string, folder: string}}
  * 规范化后的运行选项。
  */
 function parseArguments(argv) {
-  const options = { check: false, replace: false, source: "", folder: "" };
+  const options = { check: false, trimExisting: false, replace: false, source: "", folder: "" };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
+    } else if (argument === "--trim-existing") {
+      options.trimExisting = true;
     } else if (argument === "--replace") {
       options.replace = true;
     } else if (argument === "--source") {
@@ -432,12 +447,16 @@ function parseArguments(argv) {
       console.log(
         "用法：\n" +
           "  node scripts/import-staff-media.mjs --source <目录> --folder <键> [--replace]\n" +
-          "  node scripts/import-staff-media.mjs --check",
+          "  node scripts/import-staff-media.mjs --check\n" +
+          "  node scripts/import-staff-media.mjs --trim-existing",
       );
       process.exit(0);
     } else {
       throw new Error(`未知参数：${argument}`);
     }
+  }
+  if (options.trimExisting && (options.check || options.replace || options.source || options.folder)) {
+    throw new Error("--trim-existing 不可与其他参数同时使用");
   }
   return options;
 }
@@ -596,12 +615,16 @@ async function validateMediaFolder(folderPath) {
       const probe = probeMedia(filePath);
       const video = probe.streams?.find((stream) => stream.codec_type === "video");
       const audio = probe.streams?.find((stream) => stream.codec_type === "audio");
+      const duration = Number(probe.format?.duration);
       if (
         video?.codec_name !== "h264" ||
         video?.pix_fmt !== "yuv420p" ||
         (audio && audio.codec_name !== "aac")
       ) {
         throw new Error(`${filePath} 必须使用 H.264/yuv420p 和可选 AAC`);
+      }
+      if (!Number.isFinite(duration) || duration <= 0 || duration > MAX_VIDEO_DURATION_SECONDS) {
+        throw new Error(`${filePath} 时长必须不超过 ${MAX_VIDEO_DURATION_SECONDS} 秒`);
       }
     }
   }
@@ -664,6 +687,116 @@ async function checkAllMediaFolders() {
 }
 
 /**
+ * 将已校验的临时目录替换为正式素材目录，失败时恢复旧目录。
+ *
+ * @param {string} stageDir - 已完成生成和校验的临时目录。
+ * @param {string} targetDir - 正式素材目录。
+ * @param {string} folder - 稳定目录键。
+ * @param {boolean} targetExists - 正式目录是否已存在。
+ * @returns {Promise<void>}
+ */
+async function installStageFolder(stageDir, targetDir, folder, targetExists) {
+  if (!targetExists) {
+    await rename(stageDir, targetDir);
+    return;
+  }
+  const backupDir = join(STAFF_MEDIA_ROOT, `.backup-${folder}-${Date.now()}`);
+  await rename(targetDir, backupDir);
+  try {
+    await rename(stageDir, targetDir);
+  } catch (error) {
+    await rename(backupDir, targetDir);
+    throw error;
+  }
+  try {
+    await rm(backupDir, { recursive: true, force: true });
+  } catch (error) {
+    console.warn(`旧素材备份未清理：${backupDir}（${error.message}）`);
+  }
+}
+
+/**
+ * 将现有超长视频的高清和列表档位一起截断，保留原编码及音轨。
+ *
+ * @returns {Promise<void>}
+ */
+async function trimExistingVideos() {
+  runCommand("ffmpeg", ["-version"]);
+  runCommand("ffprobe", ["-version"]);
+  const folders = (await readdir(STAFF_MEDIA_ROOT, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
+    .map((entry) => entry.name)
+    .sort();
+  let trimmedVideos = 0;
+  let savedBytes = 0;
+  for (const folder of folders) {
+    const targetDir = join(STAFF_MEDIA_ROOT, folder);
+    const manifest = JSON.parse(await readFile(join(targetDir, MEDIA_MANIFEST_NAME), "utf8"));
+    const longItems = manifest.items.filter((item) => {
+      if (item.type !== "video") return false;
+      const names = [item.url, item.variants[0].url].map((name) =>
+        parseManifestFilename(name, ".mp4"),
+      );
+      return names.some((name) =>
+        Number(probeMedia(join(targetDir, name)).format?.duration) > MAX_VIDEO_DURATION_SECONDS,
+      );
+    });
+    if (!longItems.length) continue;
+
+    const stageDir = await mkdtemp(join(STAFF_MEDIA_ROOT, ".trim-"));
+    let installed = false;
+    try {
+      const entries = await readdir(targetDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isFile()) {
+          await copyFile(join(targetDir, entry.name), join(stageDir, entry.name));
+        }
+      }
+      let folderSavedBytes = 0;
+      for (const item of longItems) {
+        const names = [item.url, item.variants[0].url];
+        for (const name of names) {
+          const filePath = join(stageDir, name);
+          const trimmedPath = join(stageDir, `.${name}`);
+          const originalBytes = (await stat(filePath)).size;
+          runCommand("ffmpeg", [
+            "-hide_banner", "-loglevel", "error", "-y", "-i", filePath,
+            "-t", String(TRIM_VIDEO_DURATION_SECONDS),
+            "-map", "0:v:0", "-map", "0:a:0?", "-c", "copy",
+            "-movflags", "+faststart", "-map_metadata", "-1",
+            "-map_chapters", "-1", trimmedPath,
+          ]);
+          await rename(trimmedPath, filePath);
+          folderSavedBytes += originalBytes - (await stat(filePath)).size;
+        }
+        const inlineProbe = probeMedia(join(stageDir, item.variants[0].url));
+        const inlineVideo = inlineProbe.streams?.find(
+          (stream) => stream.codec_type === "video",
+        );
+        item.variants[0].bitrate = Number(inlineVideo?.bit_rate) ||
+          Number(inlineProbe.format?.bit_rate);
+      }
+      await writeFile(
+        join(stageDir, MEDIA_MANIFEST_NAME),
+        `${JSON.stringify(manifest, null, 2)}\n`,
+      );
+      await validateMediaFolder(stageDir);
+      await installStageFolder(stageDir, targetDir, folder, true);
+      installed = true;
+      trimmedVideos += longItems.length;
+      savedBytes += folderSavedBytes;
+      console.log(`已截断：${folder}（${longItems.length} 条）`);
+    } finally {
+      if (!installed && (await pathExists(stageDir))) {
+        await rm(stageDir, { recursive: true, force: true });
+      }
+    }
+  }
+  await checkAllMediaFolders();
+  console.log(`共截断 ${trimmedVideos} 条视频，减少 ${(savedBytes / 1024 / 1024).toFixed(2)}MB`);
+}
+
+/**
  * 从一个来源目录生成并安装用户专属 Web 素材。
  *
  * @param {{source: string, folder: string, replace: boolean}} options - 导入参数。
@@ -708,26 +841,7 @@ async function importFolder(options) {
     );
     await validateMediaFolder(stageDir);
 
-    if (!targetExists) {
-      await rename(stageDir, targetDir);
-    } else {
-      const backupDir = join(
-        STAFF_MEDIA_ROOT,
-        `.backup-${options.folder}-${Date.now()}`,
-      );
-      await rename(targetDir, backupDir);
-      try {
-        await rename(stageDir, targetDir);
-      } catch (error) {
-        await rename(backupDir, targetDir);
-        throw error;
-      }
-      try {
-        await rm(backupDir, { recursive: true, force: true });
-      } catch (error) {
-        console.warn(`旧素材备份未清理：${backupDir}（${error.message}）`);
-      }
-    }
+    await installStageFolder(stageDir, targetDir, options.folder, targetExists);
     installed = true;
     console.log(`素材已写入：assets/media/staff/${options.folder}`);
   } finally {
@@ -746,6 +860,10 @@ async function main() {
   const options = parseArguments(process.argv.slice(2));
   if (options.check) {
     await checkAllMediaFolders();
+    return;
+  }
+  if (options.trimExisting) {
+    await trimExistingVideos();
     return;
   }
   await importFolder(options);
