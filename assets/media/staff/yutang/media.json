@@ -40,6 +40,16 @@
       "width": 1280,
       "height": 720,
       "alt": ""
+    },
+    {
+      "type": "photo",
+      "url": "04-full.webp",
+      "preview": "04-inline.webp",
+      "poster": "",
+      "variants": [],
+      "width": 1353,
+      "height": 2200,
+      "alt": ""
     }
   ]
 }
