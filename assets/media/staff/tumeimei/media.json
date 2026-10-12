@@ -22,8 +22,8 @@
       "preview": "02-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1170,
-      "height": 1485,
+      "width": 2200,
+      "height": 2200,
       "alt": ""
     },
     {
@@ -32,8 +32,8 @@
       "preview": "03-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 720,
-      "height": 1280,
+      "width": 858,
+      "height": 1856,
       "alt": ""
     },
     {
@@ -44,7 +44,7 @@
       "variants": [
         {
           "url": "04-inline.mp4",
-          "bitrate": 512538
+          "bitrate": 488213
         }
       ],
       "width": 720,
