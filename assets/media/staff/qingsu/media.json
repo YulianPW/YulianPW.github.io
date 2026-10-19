@@ -9,11 +9,11 @@
       "variants": [
         {
           "url": "01-inline.mp4",
-          "bitrate": 24472
+          "bitrate": 30503
         }
       ],
-      "width": 1280,
-      "height": 624,
+      "width": 886,
+      "height": 400,
       "alt": ""
     }
   ]
