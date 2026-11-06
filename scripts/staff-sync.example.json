@@ -1,0 +1,7 @@
+{
+  "source": "https://cloud.example.com",
+  "mediaRoots": [
+    "/path/to/local-media",
+    "/path/to/other-local-media"
+  ]
+}

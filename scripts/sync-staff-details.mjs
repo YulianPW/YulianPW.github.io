@@ -3,6 +3,7 @@ import { constants } from "node:fs";
 import {
   open,
   readFile,
+  realpath,
   rename,
   stat,
   unlink,
@@ -167,7 +168,7 @@ function parseArguments(argumentsList) {
   };
 }
 
-async function fetchSnapshot(source, ifNoneMatch) {
+export async function fetchSnapshot(source, ifNoneMatch) {
   const initialUrl = new URL(source);
   if (initialUrl.protocol === "file:") {
     if (ifNoneMatch) {
@@ -274,7 +275,7 @@ function requireAllowedUrl(url) {
   }
 }
 
-async function requireCleanTarget(dataPath) {
+export async function requireCleanTarget(dataPath) {
   const targetDirectory = dirname(dataPath);
   const insideWorkTree = (
     await runCommand("git", [
@@ -477,7 +478,9 @@ function optionalOption(argumentsList, flag) {
   return value;
 }
 
-await main().catch((error) => {
-  console.error(`staff details 同步失败：${error.message}`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && await realpath(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main().catch((error) => {
+    console.error(`staff details 同步失败：${error.message}`);
+    process.exitCode = 1;
+  });
+}

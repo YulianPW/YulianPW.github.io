@@ -57,7 +57,8 @@ jobs:
       - name: Prepare static files
         run: |
           mkdir -p public
-          rsync -av --exclude '.git*' --exclude '.github' ./ ./public
+          cp index.html recruit.html x-embed-preview.html robots.txt sitemap.xml wwid.txt public/
+          rsync -av --exclude '*.md' assets/ public/assets/
 
       - name: Generate version manifest
         working-directory: public

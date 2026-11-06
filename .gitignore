@@ -20,3 +20,8 @@ version.json
 
 # 本地启动脚本
 dev.sh
+
+# 本机人员同步配置、状态与生成暂存目录
+/.staff-sync.local.json
+/.staff-showcase-sync.local.json
+/.staff-sync-*/

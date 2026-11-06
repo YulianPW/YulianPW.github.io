@@ -7,6 +7,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  realpath,
   readdir,
   rename,
   rm,
@@ -642,9 +643,14 @@ async function validateMediaFolder(folderPath) {
  *
  * @returns {Promise<void>}
  */
-async function checkAllMediaFolders() {
+export async function checkAllMediaFolders({
+  data = null,
+  mediaRoot = STAFF_MEDIA_ROOT,
+  replacements = new Map(),
+  log = console.log,
+} = {}) {
   runCommand("ffprobe", ["-version"]);
-  const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
+  data ??= JSON.parse(await readFile(DATA_PATH, "utf8"));
   if (!Array.isArray(data.staff)) {
     throw new Error("data.json.staff 必须是数组");
   }
@@ -665,23 +671,27 @@ async function checkAllMediaFolders() {
     throw new Error("data.json 中存在重复 mediaFolder 关联");
   }
 
-  const rootEntries = await readdir(STAFF_MEDIA_ROOT, { withFileTypes: true });
-  const actualFolders = rootEntries
+  const rootEntries = await readdir(mediaRoot, { withFileTypes: true });
+  const actualFolders = new Set(rootEntries
     .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
-    .map((entry) => entry.name);
-  const unreferenced = actualFolders.filter((folder) => !folders.includes(folder));
+    .map((entry) => entry.name));
+  for (const [folder, replacement] of replacements) {
+    if (replacement === null) actualFolders.delete(folder);
+    else actualFolders.add(folder);
+  }
+  const unreferenced = [...actualFolders].filter((folder) => !folders.includes(folder));
   if (unreferenced.length) {
     throw new Error(`存在未被 data.json 关联的素材目录：${unreferenced.join(",")}`);
   }
 
   let totalBytes = 0;
   for (const folder of folders) {
-    totalBytes += await validateMediaFolder(join(STAFF_MEDIA_ROOT, folder));
+    totalBytes += await validateMediaFolder(replacements.get(folder) ?? join(mediaRoot, folder));
   }
   if (totalBytes > MAX_SITE_MEDIA_BYTES) {
     throw new Error("本地用户素材超过 850MB 部署上限");
   }
-  console.log(
+  log(
     `本地素材有效：${folders.length} 个用户，${(totalBytes / 1024 / 1024).toFixed(2)}MB`,
   );
 }
@@ -810,7 +820,6 @@ async function importFolder(options) {
     throw new Error("--folder 必须是小写 ASCII、数字或中划线组成的稳定键");
   }
 
-  assertImportTools();
   const sourceDir = resolve(options.source);
   const sourceStat = await stat(sourceDir);
   if (!sourceStat.isDirectory()) throw new Error("--source 必须指向目录");
@@ -826,20 +835,7 @@ async function importFolder(options) {
   const stageDir = await mkdtemp(join(STAFF_MEDIA_ROOT, ".import-"));
   let installed = false;
   try {
-    const items = [];
-    for (const [index, entry] of media.entries()) {
-      console.log(`正在压缩：${basename(entry.path)}`);
-      items.push(
-        entry.kind === "photo"
-          ? await importPhoto(entry.path, stageDir, index + 1)
-          : await importVideo(entry.path, stageDir, index + 1),
-      );
-    }
-    await writeFile(
-      join(stageDir, MEDIA_MANIFEST_NAME),
-      `${JSON.stringify({ version: 1, items }, null, 2)}\n`,
-    );
-    await validateMediaFolder(stageDir);
+    await buildMediaFolder(media, stageDir);
 
     await installStageFolder(stageDir, targetDir, options.folder, targetExists);
     installed = true;
@@ -849,6 +845,25 @@ async function importFolder(options) {
       await rm(stageDir, { recursive: true, force: true });
     }
   }
+}
+
+/** 用已经确定顺序的本地原件生成并校验网站成品，不修改原件或正式目录。 */
+export async function buildMediaFolder(media, outputDir, { log = console.log } = {}) {
+  assertImportTools();
+  const items = [];
+  for (const [index, entry] of media.entries()) {
+    log(`正在压缩：${basename(entry.path)}`);
+    items.push(
+      entry.kind === "photo"
+        ? await importPhoto(entry.path, outputDir, index + 1)
+        : await importVideo(entry.path, outputDir, index + 1),
+    );
+  }
+  await writeFile(
+    join(outputDir, MEDIA_MANIFEST_NAME),
+    `${JSON.stringify({ version: 1, items }, null, 2)}\n`,
+  );
+  await validateMediaFolder(outputDir);
 }
 
 /**
@@ -869,7 +884,9 @@ async function main() {
   await importFolder(options);
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (process.argv[1] && await realpath(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
