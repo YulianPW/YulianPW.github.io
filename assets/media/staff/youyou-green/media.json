@@ -7,24 +7,14 @@
       "preview": "01-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1440,
-      "height": 1093,
+      "width": 2200,
+      "height": 1650,
       "alt": ""
     },
     {
       "type": "photo",
       "url": "02-full.webp",
       "preview": "02-inline.webp",
-      "poster": "",
-      "variants": [],
-      "width": 1440,
-      "height": 1920,
-      "alt": ""
-    },
-    {
-      "type": "photo",
-      "url": "03-full.webp",
-      "preview": "03-inline.webp",
       "poster": "",
       "variants": [],
       "width": 1440,

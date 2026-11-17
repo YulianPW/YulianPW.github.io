@@ -259,7 +259,7 @@ async function importPhoto(sourcePath, stageDir, ordinal) {
  * @param {number | null} trimDuration - 超长视频的截断时长。
  * @returns {void}
  */
-function encodeFullVideo(sourcePath, outputPath, crf, trimDuration) {
+export function encodeFullVideo(sourcePath, outputPath, crf, trimDuration) {
   runCommand("ffmpeg", [
     "-hide_banner",
     "-loglevel",
@@ -284,6 +284,9 @@ function encodeFullVideo(sourcePath, outputPath, crf, trimDuration) {
     String(crf),
     "-pix_fmt",
     "yuv420p",
+    // 保留可变帧率素材的时间戳，避免补帧或丢帧使画质比较错位。
+    "-fps_mode",
+    "passthrough",
     "-c:a",
     "aac",
     "-b:a",
@@ -365,6 +368,8 @@ async function importVideo(sourcePath, stageDir, ordinal) {
     "24",
     "-pix_fmt",
     "yuv420p",
+    "-fps_mode",
+    "passthrough",
     "-c:a",
     "aac",
     "-b:a",

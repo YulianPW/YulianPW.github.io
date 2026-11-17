@@ -9,10 +9,55 @@
       "variants": [
         {
           "url": "01-inline.mp4",
-          "bitrate": 20704
+          "bitrate": 24098
         }
       ],
-      "width": 1280,
+      "width": 720,
+      "height": 1566,
+      "alt": ""
+    },
+    {
+      "type": "video",
+      "url": "02-full.mp4",
+      "preview": "",
+      "poster": "02-poster.webp",
+      "variants": [
+        {
+          "url": "02-inline.mp4",
+          "bitrate": 406912
+        }
+      ],
+      "width": 720,
+      "height": 1560,
+      "alt": ""
+    },
+    {
+      "type": "video",
+      "url": "03-full.mp4",
+      "preview": "",
+      "poster": "03-poster.webp",
+      "variants": [
+        {
+          "url": "03-inline.mp4",
+          "bitrate": 268109
+        }
+      ],
+      "width": 1056,
+      "height": 720,
+      "alt": ""
+    },
+    {
+      "type": "video",
+      "url": "04-full.mp4",
+      "preview": "",
+      "poster": "04-poster.webp",
+      "variants": [
+        {
+          "url": "04-inline.mp4",
+          "bitrate": 350507
+        }
+      ],
+      "width": 960,
       "height": 720,
       "alt": ""
     }

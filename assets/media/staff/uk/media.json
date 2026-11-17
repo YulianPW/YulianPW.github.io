@@ -9,11 +9,11 @@
       "variants": [
         {
           "url": "01-inline.mp4",
-          "bitrate": 339234
+          "bitrate": 428776
         }
       ],
-      "width": 1280,
-      "height": 720,
+      "width": 720,
+      "height": 1004,
       "alt": ""
     },
     {
@@ -22,27 +22,7 @@
       "preview": "02-inline.webp",
       "poster": "",
       "variants": [],
-      "width": 1535,
-      "height": 2200,
-      "alt": ""
-    },
-    {
-      "type": "photo",
-      "url": "03-full.webp",
-      "preview": "03-inline.webp",
-      "poster": "",
-      "variants": [],
-      "width": 2200,
-      "height": 1007,
-      "alt": ""
-    },
-    {
-      "type": "photo",
-      "url": "04-full.webp",
-      "preview": "04-inline.webp",
-      "poster": "",
-      "variants": [],
-      "width": 1346,
+      "width": 1231,
       "height": 2200,
       "alt": ""
     }
